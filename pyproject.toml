@@ -1,0 +1,128 @@
+[tool.isort]
+skip = [
+  "waves/__init__.py",
+]
+multi_line_output = 3
+sections = [
+  "FUTURE",
+  "STDLIB",
+  "THIRDPARTY",
+  "FIRSTPARTY",
+  "LOCALFOLDER",
+]
+known_first_party = "waves"
+known_local_folder = "tests"
+combine_as_imports = true
+force_grid_wrap = 0
+include_trailing_comma = true
+use_parentheses = true
+length_sort = true
+lines_after_imports = 2
+line_length = 100
+
+
+[tool.black]
+target-version=["py310"]
+line-length=100
+
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+src = ["waves", "test"]
+line-length = 100
+target-version = "py310"
+ignore-init-module-imports = true
+
+# See https://github.com/charliermarsh/ruff#supported-rules
+# for rules included and matching to prefix.
+# TODO: "FBT", "B", "PIE, "T20", "SIM", "PTH", "PD", "I", "PL"
+select = ["F", "E", "W", "C4", "D", "UP"]
+
+# D205: not using summary lines and descriptions, just descriptions
+# D401: don't believe enough in imperative mode to make all the changes currently
+ignore = ["D205", "D401"]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["F", "E", "W", "C4", "D", "UP"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.per-file-ignores]
+"setup.py" = ["D104"]
+"library/__init__.py" = ["D104"]
+"library/cables/__init__.py" = ["D104"]
+"library/project/__init__.py" = ["D104"]
+"library/project/config/__init__.py" = ["D104"]
+"library/project/plant/__init__.py" = ["D104"]
+"library/project/port/__init__.py" = ["D104"]
+"library/results/__init__.py" = ["D104"]
+"library/substations/__init__.py" = ["D104"]
+"library/substructures/__init__.py" = ["D104"]
+"library/turbines/__init__.py" = ["D104"]
+"library/vessels/__init__.py" = ["D104"]
+"library/weather/__init__.py" = ["D104"]
+"examples/__init__.py" = ["D104"]
+"examples/library/__init__.py" = ["D104"]
+"examples/library/cables/__init__.py" = ["D104"]
+"examples/library/project/__init__.py" = ["D104"]
+"examples/library/project/config/__init__.py" = ["D104"]
+"examples/library/project/plant/__init__.py" = ["D104"]
+"examples/library/project/port/__init__.py" = ["D104"]
+"examples/library/results/__init__.py" = ["D104"]
+"examples/library/substations/__init__.py" = ["D104"]
+"examples/library/turbines/__init__.py" = ["D104"]
+"examples/library/vessels/__init__.py" = ["D104"]
+"examples/library/weather/__init__.py" = ["D104"]
+"test/__init__.py" = ["D104"]
+"test/library/__init__.py" = ["D104"]
+"test/library/cables/__init__.py" = ["D104"]
+"test/library/project/__init__.py" = ["D104"]
+"test/library/project/config/__init__.py" = ["D104"]
+"test/library/project/plant/__init__.py" = ["D104"]
+"test/library/substations/__init__.py" = ["D104"]
+"test/library/turbines/__init__.py" = ["D104"]
+"test/library/vessels/__init__.py" = ["D104"]
+"test/library/weather/__init__.py" = ["D104"]
+"waves/__init__.py" = ["F401"]
+"waves/utilities/__init__.py" = ["F401"]
+
+[tool.ruff.pydocstyle]
+convention = "numpy"
