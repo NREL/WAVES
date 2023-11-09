@@ -1,0 +1,17 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: index
+parts:
+- caption: Getting Started
+  chapters:
+  - file: getting_started
+  - file: contributing
+- caption: Examples
+  chapters:
+  - file: COE_land
+  - file: COE_osw
+- caption: API Reference
+  chapters:
+  - file: api
