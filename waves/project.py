@@ -94,21 +94,8 @@ def load_weather(value: str | Path | pd.DataFrame) -> pd.DataFrame:
         return value
 
     value = resolve_path(value)
-    convert_options = pa.csv.ConvertOptions(
-        timestamp_parsers=[
-            "%m/%d/%y %H:%M",
-            "%m/%d/%y %I:%M",
-            "%m/%d/%Y %H:%M",
-            "%m/%d/%Y %I:%M",
-            "%m-%d-%y %H:%M",
-            "%m-%d-%y %I:%M",
-            "%m-%d-%Y %H:%M",
-            "%m-%d-%Y %I:%M",
-        ]
-    )
     weather = (
-        pa.csv.read_csv(value, convert_options=convert_options)
-        .to_pandas()
+        pd.read_csv(value, engine="pyarrow")
         .set_index("datetime")
         .fillna(0.0)
         .resample("H")
@@ -455,13 +442,13 @@ class Project(FromDictMixin):
             )
         else:
             wombat_config = self.wombat_config  # type: ignore
-        self.wombat = Simulation.from_config(wombat_config)
+        self.wombat = Simulation.from_config(self.library_path, wombat_config)
         self.wombat_config_dict = attrs.asdict(self.wombat.config)
-        self.operations_start = self.wombat.env.weather.index.min()
-        self.operations_end = self.wombat.env.weather.index.max()
+        self.operations_start = self.wombat.env.start_datetime
+        self.operations_end = self.wombat.env.end_datetime
 
-        start = self.wombat.env.weather.index.min()
-        end = self.wombat.env.weather.index.max()
+        start = self.wombat.env.start_datetime
+        end = self.wombat.env.end_datetime
         diff = end - start
         self.operations_years = round((diff.days + (diff.seconds / 60 / 60) / 24) / 365.25, 1)
 
