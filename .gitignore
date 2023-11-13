@@ -135,7 +135,4 @@ dmypy.json
 .vscode/
 
 # Project specific
-examples/library/results
-library/results
-examples/library/weather
-library/weather
+*results/
