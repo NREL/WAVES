@@ -3,21 +3,21 @@
 
 .. automodule:: waves.utilities
 
-   
-   
-   
 
-   
-   
-   
 
-   
-   
-   
 
-   
-   
-   
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -29,4 +29,3 @@
 
    waves.utilities.floris_runners
    waves.utilities.library
-

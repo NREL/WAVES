@@ -2,7 +2,7 @@
 
 <!-- ```{eval-rst}
 .. automodule:: waves.project
-   :members: 
+   :members:
    :undoc-members:
    :member-order: bysource
    :exclude-members: library_path, weather_profile, orbit_weather_cols, floris_windspeed,

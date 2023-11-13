@@ -94,8 +94,21 @@ def load_weather(value: str | Path | pd.DataFrame) -> pd.DataFrame:
         return value
 
     value = resolve_path(value)
+    convert_options = pa.csv.ConvertOptions(
+        timestamp_parsers=[
+            "%m/%d/%y %H:%M",
+            "%m/%d/%y %I:%M",
+            "%m/%d/%Y %H:%M",
+            "%m/%d/%Y %I:%M",
+            "%m-%d-%y %H:%M",
+            "%m-%d-%y %I:%M",
+            "%m-%d-%Y %H:%M",
+            "%m-%d-%Y %I:%M",
+        ]
+    )
     weather = (
-        pd.read_csv(value, engine="pyarrow")
+        pa.csv.read_csv(value, convert_options=convert_options)
+        .to_pandas()
         .set_index("datetime")
         .fillna(0.0)
         .resample("H")
@@ -374,7 +387,6 @@ class Project(FromDictMixin):
             dict: YAML-safe dictionary of a Project-loadable configuration.
         """
         wombat_config_dict = deepcopy(self.wombat_config_dict)
-        wombat_config_dict["library"] = str(wombat_config_dict["library"])
         config_dict = {
             "library_path": str(self.library_path),
             "orbit_config": self.orbit_config_dict,
@@ -411,7 +423,7 @@ class Project(FromDictMixin):
             print("No ORBIT configuration provided, skipping model setup.")
             return
 
-        if isinstance(self.orbit_config, (str, Path)):
+        if isinstance(self.orbit_config, str | Path):
             orbit_config = self.library_path / "project/config" / self.orbit_config
             self.orbit_config_dict = load_config(orbit_config)
         else:
@@ -436,7 +448,7 @@ class Project(FromDictMixin):
             print("No WOMBAT configuration provided, skipping model setup.")
             return
 
-        if isinstance(self.wombat_config, (str, Path)):
+        if isinstance(self.wombat_config, str | Path):
             wombat_config = (
                 self.library_path / "project/config" / self.wombat_config  # type: ignore
             )
@@ -460,7 +472,7 @@ class Project(FromDictMixin):
             print("No FLORIS configuration provided, skipping model setup.")
             return
 
-        if isinstance(self.floris_config, (str, Path)):
+        if isinstance(self.floris_config, str | Path):
             self.floris_config_dict = load_yaml(
                 self.library_path / "project/config", self.floris_config
             )
@@ -721,13 +733,11 @@ class Project(FromDictMixin):
                 assert isinstance(self.weather, pd.DataFrame)  # mypy helper
             weather = self.weather.loc[:, [self.floris_wind_direction, self.floris_windspeed]]
         else:
-            start = self.wombat.env.weather.index.min()
-            stop = self.wombat.env.weather.index.max()
-
             if TYPE_CHECKING:
                 assert isinstance(self.weather, pd.DataFrame)  # mypy helper
             weather = self.weather.loc[
-                start:stop, [self.floris_wind_direction, self.floris_windspeed]
+                self.operations_start : self.operations_end,
+                [self.floris_wind_direction, self.floris_windspeed],
             ]
 
         # recreate the FlorisInterface object for the wind rose settings
@@ -2432,7 +2442,7 @@ class Project(FromDictMixin):
         Returns
         -------
         pd.DataFrame
-            A pandas.DataFrame containing all of the provided outputs defined in 
+            A pandas.DataFrame containing all of the provided outputs defined in
             :py:attr:`metrics_dict`.
 
         Raises

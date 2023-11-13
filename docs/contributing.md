@@ -143,7 +143,7 @@ When your branch is ready, make a pull request to NREL/WAVES through the
 ## Coding Style
 
 This code uses a ``pre-commit`` workflow where code styling and linting is taken care of when a user
-commits their code. Specifically, this code utilizes ``black`` for automatic formatting (line 
+commits their code. Specifically, this code utilizes ``black`` for automatic formatting (line
 length, quotation usage, hanging lines, etc.), ``isort`` for automatic import sorting, ``mypy``
 for typing, and ``ruff`` for linting.
 
@@ -278,4 +278,3 @@ over time, regardless of who the core developers are.
 - Deploying a Package to PyPi
   - The repository is equipped with a github action to build and publish new versions to PyPI. A maintainer can invoke this workflow by pushing a tag to the NREL/WAVES repository with prefix "v", such as "v1.2.3".
   - The action is defined in `.github/workflows/tags-to-pypi.yml`.
-
