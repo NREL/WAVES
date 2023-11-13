@@ -1,0 +1,131 @@
+discount_rate: 0.025
+fixed_charge_rate: 0.0569 # real FCR from national LCOE study
+floris_config: COE_2022_fixed_bottom_base_floris_jensen.yaml
+floris_wind_direction: wind_direction_100m
+floris_windspeed: windspeed_100m
+floris_x_col: floris_x
+floris_y_col: floris_y
+loss_ratio: 0.1
+offtake_price: 83.30
+orbit_config: COE_2022_fixed_bottom_base_install.yaml
+orbit_start_date: 1/1/1998
+orbit_weather_cols:
+- windspeed_100m
+- windspeed_10m
+- waveheight
+project_capex_date:
+- !!python/tuple
+  - 1996
+  - 1
+- !!python/tuple
+  - 1996
+  - 7
+- !!python/tuple
+  - 1997
+  - 1
+- !!python/tuple
+  - 1997
+  - 7
+soft_capex_date: !!python/tuple
+- 1995
+- 1
+system_capex_date:
+- !!python/tuple
+  - 1996
+  - 1
+- !!python/tuple
+  - 1996
+  - 4
+- !!python/tuple
+  - 1996
+  - 7
+- !!python/tuple
+  - 1996
+  - 10
+- !!python/tuple
+  - 1997
+  - 1
+- !!python/tuple
+  - 1997
+  - 4
+- !!python/tuple
+  - 1997
+  - 7
+- !!python/tuple
+  - 1997
+  - 10
+- !!python/tuple
+  - 1998
+  - 1
+- !!python/tuple
+  - 1998
+  - 4
+- !!python/tuple
+  - 1998
+  - 7
+- !!python/tuple
+  - 1998
+  - 10
+- !!python/tuple
+  - 1999
+  - 1
+- !!python/tuple
+  - 1999
+  - 4
+- !!python/tuple
+  - 1999
+  - 7
+- !!python/tuple
+  - 1999
+  - 10
+turbine_capex_date:
+- !!python/tuple
+  - 1996
+  - 1
+- !!python/tuple
+  - 1996
+  - 4
+- !!python/tuple
+  - 1996
+  - 7
+- !!python/tuple
+  - 1996
+  - 10
+- !!python/tuple
+  - 1997
+  - 1
+- !!python/tuple
+  - 1997
+  - 4
+- !!python/tuple
+  - 1997
+  - 7
+- !!python/tuple
+  - 1997
+  - 10
+- !!python/tuple
+  - 1998
+  - 1
+- !!python/tuple
+  - 1998
+  - 4
+- !!python/tuple
+  - 1998
+  - 7
+- !!python/tuple
+  - 1998
+  - 10
+- !!python/tuple
+  - 1999
+  - 1
+- !!python/tuple
+  - 1999
+  - 4
+- !!python/tuple
+  - 1999
+  - 7
+- !!python/tuple
+  - 1999
+  - 10
+weather_profile: era5_40.0N_72.5W_1990_2020.csv
+wombat_config: COE_2022_fixed_bottom_base_operations.yaml
