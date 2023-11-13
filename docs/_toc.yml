@@ -10,8 +10,7 @@ parts:
   - file: contributing
 - caption: Examples
   chapters:
-  - file: COE_land
-  - file: COE_osw
+  - file: COWER_2022
 - caption: API Reference
   chapters:
   - file: api

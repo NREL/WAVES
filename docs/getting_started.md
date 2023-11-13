@@ -17,7 +17,7 @@ For basic usage, users can install WAVES directly from PyPI, or from source for 
 
 ### From Source
 
-```
+```bash
 git clone https://github.com/NREL/WAVES.git
 cd WAVES
 pip install .
@@ -27,7 +27,7 @@ pip install .
 
 Use the `-e` for an editable installation, in case you plan on editing any underlying code.
 
-```
+```bash
 pip install -e .
 ```
 
@@ -37,7 +37,7 @@ If you plan on contributing to the code base at any point, be sure to install th
 
 For more details on developing, please see the [contributor's guide](contributing.md).
 
-```
+```bash
 pip install -e ".[dev,docs]"
 pre-commit install
 ```
@@ -82,8 +82,8 @@ relevant to users. For a complete API guide, please refer to the [API documentat
 
 #### Connecting Configurations
 
-Also, see the configurations :py:attr:`Project.connect_floris_to_layout` and
-:py:attr:`Project.connect_orbit_array_design` to automically run the the below during project
+Also, see the configurations {py:attr}`Project.connect_floris_to_layout` and
+{py:attr}`Project.connect_orbit_array_design` to automatically run the below during project
 initialization.
 
 ```{eval-rst}
@@ -134,7 +134,7 @@ used in place of individually calculating each metric and combining into a repor
 .. automethod:: waves.project.Project.generate_report
 ```
 
-All of the models can be individually accessed to calculate results that are not integrated into
+All the models can be individually accessed to calculate results that are not integrated into
 WAVES officially, but it should be noted that they should be used with caution in case there are
 any interdependencies between model outputs.
 

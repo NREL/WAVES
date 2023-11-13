@@ -11,6 +11,13 @@ only_build_toc_files: false
 # See https://jupyterbook.org/content/execute.html
 execute:
   execute_notebooks: auto
+  nb_execution_timeout: -1
+  exclude_patterns:
+    - _build
+    - Thumbs.db
+    - DS_Store
+    - "**.ipynb_checkpoints"
+    - COWER_2022.ipynb
 
 # Define the name of the latex output file for PDF builds
 latex:
@@ -63,3 +70,4 @@ sphinx:
     autodoc_typehints: description
     napoleon_use_admonition_for_notes: true
     napoleon_use_rtype: false
+    nb_merge_streams: true
