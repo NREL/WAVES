@@ -23,9 +23,10 @@ Using conda, create a new virtual environment:
 
 .. code-block:: console
 
-   conda create -n <environment_name> python=3.10 --no-default-packages
+   conda create -n <environment_name>
    conda activate <environment_name>
    conda install -c anaconda pip
+   conda config --set pip_interop_enabled true
 
    # to deactivate
    conda deactivate
@@ -39,7 +40,7 @@ Install it directly into an activated virtual environment:
 .. code-block:: console
 
    git clone https://github.com/NREL/WAVES.git
-   cd WHaLE
+   cd WAVES
    pip install -e .
 
 
@@ -48,7 +49,7 @@ or if you will be contributing and needing to run tests and/or build documentati
 .. code-block:: console
 
    git clone https://github.com/NREL/WAVES.git
-   cd wombat
+   cd WAVES
    pip install -e '.[all]'
 
 
