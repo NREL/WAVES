@@ -1259,8 +1259,8 @@ class Project(FromDictMixin):
         aep: bool = False,
     ) -> pd.DataFrame | float:
         """Computes the potential energy production, or annual potential energy production, in GWh,
-        for the simulation by extrapolating the monthly contributions to AEP if FLORIS results were
-        computed by a wind rose, or using the time series results.
+        for the simulation by extrapolating the monthly contributions to AEP if FLORIS (wtihout
+        wakes) results were computed by a wind rose, or using the time series results.
 
         Parameters
         ----------
@@ -1356,9 +1356,9 @@ class Project(FromDictMixin):
         aep: bool = False,
     ) -> pd.DataFrame | float:
         """Computes the energy production, or annual energy production, in GWh, for the simulation
-        by extrapolating the monthly contributions to AEP if FLORIS results were computed by a wind
-        rose, or using the time series results, and multiplying it by the WOMBAT monthly
-        availability (``Metrics.production_based_availability``).
+        by extrapolating the monthly contributions to AEP if FLORIS (with wakes) results were
+        computed by a wind rose, or using the time series results, and multiplying it by the WOMBAT
+        monthly availability (``Metrics.production_based_availability``).
 
         Parameters
         ----------
@@ -1554,7 +1554,9 @@ class Project(FromDictMixin):
     def availability(
         self, which: str, frequency: str = "project", by: str = "windfarm"
     ) -> pd.DataFrame | float:
-        """Calculates the availability based on either a time or energy basis.
+        """Calculates the availability based on either a time or energy basis. This is a thin
+        wrapper around `self.wombat.metrics.time_based_availability()` or
+        `self.wombat.metrics.production_based_availability()`.
 
         Parameters
         ----------
