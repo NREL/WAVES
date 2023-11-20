@@ -1294,7 +1294,7 @@ class Project(FromDictMixin):
         if self.floris_results_type == "wind_rose":
             power = pd.DataFrame(0.0, dtype=float, index=availability.index, columns=["drop"])
             power = power.merge(
-                self.turbine_production_energy,
+                self.turbine_potential_energy,
                 how="left",
                 left_on="month",
                 right_index=True,
