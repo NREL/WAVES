@@ -5,6 +5,7 @@
 :depth: 2
 ```
 
+(contributing:getting-started)=
 ## Getting Started
 
 These contributing guidelines should be read by software developers wishing to contribute code or
@@ -148,7 +149,7 @@ length, quotation usage, hanging lines, etc.), ``isort`` for automatic import so
 for typing, and ``ruff`` for linting.
 
 To activate the ``pre-commit`` workflow, the user must install the develop version as outlined in
-the [README](#Development), and run the following line:
+the [getting started section](contributing:getting-started), and run the following line:
 
 ```bash
 pre-commit install
@@ -210,6 +211,7 @@ To run the tests you can use any of the following commands, depending on your ne
    pytest test/regression
    ```
 
+(contributing:pull-request)=
 ## Pull Request
 
 Pull requests must be made for all changes. Most pull requests should be made against the develop
@@ -258,7 +260,7 @@ over time, regardless of who the core developers are.
 3. Update the changelog at `WAVES/CHANGELOG.md`, changing the "UNRELEASED" section to the new
    version and the release date (e.g. "[2.3 - 2022-01-18]").
 4. Make a pull request into develop with these updates, and be sure to follow the guide in
-   [Pull Requests](#pull-request).
+   [Pull Requests](contributing:pull-request).
 
 5. Merge develop into main through the git command line
 
