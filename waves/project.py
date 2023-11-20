@@ -2434,11 +2434,12 @@ class Project(FromDictMixin):
                 {
                     "Descriptive Name (units)": {
                         "metric": "metric_method_name",
-                        "kwargs": {"kwarg1": "kwarg_value_1"}
+                        "kwargs": {"kwarg1": "kwarg_value_1"}  # Exclude if not needed
                     }
                 }
 
-            For metrics that have no keyword arguments, an empty dictionary for "kwargs" is allowed.
+            For metrics that have no keyword arguments, or where the default parameter values are
+            desired, either an empty dictionary or no dictionary input for "kwargs" is allowed.
         simulation_name : str
             The name that should be given to the resulting index.
 
@@ -2461,7 +2462,7 @@ class Project(FromDictMixin):
             raise ValueError(f"None of the following are valid metrics: '{names}'.")
 
         results = {
-            name: getattr(self, val["metric"])(**val["kwargs"])
+            name: getattr(self, val["metric"])(**val.get("kwargs", {}))
             for name, val in metrics_configuration.items()
         }
         results_df = pd.DataFrame.from_dict(results, orient="index").T
