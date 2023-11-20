@@ -18,10 +18,11 @@
  -->
 
 ```{eval-rst}
+.. currentmodule:: waves
+
 .. autosummary::
-   :toctree: _autosummary
    :recursive:
 
-   waves.project
-   waves.utilities
+   project
+   utilities
 ```
