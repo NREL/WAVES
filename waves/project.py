@@ -148,13 +148,13 @@ class Project(FromDictMixin):
     floris_y_col : str
         The column of x-coordinates in the WOMBAT layout file that corresponds to
         the ``Floris.farm.layout_y`` Defaults to "floris_y".
-    orbit_config : str | pathlib.Path | None
+    orbit_config : str | pathlib.Path | dict | None
         The ORBIT configuration file name or dictionary. If None, will not set up
         the ORBIT simulation component.
-    wombat_config : str | pathlib.Path | None
+    wombat_config : str | pathlib.Path | dict | None
         The WOMBAT configuration file name or dictionary. If None, will not set up
         the WOMBAT simulation component.
-    floris_config : str | pathlib.Path | None
+    floris_config : str | pathlib.Path | dict | None
         The FLORIS configuration file name or dictionary. If None, will not set up
         the FLORIS simulation component.
     connect_floris_to_layout : bool, optional
@@ -347,20 +347,25 @@ class Project(FromDictMixin):
         """Creates a ``Project`` object from either a JSON or YAML file. See
         :py:class:`Project` for configuration requirements.
 
-        Args:
-            library_path (`str | Path`): The library path to be used in the simulation.
-            config_file (str | Path): The configuration file to create a :py:class:`Project`
-                object from, which should be located at:
-                ``library_path`` / project / config / ``config_file``.
+        Parameters
+        ----------
+        library_path : str | Path
+            The library path to be used in the simulation.
+        config_file : str | Path
+            The configuration file to create a :py:class:`Project` object from, which should be
+            located at: ``library_path`` / project / config / ``config_file``.
 
         Raises
         ------
-            FileExistsError: Raised if :py:attr:`library_path` is not a valid directory.
-            ValueError: Raised if :py:attr:`config_file` is not a JSON or YAML file.
+        FileExistsError
+            Raised if :py:attr:`library_path` is not a valid directory.
+        ValueError
+            Raised if :py:attr:`config_file` is not a JSON or YAML file.
 
         Returns
         -------
-            Project: An initialized Project object.
+        Project
+            An initialized Project object.
         """
         library_path = Path(library_path).resolve()
         if not library_path.is_dir():
@@ -384,7 +389,8 @@ class Project(FromDictMixin):
 
         Returns
         -------
-            dict: YAML-safe dictionary of a Project-loadable configuration.
+        dict
+            YAML-safe dictionary of a Project-loadable configuration.
         """
         wombat_config_dict = deepcopy(self.wombat_config_dict)
         config_dict = {
@@ -405,9 +411,10 @@ class Project(FromDictMixin):
         """Saves a copy of the Project configuration settings to recreate the results of
         the current settings.
 
-        Args:
-            config_file (str | Path): The name to use for saving to a YAML configuration
-                file.
+        Parameters
+        ----------
+        config_file : str | Path
+            The name to use for saving to a YAML configuration file.
         """
         config_dict = self.config_dict
         with open(self.library_path / "project/config" / config_file, "w") as f:
@@ -569,17 +576,18 @@ class Project(FromDictMixin):
         """Updates the FLORIS layout_x and layout_y based on the relative coordinates
         from the WOMBAT layout file.
 
-        Args:
-            x_col : str, optional
-                The relative, distance-based x-coordinate column name. Defaults to "easting".
-            y_col : str, optional
-                The relative, distance-based y-coordinate column name. Defaults to "northing".
-            update_config : bool, optional
-                Run ``FlorisInterface.reinitialize`` with the updated ``layout_x`` and
-                ``layout_y`` values. Defaults to True.
-            config_fname : str | None, optional
-                Provide a file name if ``update_config`` and this new configuration
-                should be saved. Defaults to None.
+        Parameters
+        ----------
+        x_col : str, optional
+            The relative, distance-based x-coordinate column name. Defaults to "easting".
+        y_col : str, optional
+            The relative, distance-based y-coordinate column name. Defaults to "northing".
+        update_config : bool, optional
+            Run ``FlorisInterface.reinitialize`` with the updated ``layout_x`` and ``layout_y``
+            values. Defaults to True.
+        config_fname : str | None, optional
+            Provide a file name if ``update_config`` and this new configuration should be saved.
+            Defaults to None.
         """
         layout = self.wombat.windfarm.layout_df
         x_min = layout[x_col].min()
@@ -618,35 +626,26 @@ class Project(FromDictMixin):
         """Creates the monthly chunked inputs to run a parallelized FLORIS time series
         analysis.
 
-        Args:
-            reinitialize_kwargs : dict, optional
-                Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``.
-                Defaults to {}.
-            run_kwargs : dict, optional
-                Any keyword arguments to be assed to ``FlorisInterface.calculate_wake()``.
-                Defaults to {}.
-            cut_in_wind_speed : float, optional
-                The wind speed, in m/s, at which a turbine will start producing power.
-            cut_out_wind_speed : float, optional
-                The wind speed, in m/s, at which a turbine will stop producing power.
+        Parameters
+        ----------
+        reinitialize_kwargs : dict, optional
+            Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``. Defaults to {}.
+        run_kwargs : dict, optional
+            Any keyword arguments to be assed to ``FlorisInterface.calculate_wake()``.
+            Defaults to {}.
+        cut_in_wind_speed : float, optional
+            The wind speed, in m/s, at which a turbine will start producing power.
+        cut_out_wind_speed : float, optional
+            The wind speed, in m/s, at which a turbine will stop producing power.
 
         Returns
         -------
-            tuple[
-                list[tuple[
-                    FlorisInterface,
-                    pd.DataFrame,
-                    tuple[int, int],
-                    dict,
-                    dict
-                ]],
-                np.ndarray
-            ]
-                A list of tuples of:
-                 - a copy of the ``FlorisInterface`` object
-                 - tuple of year and month
-                 - a copy of ``reinitialize_kwargs``
-                 - c copy of ``run_kwargs``
+        tuple[list[tuple[FlorisInterface, pd.DataFrame, tuple[int, int], dict, dict]], np.ndarray]
+            A list of tuples of:
+                - a copy of the ``FlorisInterface`` object
+                - tuple of year and month
+                - a copy of ``reinitialize_kwargs``
+                - c copy of ``run_kwargs``
         """
         month_list = range(1, 13)
         year_list = range(self.operations_start.year, self.operations_end.year + 1)
@@ -688,14 +687,16 @@ class Project(FromDictMixin):
         """Runs the custom FLORIS WindRose AEP methodology that allows for gathering of
         intermediary results.
 
-        Args:
-            full_wind_rose (bool, optional): If True, the full wind profile will be
-                used, otherwise, if False, the wind profile will be limited to just the
-                simulation period. Defaults to False.
-            run_kwargs (dict, optional): Arguments that are provided to
-                `FlorisInterface.get_farm_AEP_wind_rose_class()`. Defaults to {}.
+        Parameters
+        ----------
+        full_wind_rose : bool, optional
+            If True, the full wind profile will be used, otherwise, if False, the wind profile will
+            be limited to just the simulation period. Defaults to False.
+        run_kwargs : dict, optional
+            Arguments that are provided to ``FlorisInterface.get_farm_AEP_wind_rose_class()``.
+            Defaults to {}.
 
-                From FLORIS:
+            From FLORIS:
 
                 - cut_in_wind_speed (float, optional): Wind speed in m/s below which
                     any calculations are ignored and the wind farm is known to
@@ -830,35 +831,33 @@ class Project(FromDictMixin):
         (``which="wind_rose"``) or a turbine-level time series for the WOMBAT simulation
         period (``which="time_series"``).
 
-        Args:
-            which : str
-                One of "wind_rose" or "time_series" to run either a simulation-level
-                wind rose analysis for the
-            reinitialize_kwargs : dict, optional
-                Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``.
-                Defaults to {}.
-            run_kwargs : dict, optional
-                Any keyword arguments to be assed to ``FlorisInterface.calculate_wake()``.
-                Defaults to {}.
-            full_wind_rose : bool, optional
-                Indicates, for "wind_rose" analyses ONLY, if the full weather profile
-                from ``weather`` (True) or the limited, WOMBAT simulation period (False)
-                should be used for analyis. Defaults to False.
-            cut_in_wind_speed : float, optional
-                The wind speed, in m/s, at which a turbine will start producing power.
-                Should only be a value if running a time series analysis. Defaults to
-                0.001.
-            cut_out_wind_speed : float, optional
-                The wind speed, in m/s, at which a turbine will stop producing power.
-                Should only be a value if running a time series analysis. Defaults to
-                None.
-            nodes : int, optional
-                The number of nodes to parallelize over. If -1, then it will use the
-                floor of 80% of the available CPUs on the computer. Defaults to -1.
+        Parameters
+        ----------
+        which : str
+            One of "wind_rose" or "time_series" to run either a simulation-level wind rose analysis
+            or hourly time-series analysis for the base AEP model.
+        reinitialize_kwargs : dict, optional
+            Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``. Defaults to {}.
+        run_kwargs : dict, optional
+            Any keyword arguments to be assed to ``FlorisInterface.calculate_wake()``.
+            Defaults to {}.
+        full_wind_rose : bool, optional
+            Indicates, for "wind_rose" analyses ONLY, if the full weather profile from ``weather``
+            (True) or the limited, WOMBAT simulation period (False) should be used for analyis.
+            Defaults to False.
+        cut_in_wind_speed : float, optional
+            The wind speed, in m/s, at which a turbine will start producing power. Should only be a
+            value if running a time series analysis. Defaults to 0.001.
+        cut_out_wind_speed : float, optional
+            The wind speed, in m/s, at which a turbine will stop producing power. Should only be a
+            value if running a time series analysis. Defaults to None.
+        nodes : int, optional
+            The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
+            available CPUs on the computer. Defaults to -1.
 
         Raises
         ------
-            ValueError: _description_
+        ValueError: Raised if :py:attr:`which` is not one of "wind_rose" or "time_series".
         """
         if which == "wind_rose":
             # TODO: Change this to be modify the standard behavior, and get the turbine
@@ -915,42 +914,40 @@ class Project(FromDictMixin):
     ) -> None:
         """Run all three models in serial, or a subset if ``skip`` is used.
 
-        Args:
-            which_floris : str | None, optional
-                One of "wind_rose" or "time_series" if computing the farm's AEP based on
-                a wind rose, or based on time series corresponding to the WOMBAT
-                simulation period, respectively. Defaults to None.
-            floris_reinitialize_kwargs : dict
-                Any additional ``FlorisInterface.reinitialize`` keyword arguments.
-            floris_run_kwargs : dict
-                Any additional ``FlorisInterface.get_farm_AEP`` or
-                ``FlorisInterface.calculate_wake()`` keyword arguments, depending on
-                ``which_floris`` is used.
-            full_wind_rose : bool, optional
-                Indicates, for "wind_rose" analyses ONLY, if the full weather profile
-                from ``weather`` (True) or the limited, WOMBAT simulation period (False)
-                should be used for analyis. Defaults to False.
-            skip : list[str], optional
-                A list of models to be skipped. This is intended to be used after a model
-                is reinitialized with a new or modified configuration. Defaults to [].
-            cut_in_wind_speed : float, optional
-                The wind speed, in m/s, at which a turbine will start producing power.
-                Can also be provided in ``floris_reinitialize_kwargs`` for a wind rose
-                analysis, but must be provided here for a time series analysis. Defaults
-                to 0.001.
-            cut_out_wind_speed : float, optional
-                The wind speed, in m/s, at which a turbine will stop producing power.
-                Can also be provided in ``floris_reinitialize_kwargs`` for a wind rose
-                analysis, but must be provided here for a time series analysis. Defaults
-                to None.
-            nodes : int, optional
-                The number of nodes to parallelize over. If -1, then it will use the
-                floor of 80% of the available CPUs on the computer. Defaults to -1.
+        Parameters
+        ----------
+        which_floris : str | None, optional
+            One of "wind_rose" or "time_series" if computing the farm's AEP based on a wind rose,
+            or based on time series corresponding to the WOMBAT simulation period, respectively.
+            Defaults to None.
+        floris_reinitialize_kwargs : dict
+            Any additional ``FlorisInterface.reinitialize`` keyword arguments.
+        floris_run_kwargs : dict
+            Any additional ``FlorisInterface.get_farm_AEP`` or ``FlorisInterface.calculate_wake()``
+            keyword arguments, depending on ``which_floris`` is used.
+        full_wind_rose : bool, optional
+            Indicates, for "wind_rose" analyses ONLY, if the full weather profile from ``weather``
+            (True) or the limited, WOMBAT simulation period (False) should be used for analyis.
+            Defaults to False.
+        skip : list[str], optional
+            A list of models to be skipped. This is intended to be used after a model is
+            reinitialized with a new or modified configuration. Defaults to [].
+        cut_in_wind_speed : float, optional
+            The wind speed, in m/s, at which a turbine will start producing power. Can also be
+            provided in ``floris_reinitialize_kwargs`` for a wind rose analysis, but must be
+            provided here for a time series analysis. Defaults to 0.001.
+        cut_out_wind_speed : float, optional
+            The wind speed, in m/s, at which a turbine will stop producing power. Can also be
+            provided in ``floris_reinitialize_kwargs`` for a wind rose analysis, but must be
+            provided here for a time series analysis. Defaults to None.
+        nodes : int, optional
+            The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
+            available CPUs on the computer. Defaults to -1.
 
         Raises
         ------
-            ValueError
-                Raised if ``which_floris`` is not one of "wind_rose" or "time_series".
+        ValueError
+            Raised if ``which_floris`` is not one of "wind_rose" or "time_series".
         """
         if "floris" not in skip:
             if which_floris not in ("wind_rose", "time_series"):
@@ -990,13 +987,14 @@ class Project(FromDictMixin):
         """Enables a user to reinitialize one or multiple of the CapEx, OpEx, and AEP
         models.
 
-        Args:
-            orbit_config (str | Path | dict | None, optional): ORBIT configuration file
-                or dictionary. Defaults to None.
-            wombat_config (str | Path | dict | None, optional): WOMBAT configuation file
-                or dictionary. Defaults to None.
-            floris_config (str | Path | dict | None, optional): FLORIS configuration
-                file or dictionary. Defaults to None.
+        Parameters
+        ----------
+        orbit_config : str | Path | dict | None, optional
+            ORBIT configuration file or dictionary. Defaults to None.
+        wombat_config : str | Path | dict | None, optional
+            WOMBAT configuation file or dictionary. Defaults to None.
+        floris_config : (str | Path | dict | None, optional
+            FLORIS configuration file or dictionary. Defaults to None.
         """
         if orbit_config is not None:
             self.orbit_config = orbit_config
@@ -1023,20 +1021,23 @@ class Project(FromDictMixin):
     ) -> None | tuple[plt.figure, plt.axes]:
         """Plot the graph representation of the windfarm as represented through WOMBAT.
 
-        Args:
-            figure_kwargs : dict, optional
-                Customized keyword arguments for matplotlib figure instantiation that
-                will passed as ``plt.figure(**figure_kwargs). Defaults to {}.``
-            draw_kwargs : dict, optional
-                Customized keyword arguments for ``networkx.draw()`` that can will
-                passed as ``nx.draw(**figure_kwargs). Defaults to {}.``
-            return_fig : bool, optional
-                Whether or not to return the figure and axes objects for further editing
-                and/or saving. Defaults to False.
+        Parameters
+        ----------
+        figure_kwargs : dict, optional
+            Customized keyword arguments for matplotlib figure instantiation that will passed as
+            ``plt.figure(**figure_kwargs). Defaults to {}.``
+        draw_kwargs : dict, optional
+            Customized keyword arguments for ``networkx.draw()`` that can will passed as
+            ``nx.draw(**figure_kwargs). Defaults to {}.``
+        return_fig : bool, optional
+            Whether or not to return the figure and axes objects for further editing and/or saving.
+            Defaults to False.
 
         Returns
         -------
-            None | tuple[plt.figure, plt.axes]: _description_
+        None | tuple[plt.figure, plt.axes]
+            If :py:attr:`return_fig` is False, then None is returned, otherwise (True) the
+            ``Figure`` and ``Axes`` objects are returned.
         """
         figure_kwargs.setdefault("figsize", (14, 12))
         figure_kwargs.setdefault("dpi", 200)

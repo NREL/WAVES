@@ -63,19 +63,20 @@ def run_parallel_time_series_floris(
 ) -> tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame]:
     """Runs the time series floris calculations in parallel.
 
-    Args:
-        args_list : list[tuple[FlorisInterface, pd.DataFrame, tuple[int, int], dict, dict]])
-            A list of the chunked by month arguments that get passed to
-            ``run_chunked_time_series_floris``.
-        nodes : int, optional
-            The number of nodes to parallelize over. If -1, then it will use the floor
-            of 80% of the available CPUs on the computer. Defaults to -1.
+    Parameters
+    ----------
+    args_list : list[tuple[FlorisInterface, pd.DataFrame, tuple[int, int], dict, dict]])
+        A list of the chunked by month arguments that get passed to
+        ``run_chunked_time_series_floris``.
+    nodes : int, optional
+        The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
+        available CPUs on the computer. Defaults to -1.
 
     Returns
     -------
-        tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame]
-            A dictionary of the ``chunk_id`` and ``FlorisInterface`` object, and the
-            full turbine power dataframe (without renamed columns).
+    tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame]
+        A dictionary of the ``chunk_id`` and ``FlorisInterface`` object, and the full turbine power
+        dataframe (without renamed columns).
     """
     nodes = int(mp.cpu_count() * 0.7) if nodes == -1 else nodes
     with mp.Pool(nodes) as pool:
