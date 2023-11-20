@@ -2,18 +2,18 @@
 site:
   depth: 34  # COE Review 2021
   distance: 116  # COE Review 2021
-  distance_to_landfall: 50  # COE Review 2021 
-  mean_windspeed: 9.17   # avg from weather profile in the Vineyard Wind 1 site 
+  distance_to_landfall: 50  # COE Review 2021
+  mean_windspeed: 9.17   # avg from weather profile in the Vineyard Wind 1 site
 plant:
   layout: grid
-  num_turbines: 50  
+  num_turbines: 50
   row_spacing: 7  # COE Review 2021
-  substation_distance: 1  
+  substation_distance: 1
   turbine_spacing: 7  # COE Review 2021
 landfall:
   interconnection_distance: 9  # COE Review 2021
   trench_length: 7   # COE Review 2021
-turbine: 12MW_generic 
+turbine: 12MW_generic
 port:
   monthly_rate: 2000000.0 # COE Review 2021
   sub_assembly_lines: 1  # COE Review 2021
@@ -34,10 +34,10 @@ scour_protection_design:
   cost_per_tonne: 40  # COE Review 2021
   scour_protection_depth: 1  # COE Review 2021
 oss_design:
-  num_substations: 1  
+  num_substations: 1
 array_system_design:
   cables:
-  - XLPE_630mm_66kV    
+  - XLPE_630mm_66kV
   location_data: COE_2022_fixed_bottom_layout_base
 export_system_design:
   cables: XLPE_1000m_220kV
@@ -63,10 +63,8 @@ install_phases:
   TurbineInstallation: !!python/tuple
   - MonopileInstallation
   - 0.1
-  
+
 project_parameters:
   turbine_capex: 1500 # new assumed turbine price COE Review 2022
-  commissioning: 0.01  
-  decommissioning: 0.15   
-  
-
+  commissioning: 0.01
+  decommissioning: 0.15
