@@ -6,7 +6,8 @@ root: index
 parts:
 - caption: Getting Started
   chapters:
-  - file: getting_started
+  - file: install
+  - file: user_guide
   - file: contributing
 - caption: Examples
   chapters:

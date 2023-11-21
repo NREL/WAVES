@@ -615,8 +615,8 @@ class Project(FromDictMixin):
 
     def preprocess_monthly_floris(
         self,
-        reinitialize_kwargs: dict = {},
-        run_kwargs: dict = {},
+        reinitialize_kwargs: dict | None = None,
+        run_kwargs: dict | None = None,
         cut_in_wind_speed: float | None = None,
         cut_out_wind_speed: float | None = None,
     ) -> tuple[
@@ -628,11 +628,12 @@ class Project(FromDictMixin):
 
         Parameters
         ----------
-        reinitialize_kwargs : dict, optional
-            Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``. Defaults to {}.
-        run_kwargs : dict, optional
+        reinitialize_kwargs : dict | None, optional
+            Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``. Defaults to
+            None.
+        run_kwargs : dict | None, optional
             Any keyword arguments to be assed to ``FlorisInterface.calculate_wake()``.
-            Defaults to {}.
+            Defaults to None.
         cut_in_wind_speed : float, optional
             The wind speed, in m/s, at which a turbine will start producing power.
         cut_out_wind_speed : float, optional
@@ -647,6 +648,11 @@ class Project(FromDictMixin):
                 - a copy of ``reinitialize_kwargs``
                 - c copy of ``run_kwargs``
         """
+        if reinitialize_kwargs is None:
+            reinitialize_kwargs = {}
+        if run_kwargs is None:
+            run_kwargs = {}
+
         month_list = range(1, 13)
         year_list = range(self.operations_start.year, self.operations_end.year + 1)
 
@@ -682,7 +688,7 @@ class Project(FromDictMixin):
     def run_wind_rose_aep(
         self,
         full_wind_rose: bool = False,
-        run_kwargs: dict = {},
+        run_kwargs: dict | None = None,
     ):
         """Runs the custom FLORIS WindRose AEP methodology that allows for gathering of
         intermediary results.
@@ -692,9 +698,9 @@ class Project(FromDictMixin):
         full_wind_rose : bool, optional
             If True, the full wind profile will be used, otherwise, if False, the wind profile will
             be limited to just the simulation period. Defaults to False.
-        run_kwargs : dict, optional
+        run_kwargs : dict | None, optional
             Arguments that are provided to ``FlorisInterface.get_farm_AEP_wind_rose_class()``.
-            Defaults to {}.
+            Defaults to None.
 
             From FLORIS:
 
@@ -729,6 +735,8 @@ class Project(FromDictMixin):
                     the flow field. This can be useful when quantifying the loss
                     in AEP due to wakes. Defaults to *False*.
         """
+        if run_kwargs is None:
+            run_kwargs = {}
         if full_wind_rose:
             if TYPE_CHECKING:
                 assert isinstance(self.weather, pd.DataFrame)  # mypy helper
@@ -820,8 +828,8 @@ class Project(FromDictMixin):
     def run_floris(
         self,
         which: str,
-        reinitialize_kwargs: dict = {},
-        run_kwargs: dict = {},
+        reinitialize_kwargs: dict | None = None,
+        run_kwargs: dict | None = None,
         full_wind_rose: bool = False,
         cut_in_wind_speed: float = 0.001,
         cut_out_wind_speed: float | None = None,
@@ -836,11 +844,12 @@ class Project(FromDictMixin):
         which : str
             One of "wind_rose" or "time_series" to run either a simulation-level wind rose analysis
             or hourly time-series analysis for the base AEP model.
-        reinitialize_kwargs : dict, optional
-            Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``. Defaults to {}.
-        run_kwargs : dict, optional
+        reinitialize_kwargs : dict | None, optional
+            Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``. Defaults to
+            None.
+        run_kwargs : dict | None, optional
             Any keyword arguments to be assed to ``FlorisInterface.calculate_wake()``.
-            Defaults to {}.
+            Defaults to None.
         full_wind_rose : bool, optional
             Indicates, for "wind_rose" analyses ONLY, if the full weather profile from ``weather``
             (True) or the limited, WOMBAT simulation period (False) should be used for analyis.
@@ -859,6 +868,11 @@ class Project(FromDictMixin):
         ------
         ValueError: Raised if :py:attr:`which` is not one of "wind_rose" or "time_series".
         """
+        if reinitialize_kwargs is None:
+            reinitialize_kwargs = {}
+        if run_kwargs is None:
+            run_kwargs = {}
+
         if which == "wind_rose":
             # TODO: Change this to be modify the standard behavior, and get the turbine
             # powers to properly account for availability later
@@ -904,10 +918,10 @@ class Project(FromDictMixin):
     def run(
         self,
         which_floris: str | None = None,
-        floris_reinitialize_kwargs: dict = {},
-        floris_run_kwargs: dict = {},
+        floris_reinitialize_kwargs: dict | None = None,
+        floris_run_kwargs: dict | None = None,
         full_wind_rose: bool = False,
-        skip: list[str] = [],
+        skip: list[str] | None = None,
         cut_in_wind_speed: float = 0.001,
         cut_out_wind_speed: float | None = None,
         nodes: int = -1,
@@ -920,18 +934,18 @@ class Project(FromDictMixin):
             One of "wind_rose" or "time_series" if computing the farm's AEP based on a wind rose,
             or based on time series corresponding to the WOMBAT simulation period, respectively.
             Defaults to None.
-        floris_reinitialize_kwargs : dict
-            Any additional ``FlorisInterface.reinitialize`` keyword arguments.
-        floris_run_kwargs : dict
+        floris_reinitialize_kwargs : dict | None
+            Any additional ``FlorisInterface.reinitialize`` keyword arguments. Defaults to None.
+        floris_run_kwargs : dict | None
             Any additional ``FlorisInterface.get_farm_AEP`` or ``FlorisInterface.calculate_wake()``
-            keyword arguments, depending on ``which_floris`` is used.
+            keyword arguments, depending on ``which_floris`` is used. Defaults to None.
         full_wind_rose : bool, optional
             Indicates, for "wind_rose" analyses ONLY, if the full weather profile from ``weather``
             (True) or the limited, WOMBAT simulation period (False) should be used for analyis.
             Defaults to False.
-        skip : list[str], optional
+        skip : list[str] | None, optional
             A list of models to be skipped. This is intended to be used after a model is
-            reinitialized with a new or modified configuration. Defaults to [].
+            reinitialized with a new or modified configuration. Defaults to None.
         cut_in_wind_speed : float, optional
             The wind speed, in m/s, at which a turbine will start producing power. Can also be
             provided in ``floris_reinitialize_kwargs`` for a wind rose analysis, but must be
@@ -949,6 +963,12 @@ class Project(FromDictMixin):
         ValueError
             Raised if ``which_floris`` is not one of "wind_rose" or "time_series".
         """
+        if floris_reinitialize_kwargs is None:
+            floris_reinitialize_kwargs = {}
+        if floris_run_kwargs is None:
+            floris_run_kwargs = {}
+        if skip is None:
+            skip = []
         if "floris" not in skip:
             if which_floris not in ("wind_rose", "time_series"):
                 raise ValueError(
@@ -1017,18 +1037,21 @@ class Project(FromDictMixin):
     # TODO: Figure out the actual workflows requried to have more complete/easier reporting
 
     def plot_farm(
-        self, figure_kwargs: dict = {}, draw_kwargs: dict = {}, return_fig: bool = False
+        self,
+        figure_kwargs: dict | None = None,
+        draw_kwargs: dict | None = None,
+        return_fig: bool = False,
     ) -> None | tuple[plt.figure, plt.axes]:
         """Plot the graph representation of the windfarm as represented through WOMBAT.
 
         Parameters
         ----------
-        figure_kwargs : dict, optional
+        figure_kwargs : dict | None, optional
             Customized keyword arguments for matplotlib figure instantiation that will passed as
-            ``plt.figure(**figure_kwargs). Defaults to {}.``
-        draw_kwargs : dict, optional
+            ``plt.figure(**figure_kwargs)``. Defaults to None.
+        draw_kwargs : dict | None, optional
             Customized keyword arguments for ``networkx.draw()`` that can will passed as
-            ``nx.draw(**figure_kwargs). Defaults to {}.``
+            ``nx.draw(**figure_kwargs)``. Defaults to None.
         return_fig : bool, optional
             Whether or not to return the figure and axes objects for further editing and/or saving.
             Defaults to False.
@@ -1039,6 +1062,11 @@ class Project(FromDictMixin):
             If :py:attr:`return_fig` is False, then None is returned, otherwise (True) the
             ``Figure`` and ``Axes`` objects are returned.
         """
+        if figure_kwargs is None:
+            figure_kwargs = {}
+        if draw_kwargs is None:
+            draw_kwargs = {}
+
         figure_kwargs.setdefault("figsize", (14, 12))
         figure_kwargs.setdefault("dpi", 200)
 
@@ -2424,7 +2452,7 @@ class Project(FromDictMixin):
     ) -> pd.DataFrame:
         """Generates a single row dataframe of all the desired resulting metrics from the project.
 
-        .. note:: This assumes all results will be a single number, and not
+        .. note:: This assumes all results will be a single number, and not a Pandas ``DataFrame``
 
         Parameters
         ----------

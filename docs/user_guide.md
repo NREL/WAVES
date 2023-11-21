@@ -5,56 +5,19 @@
 :depth: 3
 ```
 
-## Installation
-
-Requires Python 3.9 or 3.10.
-
-For basic usage, users can install WAVES directly from PyPI, or from source for more advanced usage.
-
-### Pip
-
-`pip install waves`
-
-### From Source
-
-```bash
-git clone https://github.com/NREL/WAVES.git
-cd WAVES
-pip install .
-```
-
-#### Tinkering
-
-Use the `-e` for an editable installation, in case you plan on editing any underlying code.
-
-```bash
-pip install -e .
-```
-
-#### Developing
-
-If you plan on contributing to the code base at any point, be sure to install the developer tools.
-
-For more details on developing, please see the [contributor's guide](contributing.md).
-
-```bash
-pip install -e ".[dev,docs]"
-pre-commit install
-```
-
-## Working With the `Project` Class
-
 This section will provide a guided overview of all the components of the `Project` class that are
 relevant to users, and demonstrate inputs used for the 2022 Cost of Wind Energy Review (COWER)
 analysis. For a complete API reference, please refer to the [API documentation](./api.md).
 
-### Configuring
+## Configuring
 
+### The Project Class
 ```{eval-rst}
 .. currentmodule:: waves.project
 
 .. autoclass:: Project
    :undoc-members:
+   :noindex:
    :exclude-members: library_path, weather_profile, orbit_weather_cols, floris_windspeed,
       floris_wind_direction, floris_x_col, floris_y_col, orbit_config, wombat_config,
       floris_config, connect_floris_to_layout, connect_orbit_array_design, offtake_price,
@@ -75,6 +38,12 @@ analysis. For a complete API reference, please refer to the [API documentation](
       energy_potential, energy_production, energy_losses, availability, capacity_factor, opex,
       revenue, cash_flow, npv, irr, lcoe,
       generate_report,
+```
+
+### Working With Configurations
+
+```{eval-rst}
+.. currentmodule:: waves.project
 
 .. automethod:: Project.from_file
    :noindex:
@@ -86,7 +55,7 @@ analysis. For a complete API reference, please refer to the [API documentation](
    :noindex:
 ```
 
-#### COWER 2022 Configuration
+### COWER 2022 Configuration
 
 Aligning with COWER, we have the following inputs. It should be noted that each model's
 configuration is a pointer to another file to keep each configuration as tidy as possible. However,
@@ -99,52 +68,100 @@ configuration input.
    :linenos:
 ```
 
-#### Connecting Configurations
+### Connecting Configurations
 
 Also, see the configurations {py:attr}`Project.connect_floris_to_layout` and
 {py:attr}`Project.connect_orbit_array_design` to automatically run the below during project
 initialization.
 
 ```{eval-rst}
-.. automethod:: waves.project.Project.connect_floris_to_turbines
+.. currentmodule:: waves.project
 
-.. automethod:: waves.project.Project.generate_floris_positions_from_layout
+The following method is run on intialization when ``Project.connect_floris_to_layout`` is set to
+``True``, which is the case in the COWER example.
 
-.. automethod:: waves.project.Project.connect_orbit_cable_lengths
-
+.. automethod:: Project.connect_floris_to_turbines
+   :noindex:
 ```
 
-#### Updating Configurations
+### Updating Configurations
+
+Sometimes, additional configurations may need to be connected prior to running an analysis. For
+instance, it may be cumbersome to manually compute the FLORIS layout from a traditional coordinate
+system, such as WGS-84, or a localized distance-based coordinate reference system. In the latter,
+WAVES can help with the ``generate_floris_positions_from_layout`` method. However, as can be seen
+below, the following generation method has to be run prior to connecting the FLORIS and ORBIT/WOMBAT
+layouts. As such, your workflow leading up to an analysis might look like the following.
+
+```python
+from pathlib import Path
+from waves import Project
+from waves.utilities import load_yaml
+
+library_path = Path("../library/cower_2022/")
+config = load_yaml(library_path / "project/config", "COE_2022_fixed_bottom_base.yaml")
+config["library_path"] = library_path  # add the library path
+
+# Ensure FLORIS is not automatically connected
+config["connect_floris_to_turbines"] = False
+
+project = Project.from_dict(config)
+
+# Generate the layout and connect FLORIS
+project.generate_floris_positions_from_layout()  # note the defaults in the section below
+project.connect_floris_to_turbines()
+```
 
 ```{eval-rst}
-.. automethod:: waves.project.Project.generate_floris_positions_from_layout
+.. currentmodule:: waves.project
 
-.. automethod:: waves.project.Project.reinitialize
+.. automethod:: Project.generate_floris_positions_from_layout
+   :noindex:
+
+The following method allows users to connect the ORBIT-calculated cable lengths and insert them
+back into the layout configuration file. This is helpful if the base distance is to be computed,
+then reused later, without re-calculating, or after modifying, if desired.
+
+.. automethod:: Project.connect_orbit_cable_lengths
+   :noindex:
+
+.. automethod:: Project.reinitialize
+   :noindex:
 ```
 
-### Viewing the Wind Farm Properties
+## Viewing the Wind Farm Properties
+
+For the following set of methods, users only need to create a ``Project`` object in order to use.
 
 ```{eval-rst}
-.. automethod:: waves.project.Project.plot_farm
+.. currentmodule:: waves.project
 
-.. automethod:: waves.project.Project.n_turbines
+.. automethod:: Project.plot_farm
+   :noindex:
 
-.. automethod:: waves.project.Project.n_substations
+.. automethod:: Project.n_turbines
+   :noindex:
 
-.. automethod:: waves.project.Project.capacity
+.. automethod:: Project.n_substations
+   :noindex:
 
-.. automethod:: waves.project.Project.turbine_rating
+.. automethod:: Project.capacity
+   :noindex:
 
-.. automethod:: waves.project.Project.plot_farm
+.. automethod:: Project.turbine_rating
+   :noindex:
 ```
 
-### Running the Models
+## Running the Models
 
 ```{eval-rst}
-.. automethod:: waves.project.Project.run
+.. currentmodule:: waves.project
+
+.. automethod:: Project.run
+   :noindex:
 ```
 
-### Results
+## Results
 
 To quickly produce any of the high-level outputs to a single `DataFrame`, the below method can be
 used in place of individually calculating each metric and combining into a report. Additionally,
@@ -153,7 +170,9 @@ which relies on the `generate_report` method and accessing the ORBIT `ProjectMan
 further CapEx breakdowns.
 
 ```{eval-rst}
-.. automethod:: waves.project.Project.generate_report
+.. currentmodule:: waves.project
+
+.. automethod:: Project.generate_report
    :noindex:
 ```
 
@@ -162,79 +181,92 @@ WAVES officially, but it should be noted that they should be used with caution i
 any interdependencies between model outputs.
 
 ```{eval-rst}
+.. currentmodule:: waves.project
+
 .. autoattribute:: waves.project.Project.orbit
+   :noindex:
 
 .. autoattribute:: waves.project.Project.wombat
+   :noindex:
 
 .. autoattribute:: waves.project.Project.floris
-```
-
-#### Balance of Systems Costs and Properties
-
-```{eval-rst}
-.. automethod:: waves.project.Project.capex
-   :noindex:
-
-.. automethod:: waves.project.Project.capex_breakdown
-   :noindex:
-
-.. automethod:: waves.project.Project.array_system_total_cable_length
-   :noindex:
-
-.. automethod:: waves.project.Project.export_system_total_cable_length
    :noindex:
 ```
 
-#### Operations and Maintenance Costs
+### Balance of Systems Costs and Properties
 
 ```{eval-rst}
-.. automethod:: waves.project.Project.opex
+.. currentmodule:: waves.project
+
+.. automethod:: Project.capex
    :noindex:
 
-.. automethod:: waves.project.Project.availability
+.. automethod:: Project.capex_breakdown
    :noindex:
 
-.. automethod:: waves.project.Project.capacity_factor
+.. automethod:: Project.array_system_total_cable_length
+   :noindex:
+
+.. automethod:: Project.export_system_total_cable_length
    :noindex:
 ```
 
-#### Energy Production
+### Operations and Maintenance Costs
 
 ```{eval-rst}
-.. automethod:: waves.project.Project.energy_potential
+.. currentmodule:: waves.project
+
+.. automethod:: Project.opex
    :noindex:
 
-.. automethod:: waves.project.Project.energy_production
+.. automethod:: Project.availability
    :noindex:
 
-.. automethod:: waves.project.Project.energy_losses
+.. automethod:: Project.capacity_factor
    :noindex:
 ```
 
-#### Project Financials
+### Energy Production
 
 ```{eval-rst}
-.. automethod:: waves.project.Project.capex
+.. currentmodule:: waves.project
+
+.. automethod:: Project.energy_potential
    :noindex:
 
-.. automethod:: waves.project.Project.capex_breakdown
+.. automethod:: Project.energy_production
    :noindex:
 
-.. automethod:: waves.project.Project.opex
+.. automethod:: Project.energy_losses
+   :noindex:
+```
+
+### Project Financials
+
+```{eval-rst}
+.. currentmodule:: waves.project
+
+.. automethod:: Project.capex
    :noindex:
 
-.. automethod:: waves.project.Project.revenue
+.. automethod:: Project.capex_breakdown
    :noindex:
 
-.. automethod:: waves.project.Project.cash_flow
+.. automethod:: Project.opex
    :noindex:
 
-.. automethod:: waves.project.Project.npv
+.. automethod:: Project.revenue
    :noindex:
 
-.. automethod:: waves.project.Project.irr
+.. automethod:: Project.cash_flow
    :noindex:
 
-.. automethod:: waves.project.Project.lcoe
+.. automethod:: Project.npv
+   :noindex:
+
+.. automethod:: Project.irr
+   :noindex:
+
+.. automethod:: Project.lcoe
    :noindex:
 ```
