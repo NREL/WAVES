@@ -60,7 +60,6 @@ sphinx:
       use_issues_button: true
       use_repository_button: true
       use_edit_page_button: true
-      # baseurl: http://nrel.github.io/WAVES
       show_toc_level: 2
       repository_url: https://github.com/NREL/WAVES
       repository_branch: main
@@ -71,19 +70,18 @@ sphinx:
             icon: fa-brands fa-github,
         },
         {
-            name: PyPI_monthly_downloads,
-            url: https://pypi.org/project/sphinx-book-theme/,
+            name: PyPI version,
+            url: https://pypi.org/project/WAVES/,
             icon: "https://img.shields.io/pypi/v/WAVES?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F",
             type: url,
         },
         {
-            name: PyPI_version,
-            url: https://pypi.org/project/sphinx-book-theme/,
+            name: PyPI monthly downloads,
+            url: https://pypi.org/project/WAVES/,
             icon: "https://img.shields.io/pypi/dm/waves?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F",
             type: url,
         },
       ]
-      html_sidebars: {"**": ["search-field"]}
     language: 'python'
     autoyaml_level: 3
     autosummary_generate: true
