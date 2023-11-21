@@ -6,18 +6,20 @@ author: National Renewable Energy Laboratory
 # logo: logo.png
 copyright: '2023'
 only_build_toc_files: false
+exclude_patterns: [_build, Thumbs.db, .DS_Store, "**.ipynb_checkpoints", .github]
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
 execute:
   execute_notebooks: auto
   timeout: -1
+  merge_streams: true
   exclude_patterns:
     - _build
     - Thumbs.db
     - DS_Store
     - "**.ipynb_checkpoints"
-    # - COWER_2022.ipynb
+    - COWER_2022.ipynb
 
 # Define the name of the latex output file for PDF builds
 latex:
@@ -36,9 +38,12 @@ repository:
 
 # Add GitHub buttons to your book
 # See https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository
-html:
-  use_issues_button: true
-  use_repository_button: true
+# See sphinx:html_theme_options below
+# html:
+#   use_issues_button: true
+#   use_repository_button: true
+#   use_edit_page_button: true
+#   baseurl: http://nrel.github.io/WAVES
 
 sphinx:
   extra_extensions:
@@ -51,6 +56,34 @@ sphinx:
 
   config:
     html_theme: sphinx_book_theme
+    html_theme_options:
+      use_issues_button: true
+      use_repository_button: true
+      use_edit_page_button: true
+      # baseurl: http://nrel.github.io/WAVES
+      show_toc_level: 2
+      repository_url: https://github.com/NREL/WAVES
+      repository_branch: main
+      icon_links: [
+        {
+            name: GitHub,
+            url: https://github.com/NREL/WAVES,
+            icon: fa-brands fa-github,
+        },
+        {
+            name: PyPI_monthly_downloads,
+            url: https://pypi.org/project/sphinx-book-theme/,
+            icon: "https://img.shields.io/pypi/v/WAVES?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F",
+            type: url,
+        },
+        {
+            name: PyPI_version,
+            url: https://pypi.org/project/sphinx-book-theme/,
+            icon: "https://img.shields.io/pypi/dm/waves?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F",
+            type: url,
+        },
+      ]
+      html_sidebars: {"**": ["search-field"]}
     language: 'python'
     autoyaml_level: 3
     autosummary_generate: true

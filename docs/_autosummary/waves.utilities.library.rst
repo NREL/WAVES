@@ -1,4 +1,4 @@
-waves.utilities.library
+﻿waves.utilities.library
 =======================
 
 .. automodule:: waves.utilities.library

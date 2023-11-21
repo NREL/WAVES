@@ -45,12 +45,15 @@ pre-commit install
 ## Working With the `Project` Class
 
 This section will provide a guided overview of all the components of the `Project` class that are
-relevant to users. For a complete API guide, please refer to the [API documentation](./api.md).
+relevant to users, and demonstrate inputs used for the 2022 Cost of Wind Energy Review (COWER)
+analysis. For a complete API reference, please refer to the [API documentation](./api.md).
 
 ### Configuring
 
 ```{eval-rst}
-.. autoclass:: waves.project.Project
+.. currentmodule:: waves.project
+
+.. autoclass:: Project
    :undoc-members:
    :exclude-members: library_path, weather_profile, orbit_weather_cols, floris_windspeed,
       floris_wind_direction, floris_x_col, floris_y_col, orbit_config, wombat_config,
@@ -73,11 +76,27 @@ relevant to users. For a complete API guide, please refer to the [API documentat
       revenue, cash_flow, npv, irr, lcoe,
       generate_report,
 
-.. automethod:: waves.project.Project.from_file
+.. automethod:: Project.from_file
+   :noindex:
 
-.. automethod:: waves.project.Project.config_dict
+.. autoproperty:: Project.config_dict
+   :noindex:
 
-.. automethod:: waves.project.Project.save_config
+.. automethod:: Project.save_config
+   :noindex:
+```
+
+#### COWER 2022 Configuration
+
+Aligning with COWER, we have the following inputs. It should be noted that each model's
+configuration is a pointer to another file to keep each configuration as tidy as possible. However,
+each of `orbit_config`, `wombat_config`, and `floris_config` allow for a direct dictionary
+configuration input.
+
+```{eval-rst}
+.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+   :language: yaml
+   :linenos:
 ```
 
 #### Connecting Configurations
@@ -128,10 +147,14 @@ initialization.
 ### Results
 
 To quickly produce any of the high-level outputs to a single `DataFrame`, the below method can be
-used in place of individually calculating each metric and combining into a report.
+used in place of individually calculating each metric and combining into a report. Additionally,
+users can refer to the [COWER 2022 example](cower_2022:results) for the reported results,
+which relies on the `generate_report` method and accessing the ORBIT `ProjectManager` directly for
+further CapEx breakdowns.
 
 ```{eval-rst}
 .. automethod:: waves.project.Project.generate_report
+   :noindex:
 ```
 
 All the models can be individually accessed to calculate results that are not integrated into
@@ -150,50 +173,68 @@ any interdependencies between model outputs.
 
 ```{eval-rst}
 .. automethod:: waves.project.Project.capex
+   :noindex:
 
 .. automethod:: waves.project.Project.capex_breakdown
+   :noindex:
 
 .. automethod:: waves.project.Project.array_system_total_cable_length
+   :noindex:
 
 .. automethod:: waves.project.Project.export_system_total_cable_length
+   :noindex:
 ```
 
 #### Operations and Maintenance Costs
 
 ```{eval-rst}
 .. automethod:: waves.project.Project.opex
+   :noindex:
 
 .. automethod:: waves.project.Project.availability
+   :noindex:
 
 .. automethod:: waves.project.Project.capacity_factor
+   :noindex:
 ```
 
 #### Energy Production
 
 ```{eval-rst}
 .. automethod:: waves.project.Project.energy_potential
+   :noindex:
 
 .. automethod:: waves.project.Project.energy_production
+   :noindex:
 
 .. automethod:: waves.project.Project.energy_losses
+   :noindex:
 ```
 
 #### Project Financials
 
 ```{eval-rst}
 .. automethod:: waves.project.Project.capex
+   :noindex:
 
 .. automethod:: waves.project.Project.capex_breakdown
+   :noindex:
 
 .. automethod:: waves.project.Project.opex
+   :noindex:
 
 .. automethod:: waves.project.Project.revenue
+   :noindex:
 
 .. automethod:: waves.project.Project.cash_flow
+   :noindex:
 
 .. automethod:: waves.project.Project.npv
+   :noindex:
 
 .. automethod:: waves.project.Project.irr
+   :noindex:
 
 .. automethod:: waves.project.Project.lcoe
+   :noindex:
 ```
