@@ -19,6 +19,7 @@ dependencies = [
     "floris>=3.3",
     "wombat>=0.9.1",
     "orbit-nrel>=1.0.8",
+    "typer[all]",
 ]
 keywords = [
     "python3",
@@ -49,6 +50,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
+
+[console_scripts]
+waves = "waves:__main__"
+
+[project.scripts]
+waves = "waves.__main__:app"
 
 [project.urls]
 source = "https://github.com/NREL/WAVES"
