@@ -215,6 +215,10 @@ class Project(FromDictMixin):
         month combinations, for instance, a semi-annual 2 year cost starting in 2020 would look
         like: ``[(2020, 1), (2020, 7), (2021, 1), (2021, 7)]``. If None is provided, then the
         CapEx date will be the same as the start of the installation. Defaults to None.
+    report_config : dict[str, dict], optional
+        A dictionary that can be passed to :py:meth:`generate_report`, and be used as the
+        ``metrics_configuration`` dictionary. An additional field of ``name`` is required
+        as input, which will be passed to ``simulation_name``. Defaults to None.
 
     References
     ----------
@@ -281,6 +285,9 @@ class Project(FromDictMixin):
     turbine_capex_date: tuple[int, int] | list[tuple[int, int]] | None = field(
         default=None, converter=partial(convert_to_multi_index, name="turbine_capex_date")
     )
+    report_config: dict[str, dict] | None = field(
+        default=None, validator=attrs.validators.instance_of((dict, type(None)))
+    )
 
     # Internally created attributes, aka, no user inputs to these
     weather: pd.DataFrame = field(init=False)
@@ -324,19 +331,51 @@ class Project(FromDictMixin):
     def library_exists(self, attribute: attrs.Attribute, value: Path) -> None:
         """Validates that the user input to :py:attr:`library_path` is a valid directory.
 
-        Args:
-            attribute (attrs.Attribute): The attrs Attribute information/metadata/configuration.
-            value (str | Path): The user input.
+        Parameters
+        ----------
+        attribute : attrs.Attribute
+            The attrs Attribute information/metadata/configuration.
+        value : Path
+            The user input.
 
         Raises
         ------
-            FileNotFoundError: Raised if :py:attr:`value` does not exist.
-            ValueError: Raised if the :py:attr:`value` exists, but is not a directory.
+        FileNotFoundError
+            Raised if :py:attr:`value` does not exist.
+        ValueError
+            Raised if the :py:attr:`value` exists, but is not a directory.
         """
         if not value.exists():
             raise FileNotFoundError(f"The input path to {attribute.name} cannot be found: {value}")
         if not value.is_dir():
             raise ValueError(f"The input path to {attribute.name}: {value} is not a directory.")
+
+    @report_config.validator  # type: ignore
+    def validate_report_config(self, attribute: attrs.Attribute, value: dict | None) -> None:
+        """Validates the user input for :py:attr:`report_config`.
+
+        Parameters
+        ----------
+        attribute : attrs.Attribute
+            The attrs Attribute information/metadata/configuration.
+        value : dict | None
+            _description_
+
+        Raises
+        ------
+        ValueError
+            Raised if :py:attr:`report_config` is not a dictionary.
+        KeyError
+            Raised if :py:attr:`report_config` does not contain a key, value pair for "name".
+        """
+        if value is None:
+            return
+
+        if not isinstance(value, dict):
+            raise ValueError("`report_config` must be a dictionary, if provided")
+
+        if "name" not in value:
+            raise KeyError("A key, value pair for `name` must be provided.")
 
     # **********************************************************************************************
     # Configuration methods
@@ -380,6 +419,7 @@ class Project(FromDictMixin):
             raise ValueError(
                 "The configuration file must be a JSON (.json) or YAML (.yaml or .yml) file."
             )
+        config_dict["library_path"] = library_path
         return Project.from_dict(config_dict)
 
     @property
@@ -2447,8 +2487,8 @@ class Project(FromDictMixin):
 
     def generate_report(
         self,
-        metrics_configuration: dict[str, dict],
-        simulation_name: str,
+        metrics_configuration: dict[str, dict] | None = None,
+        simulation_name: str | None = None,
     ) -> pd.DataFrame:
         """Generates a single row dataframe of all the desired resulting metrics from the project.
 
@@ -2456,7 +2496,7 @@ class Project(FromDictMixin):
 
         Parameters
         ----------
-        metrics_dict : dict[str, dict]
+        metrics_dict : dict[str, dict], optional
             The dictionary of dictionaries containing the following key, value pair pattern::
 
                 {
@@ -2467,7 +2507,8 @@ class Project(FromDictMixin):
                 }
 
             For metrics that have no keyword arguments, or where the default parameter values are
-            desired, either an empty dictionary or no dictionary input for "kwargs" is allowed.
+            desired, either an empty dictionary or no dictionary input for "kwargs" is allowed. If
+            no input is provided, then :py:attr:`report_config` will be used to populate
         simulation_name : str
             The name that should be given to the resulting index.
 
@@ -2482,6 +2523,23 @@ class Project(FromDictMixin):
         ValueError
             Raised if any of the keys of :py:attr:`metrics_dict` aren't implemented methods.
         """
+        if metrics_configuration is None:
+            if self.report_config is None:
+                raise ValueError(
+                    "Either a `report_config` must be provided to the class, or"
+                    " `metrics_configuration` as a method argument."
+                )
+            metrics_configuration = {k: v for k, v in self.report_config.items() if k != "name"}
+        if simulation_name is None:
+            if TYPE_CHECKING:
+                assert isinstance(self.report_config, dict)
+            if "name" not in self.report_config:
+                raise ValueError(
+                    "Either a `name` key, value pair must be provided in"
+                    " `report_config`, or `name` as a method argument."
+                )
+            simulation_name = self.report_config["name"]  # type: ignore
+
         invalid_metrics = [
             el["metric"] for el in metrics_configuration.values() if not hasattr(self, el["metric"])
         ]
