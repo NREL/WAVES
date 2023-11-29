@@ -31,11 +31,18 @@ def run_single(libary_path: str, config: str, report: bool, save_report: bool) -
     if (run_kwargs := config_dict.get("run")) is None:
         raise KeyError("The key `run` could not be found. Please see `Project.run()` for details.")
 
-    sim = Project.from_file(library_path=libary_path, config_file=config)
-    sim.run(**run_kwargs)
+    project = Project.from_file(library_path=libary_path, config_file=config)
+    project.run(**run_kwargs)
     if report:
-        report_df = sim.generate_report()
-        print(report_df)
+        report_df = project.generate_report()
+        print(report_df.T.to_markdown(tablefmt="grid"))
+        if save_report:
+            name = config_dict["report_config"]["name"]
+            file_name = project.library_path / f"results/{name}.csv"
+            print(f"Results saved to {file_name}")
+            report_df.to_csv(file_name)
+
+    project.wombat.env.cleanup_log_files()
 
 
 @app.command()

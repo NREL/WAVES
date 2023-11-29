@@ -136,3 +136,71 @@ turbine_capex_date:
 - !!python/tuple
   - 1999
   - 10
+
+# CLI Arguments
+run:
+  which_floris: wind_rose  # month-based wind rose wake analysis
+  full_wind_rose: False  # use the WOMBAT date range
+  floris_reinitialize_kwargs:
+      cut_in_wind_speed: 3.0
+      cut_out_wind_speed: 25.0  # standard ws range
+report_config:
+  name: COWER 2022 - Floating
+  "# Turbines":
+    metric: n_turbines
+  Turbine Rating (MW):
+    metric: turbine_rating
+  Project Capacity (MW):
+    metric: capacity
+    kwargs:
+      units: mw
+  "# OSS":
+    metric: n_substations
+  Total Export Cable Length (km):
+    metric: export_system_total_cable_length
+  Total Array Cable Length (km):
+    metric: array_system_total_cable_length
+  CapEx ($):
+    metric: capex
+  CapEx per kW ($/kW):
+    metric: capex
+    kwargs:
+      per_capacity: kw
+  OpEx ($):
+    metric: opex
+  OpEx per kW ($/kW):
+    metric: opex
+    kwargs:
+      per_capacity: kw
+  AEP (MWh):
+    metric: energy_production
+    kwargs:
+      units: mw
+      aep: True
+      with_losses: True
+  AEP per kW (MWh/kW):
+    metric: energy_production
+    kwargs:
+      units: mw
+      per_capacity: kw
+      aep: True
+      with_losses: True
+  Net Capacity Factor With Wake Losses (%):
+    metric: capacity_factor
+    kwargs:
+      which: net
+  Net Capacity Factor With All Losses (%):
+    metric: capacity_factor
+    kwargs:
+      which: net
+      with_losses: True
+  Gross Capacity Factor (%):
+    metric: capacity_factor
+    kwargs:
+      which: gross
+  Energy Availability (%):
+    metric: availability
+    kwargs:
+      which: energy
+  LCOE ($/MWh):
+    metric: lcoe
