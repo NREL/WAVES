@@ -62,10 +62,44 @@ configuration is a pointer to another file to keep each configuration as tidy as
 each of `orbit_config`, `wombat_config`, and `floris_config` allow for a direct dictionary
 configuration input.
 
+<!-- :lines: 1-29, 38, 41, 90, 141-207 -->
 ```{eval-rst}
 .. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
    :language: yaml
+   :lines: 1-29
    :linenos:
+
+...
+
+.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+   :language: yaml
+   :linenos:
+   :lineno-start: 38
+   :lines: 38
+
+...
+
+.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+   :language: yaml
+   :linenos:
+   :lineno-start: 41
+   :lines: 41
+
+...
+
+.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+   :language: yaml
+   :linenos:
+   :lineno-start: 90
+   :lines: 90
+
+...
+
+.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+   :language: yaml
+   :linenos:
+   :lineno-start: 141
+   :lines: 141-
 ```
 
 ### Connecting Configurations
