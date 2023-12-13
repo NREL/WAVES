@@ -129,7 +129,8 @@ class Project(FromDictMixin):
     weather_profile : str | pathlib.Path
         The file path where the weather profile data is located, with the following column
         requirements:
-            - "datetime": The timestamp column
+
+            - datetime: The timestamp column
             - orbit_weather_cols: see ``orbit_weather_cols``
             - floris_windspeed: see ``floris_windspeed``
             - floris_wind_direction: see ``floris_wind_direction``
