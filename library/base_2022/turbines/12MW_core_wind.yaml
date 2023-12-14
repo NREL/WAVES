@@ -34,7 +34,7 @@ electrical_system:
       scale: 2.959
       shape: 1
       time: 28
-      materials: 0.0003111111111111111111        
+      materials: 0.0003111111111111111111
       service_equipment: CTV
       operation_reduction: 0.0
       level: 3
@@ -43,7 +43,7 @@ electrical_system:
       scale: 62.5
       shape: 1
       time: 28
-      materials: 0.0002222222222222222222         
+      materials: 0.0002222222222222222222
       service_equipment: CTV
       operation_reduction: 0.0
       level: 4
@@ -52,7 +52,7 @@ electrical_system:
       scale: 12.99
       shape: 1
       time: 170
-      materials: 0.002444444444444444444444        
+      materials: 0.002444444444444444444444
       service_equipment: LCN
       operation_reduction: 0
       replacement: true
@@ -62,7 +62,7 @@ electrical_system:
       scale: 500
       shape: 1
       time: 54
-      materials: 0.00222222222222222222222   
+      materials: 0.00222222222222222222222
       service_equipment: LCN
       operation_reduction: 0
       replacement: true
@@ -99,7 +99,7 @@ hydraulic_system:
       scale: 5.587
       shape: 1
       time: 38
-      materials: 0.000084444444444444444444         
+      materials: 0.000084444444444444444444
       service_equipment: CTV
       operation_reduction: 0
       level: 3
@@ -108,7 +108,7 @@ hydraulic_system:
       scale: 1000
       shape: 1
       time: 75
-      materials: 0.00062222222222222222222        
+      materials: 0.00062222222222222222222
       service_equipment: LCN
       operation_reduction: 0
       replacement: true
@@ -136,7 +136,7 @@ yaw_system:
       scale: 166.7
       shape: 1
       time: 40
-      materials: 0.000133333333333333333333  
+      materials: 0.000133333333333333333333
       service_equipment: CTV
       operation_reduction: 0.0
       level: 3
@@ -145,7 +145,7 @@ yaw_system:
       scale: 1000
       shape: 1
       time: 147
-      materials: 0.0005555555555555555555      
+      materials: 0.0005555555555555555555
       service_equipment: LCN
       operation_reduction: 0
       replacement: true
@@ -164,7 +164,7 @@ rotor_blades:
       scale: 2.193
       shape: 1
       time: 18
-      materials: 0.00022222222222222        
+      materials: 0.00022222222222222
       service_equipment: CTV
       operation_reduction: 0
       level: 2
@@ -173,7 +173,7 @@ rotor_blades:
       scale: 100
       shape: 1
       time: 42
-      materials: 0.00191555555555       
+      materials: 0.00191555555555
       service_equipment: CTV
       operation_reduction: 0.0
       level: 4
@@ -182,7 +182,7 @@ rotor_blades:
       scale: 1000
       shape: 1
       time: 864
-      materials: 0.01977777777777777       
+      materials: 0.01977777777777777
       service_equipment: LCN
       operation_reduction: 0
       replacement: true
@@ -193,7 +193,7 @@ generator:
   maintenance:
   - description: annual turbine inspection
     time: 24
-    materials: 0.00006666666666666     
+    materials: 0.00006666666666666
     service_equipment: CTV
     frequency: 365
   failures:
@@ -210,7 +210,7 @@ generator:
       scale: 33.33
       shape: 1
       time: 49
-      materials: 0.0006373333333333        
+      materials: 0.0006373333333333
       service_equipment: CTV
       operation_reduction: 0.0
       level: 4
@@ -219,7 +219,7 @@ generator:
       scale: 111.1
       shape: 1
       time: 244
-      materials: 0.01051111111111111      
+      materials: 0.01051111111111111
       service_equipment: LCN
       operation_reduction: 0
       replacement: true
@@ -284,4 +284,4 @@ drive_train:
       operation_reduction: 0
       replacement: true
       level: 6
-      description: main shaft replacement   
+      description: main shaft replacement

@@ -1,4 +1,4 @@
-description: COE_2022_fixed_bottom Layout using Jensen-Jimenez
+description: Base Floating 2022 Layout using Jensen-Jimenez
 farm:
   layout_x:
   - 10606.05
@@ -104,7 +104,7 @@ farm:
   - 0
   - 0
 
-  turbine_library_path: /Users/rhammond/GitHub_Public/WAVES/library/cower_2022/turbines
+  turbine_library_path: ../../turbines
   turbine_type:
   - 12MW_216m
   - 12MW_216m
@@ -156,7 +156,7 @@ farm:
   - 12MW_216m
   - 12MW_216m
   - 12MW_216m
-  
+
 floris_version: v3.0.0
 flow_field:
   air_density: 1.225
@@ -166,7 +166,7 @@ flow_field:
   - 270.0
   wind_shear: 0.12
   wind_speeds:
-  - 8.98   # avg from weather profile in the Vineyard Wind 1 site 
+  - 8.41  # avg from weather profile in the Humboldt site
   wind_veer: 0.0
 logging:
   console:
@@ -175,7 +175,7 @@ logging:
   file:
     enable: false
     level: WARNING
-name: COE_2022_fixed_bottom Layout Jensen
+name: COE_2022_floating Layout Jensen
 solver:
   turbine_grid_points: 3
   type: turbine_grid

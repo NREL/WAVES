@@ -1,6 +1,4 @@
-name: COE_2022_fixed_bottom
-library: library
-#weather: UMaine.csv
+name: base_fixed_bottom_2022
 weather: era5_40.0N_72.5W_1990_2020.csv
 service_equipment:
   - ctv1.yaml
@@ -9,12 +7,12 @@ service_equipment:
   - clv.yaml
   - jackup.yaml
   - dsv.yaml
-layout: COE_2022_fixed_bottom_layout_base.csv
+layout: base_fixed_bottom_2022_layout.csv
 inflation_rate: 0
-fixed_costs: COE_2022_fixed_bottom_fixed_costs.yaml
+fixed_costs: fixed_costs_2022.yaml
 workday_start: 7
 workday_end: 19
 start_year: 2000
 end_year: 2020
 project_capacity: 600
-port_distance: 116
+port_distance: 116  # TODO: CHECK THIS

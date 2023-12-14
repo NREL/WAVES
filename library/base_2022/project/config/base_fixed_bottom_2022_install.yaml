@@ -15,21 +15,23 @@ landfall:
   trench_length: 7   # COE Review 2021
 turbine: 12MW_generic
 port:
-  monthly_rate: 2000000.0 # COE Review 2021
+  monthly_rate: 2261495.841    # 2000000.0 # COE Review 2021 multiplied by % increase from 2020 to 2022 from U.S Bureau Labor Statistics
   sub_assembly_lines: 1  # COE Review 2021
   turbine_assembly_cranes: 1  # COE Review 2021
+
 # Vessels
-array_cable_install_vessel: example_cable_lay_vessel
-export_cable_bury_vessel: example_cable_lay_vessel
-export_cable_install_vessel: example_cable_lay_vessel
-spi_vessel: example_scour_protection_vessel
-oss_install_vessel: example_heavy_lift_vessel
-wtiv: example_wtiv
+# TODO: CHECK IF THESE NEED TO MATCH ORBIT DEFAULTS
+array_cable_install_vessel: example_cable_lay_vessel_GF
+export_cable_bury_vessel: example_cable_lay_vessel_GF
+export_cable_install_vessel: example_cable_lay_vessel_GF
+spi_vessel: example_scour_protection_vessel_GF
+oss_install_vessel: example_heavy_lift_vessel_GF
+wtiv: example_wtiv_GF
 
 # Module Specific
 MonopileDesign:
-  monopile_steel_cost: 2250 # COE Review 2021
-  tp_steel_cost: 3230 # COE Review 2021
+  monopile_steel_cost: 3487.5 # 2250 # COE Review 2021 + applied % increase from 2020 to 2022 in steel costs according to 55 % Steel and Iron Price index increase
+  tp_steel_cost: 5006.5 # 3230 # COE Review 2021 + applied % increase from 2020 to 2022 in steel costs according to 55 % Steel and Iron Price index increase
 scour_protection_design:
   cost_per_tonne: 40  # COE Review 2021
   scour_protection_depth: 1  # COE Review 2021
@@ -38,12 +40,12 @@ oss_design:
 array_system_design:
   cables:
   - XLPE_630mm_66kV
-  location_data: COE_2022_fixed_bottom_layout_base
+  location_data: base_fixed_bottom_2022
 export_system_design:
   cables: XLPE_1000m_220kV
   percent_added_length: 0.0
 OffshoreSubstationInstallation:
-  feeder: example_heavy_feeder
+  feeder: example_heavy_feeder_GF
   num_feeders: 1
 # Configured Phases
 design_phases:
@@ -65,6 +67,6 @@ install_phases:
   - 0.1
 
 project_parameters:
-  turbine_capex: 1500 # new assumed turbine price COE Review 2022
+  turbine_capex: 1700 # new assumed turbine price COE Review 2022
   commissioning: 0.01
   decommissioning: 0.15
