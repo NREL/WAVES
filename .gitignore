@@ -136,4 +136,4 @@ dmypy.json
 
 # Project specific
 *results/
-*weather/*.csv
+*/weather/*.csv
