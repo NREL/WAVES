@@ -62,43 +62,46 @@ configuration is a pointer to another file to keep each configuration as tidy as
 each of `orbit_config`, `wombat_config`, and `floris_config` allow for a direct dictionary
 configuration input.
 
-```{eval-rst}
-.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
-   :language: yaml
-   :lines: 1-36
-   :linenos:
+```{literalinclude} ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
+:language: yaml
+:lines: 1-36
+:linenos:
+```
 
 ...
 
-.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
-   :language: yaml
-   :linenos:
-   :lineno-start: 43
-   :lines: 43
+```{literalinclude} ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
+:language: yaml
+:linenos:
+:lineno-start: 43
+:lines: 43
+```
 
 ...
 
-.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
-   :language: yaml
-   :linenos:
-   :lineno-start: 46
-   :lines: 46
+```{literalinclude} ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
+:language: yaml
+:linenos:
+:lineno-start: 46
+:lines: 46
+```
 
 ...
 
-.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
-   :language: yaml
-   :linenos:
-   :lineno-start: 95
-   :lines: 95
+```{literalinclude} ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
+:language: yaml
+:linenos:
+:lineno-start: 95
+:lines: 95
+```
 
 ...
 
-.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
-   :language: yaml
-   :linenos:
-   :lineno-start: 141
-   :lines: 141-143
+```{literalinclude} ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
+:language: yaml
+:linenos:
+:lineno-start: 141
+:lines: 141-143
 ```
 
 ### Connecting Configurations
