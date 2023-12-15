@@ -53,7 +53,7 @@ electrical_system:
       shape: 1
       time: 170
       materials: 0.002444444444444444444444
-      service_equipment: LCN
+      service_equipment: TOW
       operation_reduction: 0
       replacement: true
       level: 5
@@ -63,7 +63,7 @@ electrical_system:
       shape: 1
       time: 54
       materials: 0.00222222222222222222222
-      service_equipment: LCN
+      service_equipment: TOW
       operation_reduction: 0
       replacement: true
       level: 6
@@ -109,7 +109,7 @@ hydraulic_system:
       shape: 1
       time: 75
       materials: 0.00062222222222222222222
-      service_equipment: LCN
+      service_equipment: TOW
       operation_reduction: 0
       replacement: true
       level: 5
@@ -146,7 +146,7 @@ yaw_system:
       shape: 1
       time: 147
       materials: 0.0005555555555555555555
-      service_equipment: LCN
+      service_equipment: TOW
       operation_reduction: 0
       replacement: true
       level: 5
@@ -183,7 +183,7 @@ rotor_blades:
       shape: 1
       time: 864
       materials: 0.01977777777777777
-      service_equipment: LCN
+      service_equipment: TOW
       operation_reduction: 0
       replacement: true
       level: 6
@@ -220,7 +220,7 @@ generator:
       shape: 1
       time: 244
       materials: 0.01051111111111111
-      service_equipment: LCN
+      service_equipment: TOW
       operation_reduction: 0
       replacement: true
       level: 6
@@ -280,7 +280,7 @@ drive_train:
       shape: 1
       time: 144
       materials: 0.0103111111111111111
-      service_equipment: LCN
+      service_equipment: TOW
       operation_reduction: 0
       replacement: true
       level: 6
@@ -308,7 +308,7 @@ mooring_line_1:
       shape: 1
       time: 360
       materials: 0.0021753551392575
-      service_equipment: LCN  # to be revised
+      service_equipment: TOW  # to be revised
       operation_reduction: 0
       replacement: true
       level: 6
@@ -336,7 +336,7 @@ mooring_line_2:
       shape: 1
       time: 360
       materials: 0.0021753551392575
-      service_equipment: LCN  # to be revised
+      service_equipment: TOW  # to be revised
       operation_reduction: 0
       replacement: true
       level: 6
@@ -364,7 +364,7 @@ mooring_line_3:
       shape: 1
       time: 360
       materials: 0.0021753551392575
-      service_equipment: LCN  # to be revised
+      service_equipment: TOW  # to be revised
       operation_reduction: 0
       replacement: true
       level: 6
@@ -392,7 +392,7 @@ anchor_1:
       shape: 1
       time: 360
       materials: 0.02275555
-      service_equipment: LCN  # to be revised
+      service_equipment: TOW  # to be revised
       operation_reduction: 0
       replacement: true
       level: 6
@@ -420,7 +420,7 @@ anchor_2:
       shape: 1
       time: 360
       materials: 0.02275555
-      service_equipment: LCN  # to be revised
+      service_equipment: TOW  # to be revised
       operation_reduction: 0
       replacement: true
       level: 6
@@ -448,7 +448,7 @@ anchor_3:
       shape: 1
       time: 360
       materials: 0.02275555
-      service_equipment: LCN  # to be revised
+      service_equipment: TOW  # to be revised
       operation_reduction: 0
       replacement: true
       level: 6

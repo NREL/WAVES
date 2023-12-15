@@ -21,12 +21,12 @@ port:
 
 # Vessels
 # TODO: CHECK IF THESE NEED TO MATCH ORBIT DEFAULTS
-array_cable_install_vessel: example_cable_lay_vessel_GF
-export_cable_bury_vessel: example_cable_lay_vessel_GF
-export_cable_install_vessel: example_cable_lay_vessel_GF
-spi_vessel: example_scour_protection_vessel_GF
-oss_install_vessel: example_heavy_lift_vessel_GF
-wtiv: example_wtiv_GF
+array_cable_install_vessel: demand_adjusted_cable_lay_vessel
+export_cable_bury_vessel: demand_adjusted_cable_lay_vessel
+export_cable_install_vessel: demand_adjusted_cable_lay_vessel
+spi_vessel: demand_adjusted_scour_protection_vessel
+oss_install_vessel: demand_adjusted_heavy_lift_vessel
+wtiv: demand_adjusted_wtiv
 
 # Module Specific
 MonopileDesign:
@@ -40,12 +40,12 @@ oss_design:
 array_system_design:
   cables:
   - XLPE_630mm_66kV
-  location_data: base_fixed_bottom_2022
+  location_data: base_fixed_bottom_2022_layout
 export_system_design:
   cables: XLPE_1000m_220kV
   percent_added_length: 0.0
 OffshoreSubstationInstallation:
-  feeder: example_heavy_feeder_GF
+  feeder: demand_adjusted_heavy_feeder_vessel
   num_feeders: 1
 # Configured Phases
 design_phases:
