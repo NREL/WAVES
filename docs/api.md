@@ -21,6 +21,7 @@
 .. currentmodule:: waves
 
 .. autosummary::
+   :toctree: _autosummary
    :recursive:
 
    project

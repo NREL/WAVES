@@ -19,7 +19,7 @@ execute:
     - Thumbs.db
     - DS_Store
     - "**.ipynb_checkpoints"
-    - COWER_2022.ipynb
+    # - waves_example.md  # doesn't need to be run every time when building docs
 
 # Define the name of the latex output file for PDF builds
 latex:
@@ -47,12 +47,13 @@ repository:
 
 sphinx:
   extra_extensions:
-  - 'sphinx.ext.autodoc'
-  - 'sphinx.ext.autosummary'
-  - 'sphinx.ext.viewcode'
-  - 'sphinx_autodoc_typehints'
-  - 'sphinxcontrib.autoyaml'
-  - 'sphinx.ext.napoleon'
+  - "sphinx.ext.autodoc"
+  - "sphinx.ext.autosummary"
+  - "sphinx.ext.viewcode"
+  - "sphinx_autodoc_typehints"
+  - "sphinxcontrib.autoyaml"
+  - "sphinx.ext.napoleon"
+  - "sphinx_click"
 
   config:
     html_theme: sphinx_book_theme

@@ -11,7 +11,8 @@ parts:
   - file: contributing
 - caption: Examples
   chapters:
-  - file: COWER_2022
+  - file: waves_example
 - caption: API Reference
   chapters:
   - file: api
+  - file: cli

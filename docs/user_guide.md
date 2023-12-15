@@ -64,14 +64,14 @@ configuration input.
 
 <!-- :lines: 1-29, 38, 41, 90, 141-207 -->
 ```{eval-rst}
-.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
    :lines: 1-29
    :linenos:
 
 ...
 
-.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
    :linenos:
    :lineno-start: 38
@@ -79,7 +79,7 @@ configuration input.
 
 ...
 
-.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
    :linenos:
    :lineno-start: 41
@@ -87,7 +87,7 @@ configuration input.
 
 ...
 
-.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
    :linenos:
    :lineno-start: 90
@@ -95,7 +95,7 @@ configuration input.
 
 ...
 
-.. literalinclude:: ../library/cower_2022/project/config/COE_2022_fixed_bottom_base.yaml
+.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
    :linenos:
    :lineno-start: 141
@@ -132,8 +132,8 @@ from pathlib import Path
 from waves import Project
 from waves.utilities import load_yaml
 
-library_path = Path("../library/cower_2022/")
-config = load_yaml(library_path / "project/config", "COE_2022_fixed_bottom_base.yaml")
+library_path = Path("../library/base_2022/")
+config = load_yaml(library_path / "project/config", "base_fixed_bottom_2022.yaml")
 config["library_path"] = library_path  # add the library path
 
 # Ensure FLORIS is not automatically connected
@@ -199,7 +199,7 @@ For the following set of methods, users only need to create a ``Project`` object
 
 To quickly produce any of the high-level outputs to a single `DataFrame`, the below method can be
 used in place of individually calculating each metric and combining into a report. Additionally,
-users can refer to the [COWER 2022 example](cower_2022:results) for the reported results,
+users can refer to the [COWER 2022 example](example_cower_2022:results) for the reported results,
 which relies on the `generate_report` method and accessing the ORBIT `ProjectManager` directly for
 further CapEx breakdowns.
 
@@ -303,4 +303,37 @@ any interdependencies between model outputs.
 
 .. automethod:: Project.lcoe
    :noindex:
+```
+
+## Command Line Interface (CLI)
+
+The CLI can be accessed through either of the below commands in your WAVES environment. See the next
+subsection for details on how to parameterize the running of WAVES through the CLI.
+
+```bash
+python waves ...
+```
+
+```bash
+waves ...
+```
+
+```{eval-rst}
+.. click:: waves.__main__:typer_click_object
+   :prog: waves
+   :nested: full
+```
+
+### Additional Configurations
+
+Running one or many analyses from the command line can be used with a few additional parameters
+defined in the configuration file. The [provided example](./waves_example.md) is configured to also
+be run through the CLI. Below is an example of the additional configurations
+
+```{eval-rst}
+.. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
+   :language: yaml
+   :linenos:
+   :lineno-start: 146
+   :lines: 146-
 ```
