@@ -81,6 +81,10 @@ docs = [
     "sphinxcontrib-autoyaml",
     "sphinx-click",
 ]
+examples=[
+    "jupyterlab",
+    "jupyterlab-myst",
+]
 
 [tool.setuptools]
 include-package-data = true
