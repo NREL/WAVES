@@ -79,6 +79,7 @@ docs = [
     "myst-parser",
     "sphinx-autodoc-typehints",
     "sphinxcontrib-autoyaml",
+    "sphinx-click",
 ]
 
 [tool.setuptools]

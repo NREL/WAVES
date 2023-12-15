@@ -60,7 +60,10 @@ def run(
     report: Annotated[
         bool,
         typer.Option(
-            help="Generate an outputs report. 'report_config' must be present in the `config_dict`."
+            help=(
+                "Generate a table of metrics. ``report_config`` must be configured in the"
+                "``config_dict``. See the API for``Project.generate_report()`` for details."
+            )
         ),
     ] = True,
     save_report: Annotated[
@@ -77,5 +80,8 @@ def run(
         run_single(library_path, config, report, save_report)
 
 
+typer_click_object = typer.main.get_command(app)
+
+
 if __name__ == "__main__":
-    app()
+    typer_click_object()
