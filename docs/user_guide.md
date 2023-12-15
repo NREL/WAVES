@@ -62,11 +62,10 @@ configuration is a pointer to another file to keep each configuration as tidy as
 each of `orbit_config`, `wombat_config`, and `floris_config` allow for a direct dictionary
 configuration input.
 
-<!-- :lines: 1-29, 38, 41, 90, 141-207 -->
 ```{eval-rst}
 .. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
-   :lines: 1-29
+   :lines: 1-36
    :linenos:
 
 ...
@@ -74,24 +73,24 @@ configuration input.
 .. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
    :linenos:
-   :lineno-start: 38
-   :lines: 38
+   :lineno-start: 43
+   :lines: 43
 
 ...
 
 .. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
    :linenos:
-   :lineno-start: 41
-   :lines: 41
+   :lineno-start: 46
+   :lines: 46
 
 ...
 
 .. literalinclude:: ../library/base_2022/project/config/base_fixed_bottom_2022.yaml
    :language: yaml
    :linenos:
-   :lineno-start: 90
-   :lines: 90
+   :lineno-start: 95
+   :lines: 95
 
 ...
 
@@ -99,7 +98,7 @@ configuration input.
    :language: yaml
    :linenos:
    :lineno-start: 141
-   :lines: 141-
+   :lines: 141-143
 ```
 
 ### Connecting Configurations
@@ -307,22 +306,32 @@ any interdependencies between model outputs.
 
 ## Command Line Interface (CLI)
 
-The CLI can be accessed through either of the below commands in your WAVES environment. See the next
-subsection for details on how to parameterize the running of WAVES through the CLI.
+Run one or multiple WAVES analyses given a configuration dictionary, and optionally output
+and save the results.
 
-```bash
-python waves ...
+**Usage**:
+
+```console
+waves [OPTIONS] LIBRARY_PATH CONFIGURATION...
 ```
 
-```bash
-waves ...
-```
+**Arguments**:
 
-```{eval-rst}
-.. click:: waves.__main__:typer_click_object
-   :prog: waves
-   :nested: full
-```
+* `LIBRARY_PATH`: The relative or absolute path to the simulation data library.
+* `CONFIGURATION...`: The configuration file name(s) to run. These should be located in
+  `LIBRARY_PATH/project/config/`.
+
+**Options**:
+
+* `--report / --no-report`: [default: report] Generate a table of metrics; `report_config` must be
+  configured in the ``configuration``. See the API for `Project.generate_report()` for details.
+  Use `--no-report` to just run the simulation.
+* `--save-report / --no-save-report`: [default: save-report] Save the output report metrics to a
+  CSV file. Use `no-save-report` to only display the results.
+* `--install-completion`: Install completion for the current shell.
+* `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
+* `--help`: Show this message and exit.
+
 
 ### Additional Configurations
 

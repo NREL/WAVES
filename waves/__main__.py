@@ -47,36 +47,39 @@ def run_single(libary_path: str, config: str, report: bool, save_report: bool) -
 
 @app.command()
 def run(
-    library_path: Annotated[str, typer.Argument(help="The path to the data library.")],
-    configuration_dict: Annotated[
+    library_path: Annotated[str, typer.Argument(None, help="The path to the data library.")],
+    configuration: Annotated[
         list[str],
         typer.Argument(
+            None,
             help=(
                 "The filename(s) of (with extension) of the configuration dictionary. These must"
                 " include the a key, value pair for the run arguments under the key `run`"
-            )
+            ),
         ),
     ],
     report: Annotated[
         bool,
         typer.Option(
+            True,
             help=(
                 "Generate a table of metrics. ``report_config`` must be configured in the"
                 "``config_dict``. See the API for``Project.generate_report()`` for details."
-            )
+            ),
         ),
     ] = True,
     save_report: Annotated[
         bool,
         typer.Option(
+            True,
             help="True to save the output report metrics to a CSV file, and False to print only.",
         ),
     ] = True,
 ) -> None:
-    """Run a one or multiple WAVES analyses given a configuration dictionary, and optionally output
+    """Run one or multiple WAVES analyses given a configuration dictionary, and optionally output
     and save the results.
     """
-    for config in configuration_dict:
+    for config in configuration:
         run_single(library_path, config, report, save_report)
 
 

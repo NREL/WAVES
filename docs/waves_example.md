@@ -12,6 +12,9 @@ kernelspec:
 (example_cower_2022)=
 # Cost of Wind Energy Review 2022
 
+Be sure to install `pip install "waves[examples]"` (or `pip install ".[examples]"`) to work with
+this example.
+
 This example will walk through the process of running a subset of the 2022 Cost of Wind Energy
 Review (COWER) analysis to demonstrate an analysis workflow. Please note, that this is not the exact
 workflow because it has been broken down to highlight some of the key features of WAVES. Similarly,

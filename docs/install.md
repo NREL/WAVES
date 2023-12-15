@@ -17,10 +17,20 @@ For basic usage, users can install WAVES directly from PyPI, or from source for 
 
 ### From Source
 
+A source installation is great for users that want to work with the provided example, and
+potentially modify the code at a later point in time.
+
 ```bash
 git clone https://github.com/NREL/WAVES.git
 cd WAVES
 pip install .
+```
+
+If working with the example, or running with Jupyter Notebooks, be sure to install the examples
+dependencies like the following:
+
+```bash
+pip install ".[examples]"
 ```
 
 #### Tinkering
@@ -38,6 +48,6 @@ If you plan on contributing to the code base at any point, be sure to install th
 For more details on developing, please see the [contributor's guide](contributing.md).
 
 ```bash
-pip install -e ".[dev,docs]"
+pip install -e ".[dev,docs,examples]"
 pre-commit install
 ```
