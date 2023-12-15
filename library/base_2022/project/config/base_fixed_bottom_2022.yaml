@@ -15,6 +15,11 @@ floris_windspeed: windspeed_100m
 floris_x_col: floris_x
 floris_y_col: floris_y
 
+# Create the necessary connections
+# NOTE: these are default values, but worth highlighting for an example
+connect_floris_to_layout: true
+conenct_orbit_array_design: true
+
 # High-level project financials
 discount_rate: 0.025
 fixed_charge_rate: 0.0648 # real FCR from national LCOE study, 25 year lifetime instead of 30
