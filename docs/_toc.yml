@@ -1,0 +1,18 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: index
+parts:
+- caption: Getting Started
+  chapters:
+  - file: install
+  - file: user_guide
+  - file: contributing
+- caption: Examples
+  chapters:
+  - file: waves_example
+- caption: API Reference
+  chapters:
+  - file: api
+  - file: cli

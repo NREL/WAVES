@@ -1,0 +1,17 @@
+name: base_floating_2022
+weather: era5_41.0N_125.0W_1989_2019.csv
+service_equipment:
+  - ctv1.yaml
+  - ctv2.yaml
+  - ctv3.yaml
+  - clv.yaml
+  - dsv.yaml
+layout: base_floating_2022_layout.csv
+inflation_rate: 0
+fixed_costs: fixed_costs_2022.yaml
+workday_start: 7
+workday_end: 19
+start_year: 1999
+end_year: 2019
+project_capacity: 600
+port: port_139km.yaml

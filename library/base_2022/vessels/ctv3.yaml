@@ -1,0 +1,25 @@
+name: Crew Transfer Vessel 3
+equipment_rate: 3805.31  # 3500 EUR -> USD 3/31/23
+capability: CTV
+speed: 37.04 # 37 kph = 20 knots
+strategy: scheduled
+max_windspeed_transport: 16
+max_windspeed_repair: 16
+max_waveheight_transport: 3
+max_waveheight_repair: 3
+onsite: True
+mobilization_cost: 0
+mobilization_days: 0
+start_month: 1
+start_day: 1
+end_month: 12
+end_day: 31
+start_year: 2000
+end_year: 2020
+crew_transfer_time: 0.25
+n_crews: 1
+crew:
+  day_rate: 0  # crew comes with vessel
+  n_day_rate: 0
+  hourly_rate: 0
+  n_hourly_rate: 0

@@ -1,3 +1,113 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[metadata]
+version = "attr: waves.__version__"
+
+[project]
+name = "WAVES"
+dynamic = ["version"]
+authors = [{name = "Rob Hammond", email = "rob.hammond@nrel.gov"}]
+readme = "README.md"
+description = "Wind Asset Value Estimation System"
+requires-python = ">=3.9, <3.11"
+license = {file = "LICENSE"}
+dependencies = [
+    "tqdm",
+    "attrs",
+    "pyyaml",
+    "matplotlib>=3.6",
+    "numpy-financial>=1.0.0",
+    "floris>=3.3",
+    "wombat>=0.9.1",
+    "orbit-nrel>=1.0.8",
+    "typer[all]",
+]
+keywords = [
+    "python3",
+    "wind-energy",
+    "operations-maintenance",
+    "operations-and-maintenance",
+    "balance-of-system",
+    "levelized-cost-of-energy",
+    "lcoe",
+    "aep",
+    "wakes",
+    "wake-analysis",
+    "energy-production",
+    "discrete-event-simulation",
+    "simulation",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[console_scripts]
+waves = "waves:__main__"
+
+[project.scripts]
+waves = "waves.__main__:app"
+
+[project.urls]
+source = "https://github.com/NREL/WAVES"
+documentation = "https://nrel.github.io/WAVES/"
+issues = "https://github.com/NREL/WAVES/issues"
+changelog = "https://github.com/NREL/WAVES/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "black",
+    "isort",
+    "pytest",
+    "pytest-cov",
+    "mypy",
+    "ruff",
+]
+docs = [
+    "jupyter-book",
+    "myst-nb",
+    "myst-parser",
+    "sphinx-autodoc-typehints",
+    "sphinxcontrib-autoyaml",
+    "sphinx-click",
+]
+examples=[
+    "jupyterlab",
+    "jupyterlab-myst",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["waves", "library", "*.yaml", "*.csv"]
+exclude = [
+    "*.tests",
+    "*.tests.*",
+    "tests.*",
+    "tests",
+    "*.results",
+    "*.results.*",
+    "results.*",
+    "results",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "waves.__version__"}
+
 [tool.isort]
 skip = [
   "waves/__init__.py",
@@ -87,30 +197,18 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.per-file-ignores]
 "setup.py" = ["D104"]
-"library/__init__.py" = ["D104"]
-"library/cables/__init__.py" = ["D104"]
-"library/project/__init__.py" = ["D104"]
-"library/project/config/__init__.py" = ["D104"]
-"library/project/plant/__init__.py" = ["D104"]
-"library/project/port/__init__.py" = ["D104"]
-"library/results/__init__.py" = ["D104"]
-"library/substations/__init__.py" = ["D104"]
-"library/substructures/__init__.py" = ["D104"]
-"library/turbines/__init__.py" = ["D104"]
-"library/vessels/__init__.py" = ["D104"]
-"library/weather/__init__.py" = ["D104"]
-"examples/__init__.py" = ["D104"]
-"examples/library/__init__.py" = ["D104"]
-"examples/library/cables/__init__.py" = ["D104"]
-"examples/library/project/__init__.py" = ["D104"]
-"examples/library/project/config/__init__.py" = ["D104"]
-"examples/library/project/plant/__init__.py" = ["D104"]
-"examples/library/project/port/__init__.py" = ["D104"]
-"examples/library/results/__init__.py" = ["D104"]
-"examples/library/substations/__init__.py" = ["D104"]
-"examples/library/turbines/__init__.py" = ["D104"]
-"examples/library/vessels/__init__.py" = ["D104"]
-"examples/library/weather/__init__.py" = ["D104"]
+"library/*/__init__.py" = ["D104"]
+"library/*/cables/__init__.py" = ["D104"]
+"library/*/project/__init__.py" = ["D104"]
+"library/*/project/config/__init__.py" = ["D104"]
+"library/*/project/plant/__init__.py" = ["D104"]
+"library/*/project/port/__init__.py" = ["D104"]
+"library/*/results/__init__.py" = ["D104"]
+"library/*/substations/__init__.py" = ["D104"]
+"library/*/substructures/__init__.py" = ["D104"]
+"library/*/turbines/__init__.py" = ["D104"]
+"library/*/vessels/__init__.py" = ["D104"]
+"library/*/weather/__init__.py" = ["D104"]
 "test/__init__.py" = ["D104"]
 "test/library/__init__.py" = ["D104"]
 "test/library/cables/__init__.py" = ["D104"]

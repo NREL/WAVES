@@ -1,1 +1,6 @@
-__version__ = "0.0.0"
+"""WAVES initialization."""
+
+from waves.project import Project
+
+
+__version__ = "0.5"

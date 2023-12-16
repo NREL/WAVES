@@ -131,8 +131,9 @@ dmypy.json
 # MacOS Files
 *.DS_Store
 
+# VSCode Files
+.vscode/
+
 # Project specific
-examples/library/results
-library/results
-examples/library/weather
-library/weather
+*results/
+*/weather/*.csv
