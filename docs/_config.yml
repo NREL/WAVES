@@ -11,7 +11,7 @@ exclude_patterns: [_build, Thumbs.db, .DS_Store, "**.ipynb_checkpoints", .github
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
 execute:
-  execute_notebooks: off
+  execute_notebooks: auto
   timeout: -1
   merge_streams: true
   exclude_patterns:
