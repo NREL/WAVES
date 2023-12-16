@@ -79,6 +79,15 @@ turbine_library_path: <path_to_waves>/WAVES/library/base_2022/turbines/
 library_path = Path("../library/base_2022/")
 config_fixed = load_yaml(library_path / "project/config", "base_fixed_bottom_2022.yaml")
 config_floating = load_yaml(library_path / "project/config", "base_floating_2022.yaml")
+
+# This example was designed prior to the FLORIS 3.6 release, so the path to the turbine library in
+# FLORIS must be manually updated, but this example must work for all users, so a dynamic method
+# is used below, ensuring this works for all users.
+config_fixed["floris_config"] = load_yaml(library_path / "project/config", config_fixed["floris_config"])
+config_floating["floris_config"] = load_yaml(library_path / "project/config", config_floating["floris_config"])
+
+config_fixed["floris_config"]["farm"]["turbine_library_path"] = library_path / "turbines"
+config_floating["floris_config"]["farm"]["turbine_library_path"] = library_path / "turbines"
 ```
 
 Now, we'll create a Project for each of the fixed bottom and floating offshore scenarios, showing
