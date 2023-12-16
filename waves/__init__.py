@@ -1,8 +1,6 @@
-"""WHaLE initialization."""
-
-import importlib.metadata
+"""WAVES initialization."""
 
 from waves.project import Project
 
 
-__version__ = importlib.metadata.version("waves")
+__version__ = "0.5"

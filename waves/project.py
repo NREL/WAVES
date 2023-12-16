@@ -1824,7 +1824,7 @@ class Project(FromDictMixin):
         per_capacity: str | None = None,
     ) -> pd.DataFrame | float:
         """Calculates the revenue stream using the WOMBAT availabibility, FLORIS energy
-        production, and WHaLE energy pricing.
+        production, and WAVES energy pricing.
 
         Parameters
         ----------
@@ -2382,7 +2382,7 @@ class Project(FromDictMixin):
         **kwargs,
     ) -> float:
         """Calculates the Internal Rate of Return using the ORBIT CapEx as the initial
-        investment in conjunction with the WHaLE monthly cash flows.
+        investment in conjunction with the WAVES monthly cash flows.
 
         .. note:: This method allows for the caluclation of the modified internal rate of return
             through https://numpy.org/numpy-financial/latest/mirr.html#numpy_financial.mirr

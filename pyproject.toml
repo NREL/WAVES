@@ -2,11 +2,14 @@
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
+[metadata]
+version = "attr: waves.__version__"
+
 [project]
 name = "WAVES"
-version = "0.5"
+dynamic = ["version"]
 authors = [{name = "Rob Hammond", email = "rob.hammond@nrel.gov"}]
-readme = "README.rst"
+readme = "README.md"
 description = "Wind Asset Value Estimation System"
 requires-python = ">=3.9, <3.11"
 license = {file = "LICENSE"}
@@ -101,6 +104,9 @@ exclude = [
     "results.*",
     "results",
 ]
+
+[tool.setuptools.dynamic]
+version = {attr = "waves.__version__"}
 
 [tool.isort]
 skip = [
