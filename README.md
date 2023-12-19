@@ -86,3 +86,9 @@ python
 import waves
 waves.__version__
 ```
+
+### CLI
+
+```console
+waves library-path configuration1.yaml configuration2.yaml
+```
