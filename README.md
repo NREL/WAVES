@@ -5,6 +5,9 @@
 Runs analyses for offshore wind projects by utilizing ORBIT (CapEx), WOMBAT (OpEx), and FLORIS (AEP)
 to estimate the lifecycle costs using NREL's flagship technoeconomic models.
 
+Please visit our [documentation site](https://nrel.github.io/WAVES/) for API documentation, a
+reference guide, and examples.
+
 ## Requirements
 
 Python 3.9 or 3.10
