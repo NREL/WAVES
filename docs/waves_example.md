@@ -160,6 +160,13 @@ print(f"Fixed run time: {end1 - start1:,.2f} seconds")
 print(f"Floating run time: {end2 - start2:,.2f} seconds")
 ```
 
+Both of these examples can also be run via the CLI, though the FLORIS `turbine_library_path`
+configuration will have to be manually updated in each file to ensure the examples run.
+
+```console
+waves path/to/library/base_2022/ base_fixed_bottom_2022.yaml base_floating_bottom_2022.yaml --no-save-report
+```
+
 (example_cower_2022:results)=
 ## Gather the results
 
