@@ -365,5 +365,9 @@ report_df = report_df_fixed.join(
     how="outer",
 ).fillna(0.0)
 report_df.index.name = "Metrics"
+
+# Format percent-based rows to show as such, not as decimals
+report_df.loc[report_df.index.str.contains("%")] *= 100
+
 report_df
 ```
