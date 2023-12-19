@@ -11,14 +11,14 @@ Python 3.9 or 3.10
 
 ## Environment Setup
 
-Download the latest version of `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_
-for the appropriate OS. Follow the remaining `steps <https://conda.io/projects/conda/en/latest/user-guide/install/index.html#regular-installation>`_
+Download the latest version of [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+for the appropriate OS. Follow the remaining [steps](https://conda.io/projects/conda/en/latest/user-guide/install/index.html#regular-installation)
 for the appropriate OS version.
 
 Using conda, create a new virtual environment:
 
 ```console
-conda create -n <environment_name>
+conda create -n <environment_name> python=3.10
 conda activate <environment_name>
 conda install -c anaconda pip
 conda config --set pip_interop_enabled true
