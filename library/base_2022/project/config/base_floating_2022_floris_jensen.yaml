@@ -104,7 +104,7 @@ farm:
   - 0
   - 0
 
-  turbine_library_path: /Users/rhammond/GitHub_Public/WAVES/library/base_2022/turbines
+  turbine_library_path: ../../turbines
   turbine_type:
   - 12MW_216m
   - 12MW_216m
