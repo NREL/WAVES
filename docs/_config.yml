@@ -77,7 +77,7 @@ sphinx:
         },
         {
             name: Binder,
-            url: https://mybinder.org/v2/gh/NREL/WAVES/main?filepath=examples,
+            url: "https://mybinder.org/v2/gh/NREL/WAVES/main?filepath=examples",
             icon: "https://mybinder.org/badge_logo.svg",
             type: url,
         },
