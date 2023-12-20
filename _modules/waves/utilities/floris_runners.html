@@ -1,0 +1,673 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>waves.utilities.floris_runners &#8212; WAVES</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/waves/utilities/floris_runners';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">WAVES</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NREL/WAVES" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/WAVES/" title="PyPI version" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://img.shields.io/pypi/v/WAVES?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F" class="icon-link-image" alt="PyPI version"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mybinder.org/v2/gh/NREL/WAVES/main?filepath=examples" title="Binder" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://mybinder.org/badge_logo.svg" class="icon-link-image" alt="Binder"/></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide.html">How to Use WAVES</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributor's Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../waves_example.html">Cost of Wind Energy Review 2022</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../_autosummary/waves.project.html">waves.project</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/waves.utilities.html">waves.utilities</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/waves.utilities.floris_runners.html">waves.utilities.floris_runners</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/waves.utilities.library.html">waves.utilities.library</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">CLI Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES/issues/new?title=Issue%20on%20page%20%2F_modules/waves/utilities/floris_runners.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for waves.utilities.floris_runners</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Provides the FLORIS-based methods for pre-processing data and post-processing results.&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">floris.tools</span> <span class="kn">import</span> <span class="n">FlorisInterface</span>
+<span class="kn">from</span> <span class="nn">floris.tools.wind_rose</span> <span class="kn">import</span> <span class="n">WindRose</span>
+
+
+<span class="c1"># **************************************************************************************************</span>
+<span class="c1"># Time series methods</span>
+<span class="c1"># **************************************************************************************************</span>
+
+
+<div class="viewcode-block" id="run_chunked_time_series_floris"><a class="viewcode-back" href="../../../_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.run_chunked_time_series_floris">[docs]</a><span class="k">def</span> <span class="nf">run_chunked_time_series_floris</span><span class="p">(</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">FlorisInterface</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs ``fi.calculate_wake()`` over a chunk of a larger time series analysis and</span>
+<span class="sd">    returns the individual turbine powers for each corresponding time.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fi : FlorisInterface</span>
+<span class="sd">        A copy of the base ``FlorisInterface`` object.</span>
+<span class="sd">    weather : pd.DataFrame</span>
+<span class="sd">        A subset of the full weather profile, with only the datetime index and columns:</span>
+<span class="sd">        &quot;windspeed&quot; and &quot;wind_direction&quot;.</span>
+<span class="sd">    chunk_id : tuple[int, int]</span>
+<span class="sd">        A tuple of the year and month for the data being processed.</span>
+<span class="sd">    reinit_kwargs : dict, optional</span>
+<span class="sd">        Any additional reinitialization keyword arguments. Defaults to {}.</span>
+<span class="sd">    run_kwargs : dict, optional</span>
+<span class="sd">        Any additional calculate_wake keyword arguments. Defaults to {}.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[tuple[int, int], FlorisInterface, pd.DataFrame]</span>
+<span class="sd">        The ``chunk_id``, a reinitialized ``fi`` using the appropriate wind parameters</span>
+<span class="sd">        that can be used for further post-processing, and the resulting turbine powers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fi</span><span class="p">:</span> <span class="n">FlorisInterface</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">weather</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">reinit_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">run_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+
+    <span class="n">reinit_kwargs</span><span class="p">[</span><span class="s2">&quot;wind_directions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">wind_direction</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">reinit_kwargs</span><span class="p">[</span><span class="s2">&quot;wind_speeds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weather</span><span class="o">.</span><span class="n">windspeed</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">fi</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">time_series</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">reinit_kwargs</span><span class="p">)</span>
+    <span class="n">fi</span><span class="o">.</span><span class="n">calculate_wake</span><span class="p">(</span><span class="o">**</span><span class="n">run_kwargs</span><span class="p">)</span>
+    <span class="n">power_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fi</span><span class="o">.</span><span class="n">get_turbine_powers</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">index</span><span class="o">=</span><span class="n">weather</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">chunk_id</span><span class="p">,</span> <span class="n">fi</span><span class="p">,</span> <span class="n">power_df</span></div>
+
+
+<div class="viewcode-block" id="run_parallel_time_series_floris"><a class="viewcode-back" href="../../../_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.run_parallel_time_series_floris">[docs]</a><span class="k">def</span> <span class="nf">run_parallel_time_series_floris</span><span class="p">(</span>
+    <span class="n">args_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">FlorisInterface</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]],</span>
+    <span class="n">nodes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">FlorisInterface</span><span class="p">],</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs the time series floris calculations in parallel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    args_list : list[tuple[FlorisInterface, pd.DataFrame, tuple[int, int], dict, dict]])</span>
+<span class="sd">        A list of the chunked by month arguments that get passed to</span>
+<span class="sd">        ``run_chunked_time_series_floris``.</span>
+<span class="sd">    nodes : int, optional</span>
+<span class="sd">        The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the</span>
+<span class="sd">        available CPUs on the computer. Defaults to -1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame]</span>
+<span class="sd">        A dictionary of the ``chunk_id`` and ``FlorisInterface`` object, and the full turbine power</span>
+<span class="sd">        dataframe (without renamed columns).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.7</span><span class="p">)</span> <span class="k">if</span> <span class="n">nodes</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="n">nodes</span>
+    <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">args_list</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Time series energy calculation&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">df_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">fi_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">chunk_id</span><span class="p">,</span> <span class="n">fi</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">pool</span><span class="o">.</span><span class="n">imap_unordered</span><span class="p">(</span><span class="n">run_chunked_time_series_floris</span><span class="p">,</span> <span class="n">args_list</span><span class="p">):</span>
+                <span class="n">df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+                <span class="n">fi_dict</span><span class="p">[</span><span class="n">chunk_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">fi</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="n">fi_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">fi_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+    <span class="n">turbine_power_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fi_dict</span><span class="p">,</span> <span class="n">turbine_power_df</span></div>
+
+
+<span class="c1"># **************************************************************************************************</span>
+<span class="c1"># Wind rose methods</span>
+<span class="c1"># **************************************************************************************************</span>
+
+
+<div class="viewcode-block" id="create_single_month_wind_rose"><a class="viewcode-back" href="../../../_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.create_single_month_wind_rose">[docs]</a><span class="k">def</span> <span class="nf">create_single_month_wind_rose</span><span class="p">(</span><span class="n">weather_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">month</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">WindRose</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates the FLORIS ``WindRose`` object for a given :py:attr:`month` based on the</span>
+<span class="sd">    :py:attr:`weather_df`&#39;s ``DatetimeIndex``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    weather_df : pd.DataFrame</span>
+<span class="sd">        The weather profile used to create long-term, month-based ``WindRose`` objects</span>
+<span class="sd">    month : int</span>
+<span class="sd">        The month of the year to create a ``WindRose`` object.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[int, WindRose]</span>
+<span class="sd">        A tuple of the :py:attr:`month` passed and the final ``WindRose`` object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wd</span><span class="p">,</span> <span class="n">ws</span> <span class="o">=</span> <span class="n">weather_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">weather_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span> <span class="o">==</span> <span class="n">month</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;wd&quot;</span><span class="p">,</span> <span class="s2">&quot;ws&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">wind_rose</span> <span class="o">=</span> <span class="n">WindRose</span><span class="p">()</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">wind_rose</span><span class="o">.</span><span class="n">make_wind_rose_from_user_data</span><span class="p">(</span><span class="n">wd</span><span class="p">,</span> <span class="n">ws</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">month</span><span class="p">,</span> <span class="n">wind_rose</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_monthly_wind_rose"><a class="viewcode-back" href="../../../_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.create_monthly_wind_rose">[docs]</a><span class="k">def</span> <span class="nf">create_monthly_wind_rose</span><span class="p">(</span><span class="n">weather_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">WindRose</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a dictionary of month and a long-term ``WindRose`` object based on all the</span>
+<span class="sd">    wind condition data for that month.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    weather_df : pd.DataFrame</span>
+<span class="sd">        The weather profile used to create long-term, month-based ``WindRose`` objects</span>
+<span class="sd">    month : int</span>
+<span class="sd">        The month of the year to create a ``WindRose`` object.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[int, WindRose]</span>
+<span class="sd">        A dictionary of the integer month and the long-term ``WindRose`` object associated</span>
+<span class="sd">        with all the wind conditions during that month.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">create_single_month_wind_rose</span><span class="p">(</span><span class="n">weather_df</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span> <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="check_monthly_wind_rose"><a class="viewcode-back" href="../../../_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.check_monthly_wind_rose">[docs]</a><span class="k">def</span> <span class="nf">check_monthly_wind_rose</span><span class="p">(</span>
+    <span class="n">project_wind_rose</span><span class="p">:</span> <span class="n">WindRose</span><span class="p">,</span> <span class="n">monthly_wind_rose</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">WindRose</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">WindRose</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks the monthly wind rose parameterizations to ensure the DataFrames are the</span>
+<span class="sd">    correct shape, so that when the frequency column is extracted, the compared data</span>
+<span class="sd">    is the same.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    project_wind_rose : WindRose</span>
+<span class="sd">        The ``WindRose`` created using the long term reanalysis weather profile.</span>
+<span class="sd">    monthly_wind_rose : dict[int, WindRose]</span>
+<span class="sd">        A dictionary of the month as an ``int`` and ``WindRose`` created from the long</span>
+<span class="sd">        term project reanalysis weather profile that was filtered on weather data for</span>
+<span class="sd">        the focal month.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[int, WindRose]</span>
+<span class="sd">        The :py:attr:`monthly_wind_rose` but with an missing wind conditions added into</span>
+<span class="sd">        the ``WindRose`` with 0 frequency.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">project_df</span> <span class="o">=</span> <span class="n">project_wind_rose</span><span class="o">.</span><span class="n">df</span>
+    <span class="n">wr_combinations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">project_df</span><span class="p">[[</span><span class="s2">&quot;wd&quot;</span><span class="p">,</span> <span class="s2">&quot;ws&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">month</span><span class="p">,</span> <span class="n">wind_rose</span> <span class="ow">in</span> <span class="n">monthly_wind_rose</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">wind_rose</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">project_df</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Find the missing combinations, add them to the wind rose DataFrame, and resort</span>
+        <span class="n">wr_df</span> <span class="o">=</span> <span class="n">wind_rose</span><span class="o">.</span><span class="n">df</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">wr_combinations</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">wr_df</span><span class="p">[[</span><span class="s2">&quot;wd&quot;</span><span class="p">,</span> <span class="s2">&quot;ws&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)))</span>
+        <span class="n">missing_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="n">wr_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">missing_df</span><span class="p">[[</span><span class="s2">&quot;wd&quot;</span><span class="p">,</span> <span class="s2">&quot;ws&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
+        <span class="n">missing_df</span><span class="o">.</span><span class="n">freq_val</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">wr_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">wr_df</span><span class="p">,</span> <span class="n">missing_df</span><span class="p">])</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;wd&quot;</span><span class="p">,</span> <span class="s2">&quot;ws&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Tidy up the WindRose object itself to ensure it can be used correctly</span>
+        <span class="c1"># Note: taken from the WindRose.read_wind_rose_csv() method without renormalizing the</span>
+        <span class="c1"># frequency data because we&#39;re only adding in missing values with 0 frequency</span>
+        <span class="n">wind_rose</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">wr_df</span>
+
+        <span class="c1"># Call the resample function in order to set all the internal variables</span>
+        <span class="n">wind_rose</span><span class="o">.</span><span class="n">internal_resample_wind_speed</span><span class="p">(</span><span class="n">ws</span><span class="o">=</span><span class="n">wr_df</span><span class="o">.</span><span class="n">ws</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">wind_rose</span><span class="o">.</span><span class="n">internal_resample_wind_direction</span><span class="p">(</span><span class="n">wd</span><span class="o">=</span><span class="n">wr_df</span><span class="o">.</span><span class="n">wd</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">monthly_wind_rose</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">=</span> <span class="n">wind_rose</span>
+
+    <span class="k">return</span> <span class="n">monthly_wind_rose</span></div>
+
+
+<div class="viewcode-block" id="calculate_monthly_wind_rose_results"><a class="viewcode-back" href="../../../_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.calculate_monthly_wind_rose_results">[docs]</a><span class="k">def</span> <span class="nf">calculate_monthly_wind_rose_results</span><span class="p">(</span>
+    <span class="n">turbine_power</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">freq_monthly</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the turbine AEP contribution for each month of a year, in MWh.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    turbine_power : np.ndarray</span>
+<span class="sd">        The array of turbine powers, with shape (num wd x num ws x num turbines), calculated from</span>
+<span class="sd">        the possible wind conditions at the site given the turbine layout.</span>
+<span class="sd">    freq_monthly : dict[int, np.ndarray]</span>
+<span class="sd">        The dictionary of integer months (i.e., 1 for January) and array of frequences, with shape</span>
+<span class="sd">        (num wd x num ws), created by the long term wind conditions filtered on the month.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame, pd.DataFrame</span>
+<span class="sd">        A DataFrame of each month&#39;s contribution to the AEP for each turbine in the wind farm, with</span>
+<span class="sd">        shape (12 x num turbines).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">month_day_map</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">28</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">31</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">31</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">31</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">31</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">31</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">],</span>
+        <span class="p">],</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">,</span> <span class="s2">&quot;n_days&quot;</span><span class="p">],</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;month&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the monthly turbine energy and sum over the turbines to get the farm energy</span>
+    <span class="n">turbine_energy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="n">m</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+                <span class="n">freq_monthly</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">freq_monthly</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">turbine_power</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">freq_monthly</span>
+        <span class="p">},</span>
+        <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="n">turbine_energy</span> <span class="o">*=</span> <span class="n">month_day_map</span><span class="o">.</span><span class="n">n_days</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">/</span> <span class="mf">1e6</span>
+    <span class="k">return</span> <span class="n">turbine_energy</span></div>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Renewable Energy Laboratory
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

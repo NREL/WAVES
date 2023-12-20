@@ -1,0 +1,817 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; WAVES</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">WAVES</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NREL/WAVES" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/WAVES/" title="PyPI version" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://img.shields.io/pypi/v/WAVES?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F" class="icon-link-image" alt="PyPI version"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mybinder.org/v2/gh/NREL/WAVES/main?filepath=examples" title="Binder" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://mybinder.org/badge_logo.svg" class="icon-link-image" alt="Binder"/></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">How to Use WAVES</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributor's Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="waves_example.html">Cost of Wind Energy Review 2022</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/waves.project.html">waves.project</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/waves.utilities.html">waves.utilities</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/waves.utilities.floris_runners.html">waves.utilities.floris_runners</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/waves.utilities.library.html">waves.utilities.library</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES/issues/new?title=Issue%20on%20page%20%2Fgenindex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project._fi_dict">_fi_dict (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.array_system_total_cable_length">array_system_total_cable_length() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.availability">availability() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.calculate_monthly_wind_rose_results">calculate_monthly_wind_rose_results() (in module waves.utilities.floris_runners)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.capacity">capacity() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.capacity_factor">capacity_factor() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.capex">capex() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.capex_breakdown">capex_breakdown() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.cash_flow">cash_flow() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.check_monthly_wind_rose">check_monthly_wind_rose() (in module waves.utilities.floris_runners)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.config_dict">config_dict (waves.project.Project property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.connect_floris_to_layout">connect_floris_to_layout (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.connect_floris_to_turbines">connect_floris_to_turbines() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.connect_orbit_array_design">connect_orbit_array_design (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.connect_orbit_cable_lengths">connect_orbit_cable_lengths() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.library.html#waves.utilities.library.CustomSafeLoader.construct_python_tuple">construct_python_tuple() (waves.utilities.library.CustomSafeLoader method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.convert_to_multi_index">convert_to_multi_index() (in module waves.project)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.create_monthly_wind_rose">create_monthly_wind_rose() (in module waves.utilities.floris_runners)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.create_single_month_wind_rose">create_single_month_wind_rose() (in module waves.utilities.floris_runners)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.library.html#waves.utilities.library.CustomSafeLoader">CustomSafeLoader (class in waves.utilities.library)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.discount_rate">discount_rate (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.energy_losses">energy_losses() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.energy_potential">energy_potential() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.energy_production">energy_production() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.export_system_total_cable_length">export_system_total_cable_length() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.finance_rate">finance_rate (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.fixed_charge_rate">fixed_charge_rate (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris">floris (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris_config">floris_config (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris_config_dict">floris_config_dict (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris_results_type">floris_results_type (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris_turbine_order">floris_turbine_order (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris_wind_direction">floris_wind_direction (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris_windspeed">floris_windspeed (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris_x_col">floris_x_col (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.floris_y_col">floris_y_col (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.from_file">from_file() (waves.project.Project class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.generate_floris_positions_from_layout">generate_floris_positions_from_layout() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.generate_report">generate_report() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.irr">irr() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.lcoe">lcoe() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.library_exists">library_exists() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.library_path">library_path (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.load_weather">load_weather() (in module waves.project)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.library.html#waves.utilities.library.load_yaml">load_yaml() (in module waves.utilities.library)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.loss_ratio">loss_ratio (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    module
+
+      <ul>
+        <li><a href="_autosummary/waves.project.html#module-waves.project">waves.project</a>
+</li>
+        <li><a href="_autosummary/waves.utilities.html#module-waves.utilities">waves.utilities</a>
+</li>
+        <li><a href="_autosummary/waves.utilities.floris_runners.html#module-waves.utilities.floris_runners">waves.utilities.floris_runners</a>
+</li>
+        <li><a href="_autosummary/waves.utilities.library.html#module-waves.utilities.library">waves.utilities.library</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.monthly_wind_rose">monthly_wind_rose (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.n_substations">n_substations() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.n_turbines">n_turbines() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.npv">npv() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.offtake_price">offtake_price (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.operations_end">operations_end (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.operations_start">operations_start (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.operations_years">operations_years (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.opex">opex() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.orbit">orbit (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.orbit_config">orbit_config (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.orbit_config_dict">orbit_config_dict (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.orbit_start_date">orbit_start_date (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.orbit_weather_cols">orbit_weather_cols (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.plot_farm">plot_farm() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.preprocess_monthly_floris">preprocess_monthly_floris() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project">Project (class in waves.project)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.project_capex_date">project_capex_date (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.project_potential_energy">project_potential_energy (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.project_production_energy">project_production_energy (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.project_wind_rose">project_wind_rose (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.reinitialize">reinitialize() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.reinvestment_rate">reinvestment_rate (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.report_config">report_config (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.library.html#waves.utilities.library.resolve_path">resolve_path() (in module waves.utilities.library)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.revenue">revenue() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.run">run() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.run_chunked_time_series_floris">run_chunked_time_series_floris() (in module waves.utilities.floris_runners)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.run_floris">run_floris() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.utilities.floris_runners.html#waves.utilities.floris_runners.run_parallel_time_series_floris">run_parallel_time_series_floris() (in module waves.utilities.floris_runners)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.run_wind_rose_aep">run_wind_rose_aep() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.save_config">save_config() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.setup_floris">setup_floris() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.setup_orbit">setup_orbit() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.setup_wombat">setup_wombat() (waves.project.Project method)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.soft_capex_date">soft_capex_date (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.system_capex_date">system_capex_date (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.turbine_capex_date">turbine_capex_date (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.turbine_potential_energy">turbine_potential_energy (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.turbine_production_energy">turbine_production_energy (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.turbine_rating">turbine_rating() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.validate_report_config">validate_report_config() (waves.project.Project method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    waves.project
+
+      <ul>
+        <li><a href="_autosummary/waves.project.html#module-waves.project">module</a>
+</li>
+      </ul></li>
+      <li>
+    waves.utilities
+
+      <ul>
+        <li><a href="_autosummary/waves.utilities.html#module-waves.utilities">module</a>
+</li>
+      </ul></li>
+      <li>
+    waves.utilities.floris_runners
+
+      <ul>
+        <li><a href="_autosummary/waves.utilities.floris_runners.html#module-waves.utilities.floris_runners">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    waves.utilities.library
+
+      <ul>
+        <li><a href="_autosummary/waves.utilities.library.html#module-waves.utilities.library">module</a>
+</li>
+      </ul></li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.weather">weather (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.weather_profile">weather_profile (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.wombat">wombat (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.wombat_config">wombat_config (waves.project.Project attribute)</a>
+</li>
+      <li><a href="_autosummary/waves.project.html#waves.project.Project.wombat_config_dict">wombat_config_dict (waves.project.Project attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Renewable Energy Laboratory
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

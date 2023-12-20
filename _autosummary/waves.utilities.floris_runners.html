@@ -1,0 +1,703 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>waves.utilities.floris_runners &#8212; WAVES</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/waves.utilities.floris_runners';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="waves.utilities.library" href="waves.utilities.library.html" />
+    <link rel="prev" title="waves.utilities" href="waves.utilities.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">WAVES</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NREL/WAVES" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/WAVES/" title="PyPI version" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://img.shields.io/pypi/v/WAVES?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F" class="icon-link-image" alt="PyPI version"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mybinder.org/v2/gh/NREL/WAVES/main?filepath=examples" title="Binder" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://mybinder.org/badge_logo.svg" class="icon-link-image" alt="Binder"/></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">How to Use WAVES</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributor's Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../waves_example.html">Cost of Wind Energy Review 2022</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API Documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="waves.project.html">waves.project</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="waves.utilities.html">waves.utilities</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">waves.utilities.floris_runners</a></li>
+<li class="toctree-l3"><a class="reference internal" href="waves.utilities.library.html">waves.utilities.library</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">CLI Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES/edit/main/_autosummary/waves.utilities.floris_runners.rst" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES/issues/new?title=Issue%20on%20page%20%2F_autosummary/waves.utilities.floris_runners.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_autosummary/waves.utilities.floris_runners.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>waves.utilities.floris_runners</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="module-waves.utilities.floris_runners">
+<span id="waves-utilities-floris-runners"></span><h1>waves.utilities.floris_runners<a class="headerlink" href="#module-waves.utilities.floris_runners" title="Permalink to this heading">#</a></h1>
+<p>Provides the FLORIS-based methods for pre-processing data and post-processing results.</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#waves.utilities.floris_runners.calculate_monthly_wind_rose_results" title="waves.utilities.floris_runners.calculate_monthly_wind_rose_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_monthly_wind_rose_results</span></code></a>(...)</p></td>
+<td><p>Calculate the turbine AEP contribution for each month of a year, in MWh.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#waves.utilities.floris_runners.check_monthly_wind_rose" title="waves.utilities.floris_runners.check_monthly_wind_rose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_monthly_wind_rose</span></code></a>(project_wind_rose, ...)</p></td>
+<td><p>Checks the monthly wind rose parameterizations to ensure the DataFrames are the correct shape, so that when the frequency column is extracted, the compared data is the same.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#waves.utilities.floris_runners.create_monthly_wind_rose" title="waves.utilities.floris_runners.create_monthly_wind_rose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_monthly_wind_rose</span></code></a>(weather_df)</p></td>
+<td><p>Create a dictionary of month and a long-term <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> object based on all the wind condition data for that month.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#waves.utilities.floris_runners.create_single_month_wind_rose" title="waves.utilities.floris_runners.create_single_month_wind_rose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_single_month_wind_rose</span></code></a>(weather_df, month)</p></td>
+<td><p>Creates the FLORIS <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> object for a given <code class="xref py py-attr docutils literal notranslate"><span class="pre">month</span></code> based on the <code class="xref py py-attr docutils literal notranslate"><span class="pre">weather_df</span></code>'s <code class="docutils literal notranslate"><span class="pre">DatetimeIndex</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#waves.utilities.floris_runners.run_chunked_time_series_floris" title="waves.utilities.floris_runners.run_chunked_time_series_floris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_chunked_time_series_floris</span></code></a>(args)</p></td>
+<td><p>Runs <code class="docutils literal notranslate"><span class="pre">fi.calculate_wake()</span></code> over a chunk of a larger time series analysis and returns the individual turbine powers for each corresponding time.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#waves.utilities.floris_runners.run_parallel_time_series_floris" title="waves.utilities.floris_runners.run_parallel_time_series_floris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_parallel_time_series_floris</span></code></a>(args_list[, ...])</p></td>
+<td><p>Runs the time series floris calculations in parallel.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="waves.utilities.floris_runners.run_chunked_time_series_floris">
+<span class="sig-prename descclassname"><span class="pre">waves.utilities.floris_runners.</span></span><span class="sig-name descname"><span class="pre">run_chunked_time_series_floris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/waves/utilities/floris_runners.html#run_chunked_time_series_floris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#waves.utilities.floris_runners.run_chunked_time_series_floris" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs <code class="docutils literal notranslate"><span class="pre">fi.calculate_wake()</span></code> over a chunk of a larger time series analysis and
+returns the individual turbine powers for each corresponding time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fi</strong> (<em>FlorisInterface</em>) -- A copy of the base <code class="docutils literal notranslate"><span class="pre">FlorisInterface</span></code> object.</p></li>
+<li><p><strong>weather</strong> (<em>pd.DataFrame</em>) -- A subset of the full weather profile, with only the datetime index and columns:
+&quot;windspeed&quot; and &quot;wind_direction&quot;.</p></li>
+<li><p><strong>chunk_id</strong> (<em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) -- A tuple of the year and month for the data being processed.</p></li>
+<li><p><strong>reinit_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) -- Any additional reinitialization keyword arguments. Defaults to {}.</p></li>
+<li><p><strong>run_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) -- Any additional calculate_wake keyword arguments. Defaults to {}.</p></li>
+<li><p><strong>args</strong> (<em>tuple</em>) -- </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>tuple[tuple[int, int], FlorisInterface, pd.DataFrame]</em> -- The <code class="docutils literal notranslate"><span class="pre">chunk_id</span></code>, a reinitialized <code class="docutils literal notranslate"><span class="pre">fi</span></code> using the appropriate wind parameters
+that can be used for further post-processing, and the resulting turbine powers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">FlorisInterface</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="waves.utilities.floris_runners.run_parallel_time_series_floris">
+<span class="sig-prename descclassname"><span class="pre">waves.utilities.floris_runners.</span></span><span class="sig-name descname"><span class="pre">run_parallel_time_series_floris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/waves/utilities/floris_runners.html#run_parallel_time_series_floris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#waves.utilities.floris_runners.run_parallel_time_series_floris" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs the time series floris calculations in parallel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args_list</strong> (<em>list</em><em>[</em><em>tuple</em><em>[</em><em>FlorisInterface</em><em>, </em><em>pd.DataFrame</em><em>, </em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>dict</em><em>, </em><em>dict</em><em>]</em><em>]</em><em>)</em>) -- A list of the chunked by month arguments that get passed to
+<code class="docutils literal notranslate"><span class="pre">run_chunked_time_series_floris</span></code>.</p></li>
+<li><p><strong>nodes</strong> (<em>int</em><em>, </em><em>optional</em>) -- The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
+available CPUs on the computer. Defaults to -1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame]</em> -- A dictionary of the <code class="docutils literal notranslate"><span class="pre">chunk_id</span></code> and <code class="docutils literal notranslate"><span class="pre">FlorisInterface</span></code> object, and the full turbine power
+dataframe (without renamed columns).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">FlorisInterface</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="waves.utilities.floris_runners.create_single_month_wind_rose">
+<span class="sig-prename descclassname"><span class="pre">waves.utilities.floris_runners.</span></span><span class="sig-name descname"><span class="pre">create_single_month_wind_rose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/waves/utilities/floris_runners.html#create_single_month_wind_rose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#waves.utilities.floris_runners.create_single_month_wind_rose" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates the FLORIS <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> object for a given <code class="xref py py-attr docutils literal notranslate"><span class="pre">month</span></code> based on the
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">weather_df</span></code>'s <code class="docutils literal notranslate"><span class="pre">DatetimeIndex</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weather_df</strong> (<em>pd.DataFrame</em>) -- The weather profile used to create long-term, month-based <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> objects</p></li>
+<li><p><strong>month</strong> (<em>int</em>) -- The month of the year to create a <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>tuple[int, WindRose]</em> -- A tuple of the <code class="xref py py-attr docutils literal notranslate"><span class="pre">month</span></code> passed and the final <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">WindRose</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="waves.utilities.floris_runners.create_monthly_wind_rose">
+<span class="sig-prename descclassname"><span class="pre">waves.utilities.floris_runners.</span></span><span class="sig-name descname"><span class="pre">create_monthly_wind_rose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weather_df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/waves/utilities/floris_runners.html#create_monthly_wind_rose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#waves.utilities.floris_runners.create_monthly_wind_rose" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a dictionary of month and a long-term <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> object based on all the
+wind condition data for that month.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weather_df</strong> (<em>pd.DataFrame</em>) -- The weather profile used to create long-term, month-based <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> objects</p></li>
+<li><p><strong>month</strong> (<em>int</em>) -- The month of the year to create a <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>dict[int, WindRose]</em> -- A dictionary of the integer month and the long-term <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> object associated
+with all the wind conditions during that month.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">WindRose</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="waves.utilities.floris_runners.check_monthly_wind_rose">
+<span class="sig-prename descclassname"><span class="pre">waves.utilities.floris_runners.</span></span><span class="sig-name descname"><span class="pre">check_monthly_wind_rose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_wind_rose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monthly_wind_rose</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/waves/utilities/floris_runners.html#check_monthly_wind_rose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#waves.utilities.floris_runners.check_monthly_wind_rose" title="Permalink to this definition">#</a></dt>
+<dd><p>Checks the monthly wind rose parameterizations to ensure the DataFrames are the
+correct shape, so that when the frequency column is extracted, the compared data
+is the same.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_wind_rose</strong> (<em>WindRose</em>) -- The <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> created using the long term reanalysis weather profile.</p></li>
+<li><p><strong>monthly_wind_rose</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>WindRose</em><em>]</em>) -- A dictionary of the month as an <code class="docutils literal notranslate"><span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> created from the long
+term project reanalysis weather profile that was filtered on weather data for
+the focal month.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>dict[int, WindRose]</em> -- The <code class="xref py py-attr docutils literal notranslate"><span class="pre">monthly_wind_rose</span></code> but with an missing wind conditions added into
+the <code class="docutils literal notranslate"><span class="pre">WindRose</span></code> with 0 frequency.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">WindRose</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="waves.utilities.floris_runners.calculate_monthly_wind_rose_results">
+<span class="sig-prename descclassname"><span class="pre">waves.utilities.floris_runners.</span></span><span class="sig-name descname"><span class="pre">calculate_monthly_wind_rose_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">turbine_power</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_monthly</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/waves/utilities/floris_runners.html#calculate_monthly_wind_rose_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#waves.utilities.floris_runners.calculate_monthly_wind_rose_results" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the turbine AEP contribution for each month of a year, in MWh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>turbine_power</strong> (<em>np.ndarray</em>) -- The array of turbine powers, with shape (num wd x num ws x num turbines), calculated from
+the possible wind conditions at the site given the turbine layout.</p></li>
+<li><p><strong>freq_monthly</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>np.ndarray</em><em>]</em>) -- The dictionary of integer months (i.e., 1 for January) and array of frequences, with shape
+(num wd x num ws), created by the long term wind conditions filtered on the month.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>pd.DataFrame, pd.DataFrame</em> -- A DataFrame of each month's contribution to the AEP for each turbine in the wind farm, with
+shape (12 x num turbines).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./_autosummary"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="waves.utilities.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">waves.utilities</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="waves.utilities.library.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">waves.utilities.library</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Renewable Energy Laboratory
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
