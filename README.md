@@ -1,8 +1,11 @@
 # WAVES: Wind Asset Value Estimation System
 
 [![PyPI version](https://badge.fury.io/py/waves.svg)](https://badge.fury.io/py/waves)
+[![PyPI downloads](https://img.shields.io/pypi/dm/waves?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F)](https://pypi.org/project/WAVES/)
 [![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![image](https://img.shields.io/pypi/pyversions/waves.svg)](https://pypi.python.org/pypi/waves)
+
+
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NREL/WAVES/main?filepath=examples)
 [![Jupyter Book](https://jupyterbook.org/badge.svg)](https://nrel.github.io/WAVES)
 
