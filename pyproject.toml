@@ -82,7 +82,6 @@ docs = [
     "myst-parser",
     "sphinx-autodoc-typehints",
     "sphinxcontrib-autoyaml",
-    "sphinx-click",
 ]
 examples=[
     "jupyterlab",

@@ -157,10 +157,10 @@ pre-commit install
 
 ## Documentation
 
-Documentation is written primarily using ReStructured Text, with some components written in
-Markdown, and is located in the `WAVES/sphinx/` directory. Additionally, all method and class documentation
-is written as Google-style docstrings in the code itself, with some aspects documented inline as
-needed.
+Documentation is written primarily using Markdown, with some components written in
+ReStructured Text, and is located in the `WAVES/docs/` directory. Additionally, all method and class
+documentation is written as NumPy-style docstrings in the code itself, with some aspects documented
+inline as needed.
 
 If the `docs` extras haven't already been installed, be sure to do so before you attempt to build
 the documentation site.
@@ -182,8 +182,8 @@ jupyter-book build docs
 
 ## Testing
 
-All code should be paired with a corresponding unit or integration test. WAVES uses both pytest and
-the built in unittest framework.
+All code should be paired with a corresponding unit, regression, or integration test written with
+the pytest framework.
 
 To run the tests you can use any of the following commands, depending on your needs.
 
@@ -233,6 +233,7 @@ base. Be sure to write a complete description of these changes in the pull reque
 All tests must pass. Pull requests will be rejected or have changes requested if tests do not pass,
 or cannot pass with changes. Tests are automatically run through Github Actions for any pull request
 or push to the main or develop branches, but should also be run locally before submission.
+
 #### Test Coverage
 
 The testing framework described below will generate a coverage report from the tests run through
@@ -241,8 +242,10 @@ coverage report enabled.
 
 ### Documentation
 
-Include any relevant changes to inline documentation, docstrings, and any of the RST files located
-in `WAVES/sphinx/`. Pull requests will not be accepted until these changes are complete.
+Include any relevant changes to inline documentation, docstrings, and any of the documentation files
+located in `WAVES/docs/`. Pull requests will not be accepted until these changes are complete.
+
+Be sure to build the documentation and run the examples in the CLI locally prior to submission.
 
 ### Changelog
 

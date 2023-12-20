@@ -83,8 +83,5 @@ def run(
         run_single(library_path, config, report, save_report)
 
 
-typer_click_object = typer.main.get_command(app)
-
-
 if __name__ == "__main__":
-    typer_click_object()
+    app()
