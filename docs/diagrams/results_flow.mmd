@@ -1,0 +1,57 @@
+flowchart LR
+
+    A("Project.run()")
+    A --> B("Project.orbit.run()")
+    A --> C("Project.wombat.run()")
+    A --> D("Project.run_floris()")
+
+    B --> ORBIT
+    C --> WOMBAT
+    D --> FLORIS
+
+
+    subgraph Independent
+
+        NT[n_turbines]
+        NOSS[n_substations]
+        TurbRat[turbine_rating]
+
+        subgraph ORBIT
+            ArrayLen[total_array_length]
+            ExpLen[total_export_length]
+            CapEx[capex_breakdown]
+        end
+
+        subgraph WOMBAT
+            Avail[availability]
+            OpEx[opex]
+        end
+
+        subgraph FLORIS
+            TurbPotential[turbine_potential_energy]
+            ProjPotential[project_potential_energy]
+            TurbProd[turbine_production_energy]
+            ProjProd[project_production_energy]
+        end
+
+    end
+
+    subgraph Combined
+        EnergyPotential[energy_potential] --> EnergyLoss[energy_losses]
+        EnergyProd[energy_production] --> EnergyLoss
+        EnergyPotential --> CF[capacity_factor]
+        EnergyProd --> CF
+        EnergyProd --> Revenue[revenue]
+        Revenue --> CashFlow[cash_flow]
+        CashFlow --> NPV[npv]
+        CashFlow --> IRR[irr]
+        CashFlow --> LCOE[lcoe]
+
+        TurbPotential --> EnergyPotential
+        ProjPotential --> EnergyPotential
+        TurbProd --> EnergyProd
+        ProjProd --> EnergyProd
+        Avail --> EnergyProd
+        OpEx --> CashFlow
+        CapEx --> CashFlow
+    end
