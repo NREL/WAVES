@@ -1154,7 +1154,7 @@ class Project(FromDictMixin):
             return len(self.wombat.windfarm.turbine_id)
         if self.floris_config is not None:
             return self.floris.farm.n_turbines
-        raise RuntimeError("No models wer provided, cannot calculate value.")
+        raise RuntimeError("No models were provided, cannot calculate value.")
 
     def turbine_rating(self) -> float:
         """Calculates the average turbine rating, in MW, of all the turbines in the project.
@@ -1173,7 +1173,7 @@ class Project(FromDictMixin):
             return self.orbit.turbine_rating
         if self.wombat_config is not None:
             return self.wombat.windfarm.capacity / 1000 / self.n_turbines
-        raise RuntimeError("No models wer provided, cannot calculate value.")
+        raise RuntimeError("No models were provided, cannot calculate value.")
 
     def n_substations(self) -> int:
         """Calculates the number of subsations in the project.
