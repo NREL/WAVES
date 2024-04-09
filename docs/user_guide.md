@@ -120,6 +120,12 @@ The following method is run on intialization when ``Project.connect_floris_to_la
    :noindex:
 ```
 
+Visually, this looks like the following workflow:
+
+```{image} diagrams/input_flow.svg
+:align: center
+```
+
 ### Updating Configurations
 
 Sometimes, additional configurations may need to be connected prior to running an analysis. For
@@ -198,6 +204,12 @@ For the following set of methods, users only need to create a ``Project`` object
 ```
 
 ## Results
+
+Visually, the following is a general flow of operations for combining each model's outputs:
+
+```{image} diagrams/results_flow.svg
+:align: center
+```
 
 To quickly produce any of the high-level outputs to a single `DataFrame`, the below method can be
 used in place of individually calculating each metric and combining into a report. Additionally,
