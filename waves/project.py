@@ -607,6 +607,9 @@ class Project(FromDictMixin):
                 index=False,
             )
 
+        # Unset the ORBIT settings to ensure the design result isn't double counted
+        self.setup_orbit()
+
     def generate_floris_positions_from_layout(
         self,
         x_col: str = "easting",
