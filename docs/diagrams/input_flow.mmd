@@ -1,0 +1,42 @@
+flowchart TD
+
+    subgraph Configuration
+
+        ConfigA[orbit_config]
+        ConfigB[wombat_config]
+        ConfigC[floris_config]
+        ConfigD[Additional\nConfigurations]
+        ConfigE[fa:fa-code fa:fa-file WAVES Configuration]
+
+        ConfigE ---|fa:fa-file file name or \n fa:fa-code settings| ConfigB
+        ConfigE ---|fa:fa-file file name or \n fa:fa-code settings| ConfigA
+        ConfigE ---|fa:fa-file file name or \n fa:fa-code settings| ConfigC
+        ConfigE ---|fa:fa-code settings| ConfigD
+
+        ConfigD --- ConfigF(Shared ORBIT settings and \n ORBIT tie-ins for weather)
+        ConfigD --- ConfigG(FLORIS tie-ins for weather)
+        ConfigD --- ConfigH(Detailed CapEx breakdowns)
+        ConfigD --- ConfigI(High level financial variables)
+        ConfigD --- ConfigJ(Indicators to connect any \n of ORBIT or FLORIS \n to WOMBAT configurations)
+    end
+
+    subgraph Initialization
+        InitA(Create ORBIT ProjectManager)
+        InitB(Create WOMBAT Simulation)
+        InitC(Create FLORIS FlorisInterface)
+        InitD[Connect layouts\nand weather profiles]
+        InitE[Project]
+        InitF[Project.orbit --> ProjectManager]
+        InitG[Project.wombat --> Simulation]
+        InitH[Project.floris --> FlorisInterface]
+
+        InitA --> InitD
+        InitB --> InitD
+        InitC --> InitD
+        InitD --> InitE
+        InitE --- InitF
+        InitE --- InitG
+        InitE --- InitH
+    end
+
+    Configuration --> Initialization
