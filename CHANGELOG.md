@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.5.3 (7 May 2024)
+
+- A bug was fixed where the array system installation costs were nearly doubled when compared
+  to a direct ORBIT run. This was the result of a duplicated design result when calling both
+  `Project.connect_orbit_cable_lengths()` and `Project.orbit.run()`.
+
 ## 0.5.2 (9 April 2024)
 
 - Pins FLORIS to v3.6 to avoid workarounds for previous versions, and to avoid issues with
