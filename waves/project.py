@@ -111,7 +111,7 @@ def load_weather(value: str | Path | pd.DataFrame) -> pd.DataFrame:
         .to_pandas()
         .set_index("datetime")
         .fillna(0.0)
-        .resample("H")
+        .resample("h")
         .interpolate(limit_direction="both", limit=5)
     )
     return weather
@@ -237,6 +237,9 @@ class Project(FromDictMixin):
     )
     floris_config: str | Path | dict | None = field(
         default=None, validator=attrs.validators.instance_of((str, Path, dict, type(None)))
+    )
+    landbosse_config_directory: str | Path | None = field(
+        default=None, validator=attrs.validators.instance_of((str, Path, type(None)))
     )
     orbit_start_date: str | None = field(default=None)
     orbit_weather_cols: list[str] = field(
@@ -445,6 +448,7 @@ class Project(FromDictMixin):
             "floris_wind_direction": self.floris_wind_direction,
             "floris_x_col": self.floris_x_col,
             "floris_y_col": self.floris_y_col,
+            "landbosse_config_directory": self.landbosse_config_directory,
         }
         return config_dict
 
@@ -1029,6 +1033,8 @@ class Project(FromDictMixin):
             self.orbit.run()
         if "wombat" not in skip:
             self.wombat.run()
+        if "landbosse" not in skip:
+            self.run_landbosse()
         if "floris" not in skip:
             if TYPE_CHECKING:
                 assert isinstance(which_floris, str)
@@ -1041,6 +1047,113 @@ class Project(FromDictMixin):
                 cut_out_wind_speed=cut_out_wind_speed,
                 nodes=nodes,
             )
+
+    def run_landbosse(self):
+        """Create landbosse input files based on orbit and wombat outputs, then run landbosse."""
+        # probably a horribly inefficient way to get WTG info
+        farm = self.floris_config_dict["farm"]
+        dir_wtg = self.library_path / farm["turbine_library_path"]
+        wtg = set(farm["turbine_type"])
+        assert len(wtg) == 1, "More than one turbine type not implemented."
+        wtg = next(iter(wtg))
+        with open(dir_wtg / (wtg + ".yaml")) as f:  # type: ignore
+            wtg_config = yaml.safe_load(f)
+
+        # Create a dict containing various outputs from the other models
+        # to write into the LandBOSSE input project list
+        lb_project_list_input = {
+            "Project ID": self.report_config["name"],  # type: ignore
+            "Project data file": self.report_config["name"],  # type: ignore
+            "Total project construction time (months)": self.orbit.installation_time
+            / 24.0
+            / 365.25
+            * 12.0,  # TODO is installation time given in hours?
+            "Turbine rating MW": self.turbine_rating(),
+            "Hub height m": wtg_config["hub_height"],
+            "Rotor diameter m": wtg_config["rotor_diameter"],
+            "Turbine spacing (times rotor diameter)": self.orbit.config["plant"]["turbine_spacing"],
+            "Row spacing (times rotor diameter)": self.orbit.config["plant"]["row_spacing"],
+            "Number of turbines": self.n_turbines(),
+            "Wind shear exponent": self.floris_config_dict["flow_field"]["wind_shear"],
+        }
+
+        path_lb_project_list = (
+            self.library_path
+            / "project/config"
+            / self.config_dict["landbosse_config_directory"]
+            / "project_list.xlsx"
+        )
+        lb_project_list = pd.read_excel(path_lb_project_list)
+        assert (
+            len(lb_project_list.index) == 1
+        ), "Running more than one LandBOSSE project is not supported"
+        assert all(
+            c in lb_project_list.columns for c in lb_project_list_input
+        ), "Cannot add a new column to the LandBOSSE project list"
+        lb_project_list = lb_project_list.assign(**lb_project_list_input)
+        lb_project_list.to_excel(path_lb_project_list, index=False)
+
+        # TODO using surface temperature and pressure instead of 100m
+        lb_weather_columns = [
+            "surface_temperature",
+            "surface_pressure",
+            "wind_direction_100m",
+            "windspeed_100m",
+        ]
+        lb_weather = self.weather[lb_weather_columns].copy()
+
+        lb_weather["surface_temperature"] -= 273.15  # convert to deg C
+        lb_weather["surface_pressure"] /= 101_325.0  # convert to atmospheres
+
+        # LandBOSSE project data
+        path_lb_project_data = (
+            self.library_path
+            / "project/config"
+            / self.config_dict["landbosse_config_directory"]
+            / "project_data"
+            / (self.report_config["name"] + ".xlsx")  # type: ignore
+        )
+
+        # Read existing weather data from the LandBOSSE project data
+        lb_weather_excel = pd.read_excel(
+            path_lb_project_data,
+            sheet_name="weather_window",
+            header=None,
+        )
+
+        # Replace the existing weather data with the weather data from WAVES
+        lb_weather_excel = pd.concat(
+            (
+                # Get the first rows from the existing dataframe so the headers don't change
+                # exclude first column since it is all-NaT and pandas throws an error
+                # when concating all-NaN columns
+                lb_weather_excel.iloc[:5, 1:],
+                # concat the new weather data below the old headers
+                lb_weather.reset_index().set_axis(range(len(lb_weather.columns) + 1), axis=1),
+            )
+        ).sort_index(axis=1)
+        with pd.ExcelWriter(
+            path_lb_project_data, if_sheet_exists="replace", mode="a", engine="openpyxl"
+        ) as ew:
+            # Replace the old weather data with the WAVES weather data using the old headers
+            lb_weather_excel.to_excel(
+                ew,
+                sheet_name="weather_window",
+                index=False,
+                header=False,
+            )
+
+        # super janky way to import and run landbosse
+        import os
+        import sys
+
+        sys.path.insert(0, "../../../LandBOSSE")  # TODO temp hacky
+        os.environ["LANDBOSSE_INPUT_DIR"] = str(self.library_path / "project/config/landbosse")
+        os.environ["LANDBOSSE_OUTPUT_DIR"] = str(self.library_path / "results")
+
+        from main import main as landbosse_main  # importing from landbosse
+
+        landbosse_main()
 
     def reinitialize(
         self,
