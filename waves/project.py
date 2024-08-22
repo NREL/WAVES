@@ -241,6 +241,9 @@ class Project(FromDictMixin):
     landbosse_config_directory: str | Path | None = field(
         default=None, validator=attrs.validators.instance_of((str, Path, type(None)))
     )
+    landbosse_install_directory: str | Path | None = field(
+        default=None, validator=attrs.validators.instance_of((str, Path, type(None)))
+    )
     orbit_start_date: str | None = field(default=None)
     orbit_weather_cols: list[str] = field(
         default=["windspeed", "wave_height"],
@@ -449,6 +452,7 @@ class Project(FromDictMixin):
             "floris_x_col": self.floris_x_col,
             "floris_y_col": self.floris_y_col,
             "landbosse_config_directory": self.landbosse_config_directory,
+            "landbosse_install_directory": self.landbosse_install_directory,
         }
         return config_dict
 
@@ -1145,15 +1149,18 @@ class Project(FromDictMixin):
 
         # super janky way to import and run landbosse
         import os
-        import sys
+        import importlib.util
 
-        sys.path.insert(0, "../../../LandBOSSE")  # TODO temp hacky
         os.environ["LANDBOSSE_INPUT_DIR"] = str(self.library_path / "project/config/landbosse")
         os.environ["LANDBOSSE_OUTPUT_DIR"] = str(self.library_path / "results")
 
-        from main import main as landbosse_main  # importing from landbosse
-
-        landbosse_main()
+        spec = importlib.util.spec_from_file_location(
+            "main",
+            Path(self.landbosse_install_directory).resolve() / "main.py",  # type: ignore
+        )
+        landbosse_module = importlib.util.module_from_spec(spec)  # type: ignore
+        spec.loader.exec_module(landbosse_module)  # type: ignore
+        landbosse_module.main()
 
     def reinitialize(
         self,

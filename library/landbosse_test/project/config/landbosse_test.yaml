@@ -5,6 +5,7 @@ floris_config: landbosse_test_floris_jensen.yaml
 weather_profile: era5_40.0N_72.5W_1990_2020.csv
 
 landbosse_config_directory: landbosse
+landbosse_install_directory: ../../../LandBOSSE
 
 # Shared input connections
 orbit_start_date: 1/1/1998

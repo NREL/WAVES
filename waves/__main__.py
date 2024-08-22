@@ -1,4 +1,5 @@
 """Creates the main CLI for WAVES."""
+
 from typing import Annotated
 from pathlib import Path
 
@@ -47,18 +48,17 @@ def run_single(libary_path: str, config: str, report: bool, save_report: bool) -
 
 @app.command()
 def run(
-    library_path: Annotated[str, typer.Argument(None, help="The path to the data library.")],
+    library_path: Annotated[str, typer.Argument(help="The path to the data library.")],
     configuration: Annotated[
         list[str],
         typer.Argument(
-            None,
             help=(
                 "The filename(s) of (with extension) of the configuration dictionary. These must"
                 " include the a key, value pair for the run arguments under the key `run`"
             ),
         ),
     ],
-    report: Annotated[
+    report=Annotated[
         bool,
         typer.Option(
             True,
@@ -67,14 +67,14 @@ def run(
                 "``config_dict``. See the API for``Project.generate_report()`` for details."
             ),
         ),
-    ] = True,
-    save_report: Annotated[
+    ],
+    save_report=Annotated[
         bool,
         typer.Option(
             True,
             help="True to save the output report metrics to a CSV file, and False to print only.",
         ),
-    ] = True,
+    ],
 ) -> None:
     """Run one or multiple WAVES analyses given a configuration dictionary, and optionally output
     and save the results.
