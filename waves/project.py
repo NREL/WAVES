@@ -181,9 +181,6 @@ class Project(FromDictMixin):
         Interest rate paid on the cash flows. Defaults to None.
     reinvestment_rate : float, optional
         Interest rate paid on the cash flows upon reinvestment. Defaults to None.
-    loss_ratio : float, optional
-        Additional non-wake losses to deduct from the total energy production. Should be
-        represented as a decimal in the range of [0, 1]. Defaults to None.
     orbit_start_date : str | None
         The date to use for installation phase start timings that are set to "0" in the
         ``install_phases`` configuration. If None the raw configuration data will be used.
@@ -269,9 +266,6 @@ class Project(FromDictMixin):
         default=None, validator=attrs.validators.instance_of((float, type(None)))
     )
     reinvestment_rate: float = field(
-        default=None, validator=attrs.validators.instance_of((float, type(None)))
-    )
-    loss_ratio: float = field(
         default=None, validator=attrs.validators.instance_of((float, type(None)))
     )
     soft_capex_date: tuple[int, int] | list[tuple[int, int]] | None = field(
@@ -1332,7 +1326,7 @@ class Project(FromDictMixin):
         aep: bool = False,
     ) -> pd.DataFrame | float:
         """Computes the potential energy production, or annual potential energy production, in GWh,
-        for the simulation by extrapolating the monthly contributions to AEP if FLORIS (wtihout
+        for the simulation by extrapolating the monthly contributions to AEP if FLORIS (without
         wakes) results were computed by a wind rose, or using the time series results.
 
         Parameters
@@ -1425,13 +1419,11 @@ class Project(FromDictMixin):
         units: str = "gw",
         per_capacity: str | None = None,
         with_losses: bool = False,
-        loss_ratio: float | None = None,
         aep: bool = False,
     ) -> pd.DataFrame | float:
         """Computes the energy production, or annual energy production, in GWh, for the simulation
         by extrapolating the monthly contributions to AEP if FLORIS (with wakes) results were
-        computed by a wind rose, or using the time series results, and multiplying it by the WOMBAT
-        monthly availability (``Metrics.production_based_availability``).
+        computed by a wind rose, or using the time series results.
 
         Parameters
         ----------
@@ -1446,13 +1438,10 @@ class Project(FromDictMixin):
             units. If None, then the unnormalized energy production is returned, otherwise it must
             be one of "kw", "mw", or "gw". Defaults to None.
         with_losses : bool, optional
-            Use the :py:attr:`loss_ratio` or :py:attr:`Project.loss_ratio` to post-hoc
-            consider non-wake and non-availability losses in the energy production aggregation.
+            Use the :py:attr:`Project.total_loss_ratio` to post-hoc
+            consider environmental, availability, wake, technical, and electrical losses in the energy
+            production aggregation.
             Defaults to False.
-        loss_ratio : float, optional
-            The decimal non-wake and non-availability losses ratio to apply to the energy
-            production. If None, then it will attempt to use the :py:attr:`loss_ratio` provided
-            in the Project configuration. Defaults to None.
         aep : bool, optional
             Flag to return the energy production normalized by the number of years the plan is in
             operation. Note that :py:attr:`frequency` must be "project" for this to be computed.
@@ -1474,6 +1463,9 @@ class Project(FromDictMixin):
 
         # For the wind rose outputs, only consider project-level availability because
         # wind rose AEP is a long-term estimation of energy production
+
+        # commenting availability out as we are trying to calculate aep just based on wakes
+
         availability = self.wombat.metrics.production_based_availability(
             frequency="month-year", by="turbine"
         ).loc[:, self.floris_turbine_order]
@@ -1485,7 +1477,8 @@ class Project(FromDictMixin):
                 left_on="month",
                 right_index=True,
             ).drop(labels=["drop"], axis=1)
-            energy_gwh = availability * power / 1000
+            # energy_gwh = availability * power / 1000
+            energy_gwh = power / 1000
 
         if self.floris_results_type == "time_series":
             energy_gwh = self.turbine_aep_mwh / 1000
@@ -1513,16 +1506,9 @@ class Project(FromDictMixin):
                 energy_gwh = energy_gwh.values.sum()
 
         if with_losses:
-            # Check that a loss_ratio exists
-            if loss_ratio is None:
-                if (loss_ratio := self.loss_ratio) is None:
-                    raise ValueError(
-                        "`loss_ratio` wasn't defined in the Project settings or in the method"
-                        " keyword arguments."
-                    )
             # Get the base production numbers from WOMBAT
             base_production = self.energy_potential(frequency=frequency, by=by, units="gw")
-            energy_gwh -= base_production * loss_ratio
+            energy_gwh = base_production * (1 - self.total_loss_ratio())
 
         if aep:
             if frequency != "project":
@@ -1548,8 +1534,8 @@ class Project(FromDictMixin):
         units: str = "gw",
         per_capacity: str | None = None,
         with_losses: bool = False,
-        loss_ratio: float | None = None,
         aep: bool = False,
+        losses_breakdown: bool = False,
     ) -> pd.DataFrame:
         """Computes the energy losses for the simulation by subtracting the energy production from
         the potential energy production.
@@ -1567,13 +1553,10 @@ class Project(FromDictMixin):
             units. If None, then the unnormalized energy production is returned, otherwise it must
             be one of "kw", "mw", or "gw". Defaults to None.
         with_losses : bool, optional
-            Use the :py:attr:`loss_ratio` or :py:attr:`Project.loss_ratio` to post-hoc
-            consider non-wake and non-availability losses in the energy production aggregation.
+            Use the :py:attr:`Project.total_loss_ratio` to post-hoc
+            consider environmental, availability, wake, technical, and electrical losses in the energy
+            production aggregation.
             Defaults to False.
-        loss_ratio : float, optional
-            The decimal non-wake and non-availability losses ratio to apply to the energy
-            production. If None, then it will attempt to use the :py:attr:`loss_ratio` provided
-            in the Project configuration. Defaults to None.
         aep : bool, optional
             AEP for the annualized losses. Only used for :py:attr:`frequency` = "project".
 
@@ -1592,19 +1575,26 @@ class Project(FromDictMixin):
             by="turbine",
             units="kw",
         )
-        production = self.energy_production(  # type: ignore
+
+        production = self.energy_production(
             "month-year",
             by="turbine",
             units="kw",
             with_losses=with_losses,
-            loss_ratio=loss_ratio,
         )[self.wombat.metrics.turbine_id]
+
         losses = potential - production
+
+        # Compute total loss ratio
+        total_loss_ratio = self.total_loss_ratio()
+
+        # display loss breakdown
+        if losses_breakdown:
+            return self.losses_breakdown()
 
         unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
         if by == "windfarm":
             losses = losses.sum(axis=1).to_frame(f"Energy Losses ({unit_map[units]})")
-
         if frequency == "project":
             losses = losses.sum(axis=0)
             if by == "windfarm":
@@ -1613,7 +1603,6 @@ class Project(FromDictMixin):
                 losses /= self.operations_years
         elif frequency == "annual":
             losses = losses.groupby("year").sum()
-
         if units == "mw":
             losses /= 1e3
         elif units == "gw":
@@ -1623,6 +1612,136 @@ class Project(FromDictMixin):
             return losses
 
         return losses / self.capacity(per_capacity)
+
+    def wake_loss_ratio(self) -> float:
+        """Calculate wake losses using FLORIS outputs.
+
+        Returns
+        -------
+        float
+            The wake loss ratio.
+        """
+        potential = self.energy_potential(
+            "month-year",
+            by="turbine",
+            units="kw",
+        )
+
+        production = self.energy_production(
+            "month-year",
+            by="turbine",
+            units="kw",
+            with_losses=False,
+        )[self.wombat.metrics.turbine_id]
+
+        losses = potential - production
+
+        return losses.sum(axis=0).sum() / potential.sum(axis=0).sum()
+
+    def technical_loss_ratio(self) -> float:
+        """Calculate technical losses based on the project type.
+
+        Returns
+        -------
+        float
+            The technical loss ratio.
+        """
+        # if "Mooring" is in the design phases of the ORBIT config, it is a floating project, if not, it is fixed-bottom
+
+        floating_substring = "Mooring"
+        if any(
+            floating_substring.lower() in item.lower()
+            for item in self.orbit_config_dict["design_phases"]
+        ):
+            return 1 - (1 - 0.01) * (1 - 0.001) * (
+                1 - 0.001
+            )  # ORCA -> Hysteresis (1%), Onboard Equip. (0.1%), Rotor Misalignment (0.1%) for a flating project
+        else:
+            return 0.01  # ORCA -> Hysterisis (1%) for a fixed-bottom project
+
+    def electrical_loss_ratio(self) -> float:
+        """Calculate electrical losses based on ORBIT parameters.
+
+        Returns
+        -------
+        float
+            The electrical loss ratio.
+
+        """
+        depth = self.orbit_config_dict["site"]["depth"]
+        distance_to_landfall = self.orbit_config_dict["site"]["distance_to_landfall"]
+        # ORCA formula
+        electrical_loss_ratio = (
+            2.20224112
+            + 0.000604121 * depth
+            + 0.0407303367321603 * distance_to_landfall
+            + -0.0003712532582 * distance_to_landfall**2
+            + 0.0000016525338 * distance_to_landfall**3
+            + -0.000000003547544 * distance_to_landfall**4
+            + 0.0000000000029271 * distance_to_landfall**5
+        ) / 100
+
+        return electrical_loss_ratio
+
+    def environmental_loss_ratio(self) -> float:
+        """Set environmental loss assumption from ORCA.
+
+        Returns
+        -------
+        float
+            The environmental loss ratio.
+        """
+        return 0.0159
+
+    def total_loss_ratio(self) -> float:
+        """Calculate total losses based on environmental, availability, wake, technical, and electrical losses.
+
+        Returns
+        -------
+        float
+            The total loss ratio.
+
+        """
+        total_loss_ratio = 1 - (
+            (1 - self.environmental_loss_ratio())
+            * (1 - (1 - self.availability(which="energy", frequency="project", by="windfarm")))
+            * (1 - self.wake_loss_ratio())
+            * (1 - self.technical_loss_ratio())
+            * (1 - self.electrical_loss_ratio())
+        )
+
+        return total_loss_ratio
+
+    def losses_breakdown(self) -> float:
+        """Provide a categorical breakout of each of the above loss categories, and the total.
+
+        Returns
+        -------
+        pd.DataFrame
+            Breakdown of all losses types considered and total losses in percentages.
+
+        """
+        loss_types = [
+            "Environmental Losses",
+            "Availability Losses",
+            "Wake Losses",
+            "Technical Losses",
+            "Electrical Losses",
+            "Total Losses",
+        ]
+
+        values = [
+            self.environmental_loss_ratio() * 100,
+            (1 - self.availability(which="energy", frequency="project", by="windfarm")) * 100,
+            self.wake_loss_ratio() * 100,
+            self.technical_loss_ratio() * 100,
+            self.electrical_loss_ratio() * 100,
+            self.total_loss_ratio() * 100,
+        ]
+
+        losses_breakdown = pd.DataFrame({"Loss Type": loss_types, "Value (%)": values})
+
+        return losses_breakdown
 
     def availability(
         self, which: str, frequency: str = "project", by: str = "windfarm"
@@ -1675,7 +1794,6 @@ class Project(FromDictMixin):
         frequency: str = "project",
         by: str = "windfarm",
         with_losses: bool = False,
-        loss_ratio: float | None = None,
     ) -> pd.DataFrame | float:
         """Calculates the capacity factor over a project's lifetime as a single value, annual
         average, or monthly average for the whole windfarm or by turbine.
@@ -1690,18 +1808,12 @@ class Project(FromDictMixin):
         by : str
             One of "windfarm" or "turbine". Defaults to "windfarm".
         with_losses : bool, optional
-            Use the :py:attr:`loss_ratio` or :py:attr:`Project.loss_ratio` to post-hoc
-            consider non-wake and non-availability losses in the energy production aggregation.
+            Use the :py:attr:`Project.total_loss_ratio` to post-hoc
+            consider environmental, availability, wake, technical, and electrical losses in the energy
+            production aggregation.
             Defaults to False.
 
             .. note:: This will only be checked for :py:attr:`which` = "net".
-
-        loss_ratio : float, optional
-            The decimal non-wake and non-availability losses ratio to apply to the energy
-            production. If None, then it will attempt to use the :py:attr:`loss_ratio` provided
-            in the Project configuration. Defaults to None.
-
-            .. note:: This will only be used when for :py:attr:`which` = "net".
 
         Returns
         -------
@@ -1727,7 +1839,6 @@ class Project(FromDictMixin):
                 by="turbine",
                 units="kw",
                 with_losses=with_losses,
-                loss_ratio=loss_ratio,
             )
         else:
             numerator = self.energy_potential(
