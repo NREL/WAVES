@@ -126,6 +126,8 @@ class Project(FromDictMixin):
     ----------
     library_path : str | pathlib.Path
         The file path where the configuration data for ORBIT, WOMBAT, and FLORIS can be found.
+    turbine_type : str
+        The type of wind turbine used. Must be one of "land", "fixed", or "floating".
     weather_profile : str | pathlib.Path
         The file path where the weather profile data is located, with the following column
         requirements:
@@ -225,6 +227,7 @@ class Project(FromDictMixin):
     """
 
     library_path: Path = field(converter=resolve_path)
+    turbine_type: str = field(converter=str.lower, validator=attrs.validators.instance_of(str))
     weather_profile: str = field(converter=str)
     orbit_config: str | Path | dict | None = field(
         default=None, validator=attrs.validators.instance_of((str, Path, dict, type(None)))
@@ -345,6 +348,25 @@ class Project(FromDictMixin):
         if not value.is_dir():
             raise ValueError(f"The input path to {attribute.name}: {value} is not a directory.")
 
+    @turbine_type.validator  # type: ignore
+    def validate_turbine_type(self, attribute: attrs.Attribute, value: str) -> None:
+        """Validates that :py:attr`turbine_type` is one of "land", "fixed", or "floating".
+
+        Parameters
+        ----------
+        attribute : attrs.Attribute
+            The attrs Attribute information/metadata/configuration.
+        value : str
+            The user input.
+
+        Raises
+        ------
+        ValueError
+            Raised if not one of "land", "fixed", or "floating".
+        """
+        if value not in ("land", "fixed", "floating"):
+            raise ValueError(f"{attribute.name} must be one 'land', 'fixed', or floating'.")
+
     @report_config.validator  # type: ignore
     def validate_report_config(self, attribute: attrs.Attribute, value: dict | None) -> None:
         """Validates the user input for :py:attr:`report_config`.
@@ -370,7 +392,9 @@ class Project(FromDictMixin):
             raise ValueError("`report_config` must be a dictionary, if provided")
 
         if "name" not in value:
-            raise KeyError("A key, value pair for `name` must be provided.")
+            raise KeyError(
+                f"A key, value pair for `name` must be provided for the {attribute.name}."
+            )
 
     # **********************************************************************************************
     # Configuration methods
@@ -1438,10 +1462,9 @@ class Project(FromDictMixin):
             units. If None, then the unnormalized energy production is returned, otherwise it must
             be one of "kw", "mw", or "gw". Defaults to None.
         with_losses : bool, optional
-            Use the :py:attr:`Project.total_loss_ratio` to post-hoc
-            consider environmental, availability, wake, technical, and electrical losses in the energy
-            production aggregation.
-            Defaults to False.
+            Use the :py:attr:`Project.total_loss_ratio` to post-hoc consider environmental,
+            availability, wake, technical, and electrical losses in the energy production
+            aggregation. Defaults to False.
         aep : bool, optional
             Flag to return the energy production normalized by the number of years the plan is in
             operation. Note that :py:attr:`frequency` must be "project" for this to be computed.
@@ -1553,10 +1576,9 @@ class Project(FromDictMixin):
             units. If None, then the unnormalized energy production is returned, otherwise it must
             be one of "kw", "mw", or "gw". Defaults to None.
         with_losses : bool, optional
-            Use the :py:attr:`Project.total_loss_ratio` to post-hoc
-            consider environmental, availability, wake, technical, and electrical losses in the energy
-            production aggregation.
-            Defaults to False.
+            Use the :py:attr:`Project.total_loss_ratio` to post-hoc consider environmental,
+            availability, wake, technical, and electrical losses in the energy production
+            aggregation. Defaults to False.
         aep : bool, optional
             AEP for the annualized losses. Only used for :py:attr:`frequency` = "project".
 
@@ -1576,7 +1598,7 @@ class Project(FromDictMixin):
             units="kw",
         )
 
-        production = self.energy_production(
+        production = self.energy_production(  # type: ignore
             "month-year",
             by="turbine",
             units="kw",
@@ -1627,7 +1649,7 @@ class Project(FromDictMixin):
             units="kw",
         )
 
-        production = self.energy_production(
+        production = self.energy_production(  # type: ignore
             "month-year",
             by="turbine",
             units="kw",
@@ -1636,28 +1658,24 @@ class Project(FromDictMixin):
 
         losses = potential - production
 
-        return losses.sum(axis=0).sum() / potential.sum(axis=0).sum()
+        return losses.sum(axis=0).sum() / potential.sum(axis=0).sum()  # type: ignore
 
     def technical_loss_ratio(self) -> float:
         """Calculate technical losses based on the project type.
+
+        This method is adopted from ORCA where a 1% hysterisis loss is applied for fixed-bottom
+        turbines. For floating turbines, this is 1% hysterisis, 0.1% for onboard equipment, and 0.1%
+        for rotor misalignment (0.01197901 total).
 
         Returns
         -------
         float
             The technical loss ratio.
         """
-        # if "Mooring" is in the design phases of the ORBIT config, it is a floating project, if not, it is fixed-bottom
-
-        floating_substring = "Mooring"
-        if any(
-            floating_substring.lower() in item.lower()
-            for item in self.orbit_config_dict["design_phases"]
-        ):
-            return 1 - (1 - 0.01) * (1 - 0.001) * (
-                1 - 0.001
-            )  # ORCA -> Hysteresis (1%), Onboard Equip. (0.1%), Rotor Misalignment (0.1%) for a flating project
+        if self.turbine_type == "floating":
+            return 1 - (1 - 0.01) * (1 - 0.001) * (1 - 0.001)
         else:
-            return 0.01  # ORCA -> Hysterisis (1%) for a fixed-bottom project
+            return 0.01
 
     def electrical_loss_ratio(self) -> float:
         """Calculate electrical losses based on ORBIT parameters.
@@ -1694,7 +1712,8 @@ class Project(FromDictMixin):
         return 0.0159
 
     def total_loss_ratio(self) -> float:
-        """Calculate total losses based on environmental, availability, wake, technical, and electrical losses.
+        """Calculate total losses based on environmental, availability, wake, technical, and
+        electrical losses.
 
         Returns
         -------
@@ -1808,10 +1827,9 @@ class Project(FromDictMixin):
         by : str
             One of "windfarm" or "turbine". Defaults to "windfarm".
         with_losses : bool, optional
-            Use the :py:attr:`Project.total_loss_ratio` to post-hoc
-            consider environmental, availability, wake, technical, and electrical losses in the energy
-            production aggregation.
-            Defaults to False.
+            Use the :py:attr:`Project.total_loss_ratio` to post-hoc consider environmental,
+            availability, wake, technical, and electrical losses in the energy production
+            aggregation. Defaults to False.
 
             .. note:: This will only be checked for :py:attr:`which` = "net".
 
@@ -2196,7 +2214,7 @@ class Project(FromDictMixin):
         elif frequency == "project":
             capex_df = capex_df.sum(axis=0).to_frame(name="Cash Flow").T
 
-        capex_df["Capex"] = capex_df.sum(axis=1).sort_index()
+        capex_df["CapEx"] = capex_df.sum(axis=1).sort_index()
         if breakdown:
             return capex_df
         return capex_df.CapEx.to_frame()
