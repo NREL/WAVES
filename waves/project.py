@@ -183,6 +183,9 @@ class Project(FromDictMixin):
         Interest rate paid on the cash flows. Defaults to None.
     reinvestment_rate : float, optional
         Interest rate paid on the cash flows upon reinvestment. Defaults to None.
+    environmental_loss_ratio : float, optional
+        Percentage of environmental losses to deduct from the total energy production. Should be
+        represented as a decimal in the range of [0, 1]. Defaults to 0.0159.
     orbit_start_date : str | None
         The date to use for installation phase start timings that are set to "0" in the
         ``install_phases`` configuration. If None the raw configuration data will be used.
@@ -395,9 +398,7 @@ class Project(FromDictMixin):
             raise ValueError("`report_config` must be a dictionary, if provided")
 
         if "name" not in value:
-            raise KeyError(
-                f"A key, value pair for `name` must be provided for the {attribute.name}."
-            )
+            raise KeyError("A key, value pair for `name` must be provided for the simulation name.")
 
     # **********************************************************************************************
     # Configuration methods
@@ -1465,8 +1466,8 @@ class Project(FromDictMixin):
             units. If None, then the unnormalized energy production is returned, otherwise it must
             be one of "kw", "mw", or "gw". Defaults to None.
         environmental_loss_ratio : float, optional
-            The decimal environmental loss ratio to apply to the energy production. If None, then 
-            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project 
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
             configuration. Defaults to 0.0159.
         aep : bool, optional
             Flag to return the energy production normalized by the number of years the plan is in
@@ -1570,13 +1571,13 @@ class Project(FromDictMixin):
             units. If None, then the unnormalized energy production is returned, otherwise it must
             be one of "kw", "mw", or "gw". Defaults to None.
         environmental_loss_ratio : float, optional
-            The decimal environmental loss ratio to apply to the energy production. If None, then 
-            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project 
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
             configuration. Defaults to 0.0159.
         aep : bool, optional
             AEP for the annualized losses. Only used for :py:attr:`frequency` = "project".
         losses_breakdown : bool, optional
-            Flag to return the losses breakdown including environmental, availability, wake, 
+            Flag to return the losses breakdown including environmental, availability, wake,
             technical, electrical losses, and total losses.
 
         Raises
@@ -1604,11 +1605,11 @@ class Project(FromDictMixin):
         losses = potential - production
 
         # Compute total loss ratio
-        total_loss_ratio = self.total_loss_ratio(environmental_loss_ratio = environmental_loss_ratio)
+        total_loss_ratio = self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
 
         # display loss breakdown
         if losses_breakdown:
-            return self.losses_breakdown(environmental_loss_ratio = environmental_loss_ratio)
+            return self.losses_breakdown(environmental_loss_ratio=environmental_loss_ratio)
 
         unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
         if by == "windfarm":
@@ -1632,7 +1633,7 @@ class Project(FromDictMixin):
         return losses / self.capacity(per_capacity)
 
     def wake_losses(
-       self,
+        self,
         frequency: str = "project",
         by: str = "windfarm",
         units: str = "kw",
@@ -1640,8 +1641,8 @@ class Project(FromDictMixin):
         aep: bool = False,
         ratio: bool = False,
     ) -> pd.DataFrame | float:
-        """Computes the wake losses, in GWh, for the simulation by extrapolating the 
-        monthly wake loss contributions to AEP if FLORIS (with wakes) results were 
+        """Computes the wake losses, in GWh, for the simulation by extrapolating the
+        monthly wake loss contributions to AEP if FLORIS (with wakes) results were
         computed by a wind rose, or using the time series results.
 
         Parameters
@@ -1660,7 +1661,7 @@ class Project(FromDictMixin):
             Flag to return the wake losses normalized by the number of years the plan is in
             operation. Note that :py:attr:`frequency` must be "project" for this to be computed.
         ratio : bool, optional
-            Flag to return the wake loss ratio or the ratio of wake losses to the potential energy 
+            Flag to return the wake loss ratio or the ratio of wake losses to the potential energy
             generation.
 
         Raises
@@ -1673,10 +1674,9 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level losses, in GWh, for the desired ``frequency``.
         """
-
         potential = self.energy_potential(
-            frequency = "month-year",
-            by= "turbine",
+            frequency="month-year",
+            by="turbine",
             units="kw",
         )
 
@@ -1704,14 +1704,10 @@ class Project(FromDictMixin):
 
         # Aggregate to the desired frequency level (nothing required for month-year)
         if frequency == "annual":
-            losses = (
-                losses.reset_index(drop=False).groupby("year").sum().drop(columns=["month"])
-            )
+            losses = losses.reset_index(drop=False).groupby("year").sum().drop(columns=["month"])
         elif frequency == "project":
             if by == "turbine":
-                losses = (
-                    losses.sum(axis=0).to_frame(name=f"Energy Losses ({unit_map[units]})").T
-                )
+                losses = losses.sum(axis=0).to_frame(name=f"Energy Losses ({unit_map[units]})").T
             else:
                 losses = losses.values.sum()
         if aep:
@@ -1770,12 +1766,12 @@ class Project(FromDictMixin):
     ) -> float:
         """Calculate total losses based on environmental, availability, wake, technical, and
         electrical losses.
-        
+
         Parameters
         ----------
         environmental_loss_ratio : float, optional
-            The decimal environmental loss ratio to apply to the energy production. If None, then 
-            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project 
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
             configuration. Defaults to 0.0159.
 
         Returns
@@ -1784,7 +1780,6 @@ class Project(FromDictMixin):
             The total loss ratio.
 
         """
-
         # Check that the environmental loos ratio exists
         if environmental_loss_ratio is None:
             if (environmental_loss_ratio := self.environmental_loss_ratio) is None:
@@ -1793,11 +1788,10 @@ class Project(FromDictMixin):
                     " keyword arguments."
                 )
 
-        
         total_loss_ratio = 1 - (
             (1 - environmental_loss_ratio)
             * (1 - (1 - self.availability(which="energy", frequency="project", by="windfarm")))
-            * (1 - self.wake_losses(ratio = True))
+            * (1 - self.wake_losses(ratio=True))
             * (1 - self.technical_loss_ratio())
             * (1 - self.electrical_loss_ratio())
         )
@@ -1813,8 +1807,8 @@ class Project(FromDictMixin):
         Parameters
         ----------
         environmental_loss_ratio : float, optional
-            The decimal environmental loss ratio to apply to the energy production. If None, then 
-            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project 
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
             configuration. Defaults to 0.0159.
 
         Returns
@@ -1843,10 +1837,10 @@ class Project(FromDictMixin):
         values = [
             environmental_loss_ratio * 100,
             (1 - self.availability(which="energy", frequency="project", by="windfarm")) * 100,
-            self.wake_losses(ratio = True) * 100,
+            self.wake_losses(ratio=True) * 100,
             self.technical_loss_ratio() * 100,
             self.electrical_loss_ratio() * 100,
-            self.total_loss_ratio(environmental_loss_ratio = environmental_loss_ratio) * 100,
+            self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio) * 100,
         ]
 
         losses_breakdown = pd.DataFrame({"Loss Type": loss_types, "Value (%)": values})
@@ -1920,8 +1914,8 @@ class Project(FromDictMixin):
 
             .. note:: This will only be checked for :py:attr:`which` = "net".
         environmental_loss_ratio : float, optional
-            The decimal environmental loss ratio to apply to the energy production. If None, then 
-            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project 
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
             configuration. Defaults to 0.0159.
 
         Returns
@@ -1943,14 +1937,13 @@ class Project(FromDictMixin):
         by_turbine = by == "turbine"
 
         if which == "net":
-            numerator = (1 - self.total_loss_ratio(
-                environmental_loss_ratio = environmental_loss_ratio
+            numerator = (
+                1 - self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
+            ) * self.energy_potential(
+                frequency="month-year",
+                by="turbine",
+                units="kw",
             )
-                        ) * self.energy_potential(
-                                frequency="month-year",
-                                by="turbine",
-                                units="kw",
-                                )
         else:
             numerator = self.energy_potential(
                 frequency="month-year",
