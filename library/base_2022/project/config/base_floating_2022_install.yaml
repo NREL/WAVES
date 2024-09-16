@@ -45,7 +45,7 @@ array_system_design:
   - XLPE_630mm_66kV
   location_data: base_floating_2022_layout
 export_system_design:
-  cables: XLPE_1000m_220kV
+  cables: XLPE_1000mm_220kV
   percent_added_length: 0.0
 # Configured Phases
 design_phases:
