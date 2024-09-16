@@ -398,9 +398,7 @@ class Project(FromDictMixin):
             raise ValueError("`report_config` must be a dictionary, if provided")
 
         if "name" not in value:
-            raise KeyError(
-                "A key, value pair for `name` must be provided for the simulation name."
-            )
+            raise KeyError("A key, value pair for `name` must be provided for the simulation name.")
 
     # **********************************************************************************************
     # Configuration methods
@@ -1689,7 +1687,7 @@ class Project(FromDictMixin):
 
         losses = potential - production
 
-        if ratio == True:
+        if ratio:
             return losses.sum(axis=0).sum() / potential.sum(axis=0).sum()
 
         if units == "kw":
