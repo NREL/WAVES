@@ -398,7 +398,9 @@ class Project(FromDictMixin):
             raise ValueError("`report_config` must be a dictionary, if provided")
 
         if "name" not in value:
-            raise KeyError("A key, value pair for `name` must be provided for the simulation name.")
+            raise KeyError(
+                "A key, value pair for `name` must be provided for the simulation name."
+            )
 
     # **********************************************************************************************
     # Configuration methods
@@ -1490,7 +1492,6 @@ class Project(FromDictMixin):
 
         # For the wind rose outputs, only consider project-level availability because
         # wind rose AEP is a long-term estimation of energy production
-
         availability = self.wombat.metrics.production_based_availability(
             frequency="month-year", by="turbine"
         ).loc[:, self.floris_turbine_order]
