@@ -735,9 +735,9 @@ class Project(FromDictMixin):
         )
         zero_power_filter = np.full((weather.shape[0]), True)
         if cut_out_wind_speed is not None:
-            zero_power_filter = weather.windspeed < cut_out_wind_speed
+            zero_power_filter = weather.windspeed.to_numpy() < cut_out_wind_speed
         if cut_in_wind_speed is not None:
-            zero_power_filter &= weather.windspeed >= cut_in_wind_speed
+            zero_power_filter &= weather.windspeed.to_numpy() >= cut_in_wind_speed
 
         args = [
             (
@@ -954,20 +954,20 @@ class Project(FromDictMixin):
             self.floris_results_type = "wind_rose"
 
         elif which == "time_series":
+            self.connect_floris_to_turbines(x_col=self.floris_x_col, y_col=self.floris_y_col)
             parallel_args, zero_power_filter = self.preprocess_monthly_floris(
                 reinitialize_kwargs, run_kwargs, cut_in_wind_speed, cut_out_wind_speed
             )
-            fi_dict, turbine_powers = run_parallel_time_series_floris(parallel_args, nodes)
+            fi_dict, potential, production = run_parallel_time_series_floris(parallel_args, nodes)
 
             self._fi_dict = fi_dict
-            self.turbine_aep_mwh = turbine_powers
-            self.connect_floris_to_turbines(x_col=self.floris_x_col, y_col=self.floris_y_col)
+            self.turbine_potential_energy = potential
             self.turbine_potential_energy.columns = self.floris_turbine_order
             self.turbine_potential_energy = (
                 self.turbine_potential_energy.where(
                     np.repeat(
                         zero_power_filter.reshape(-1, 1),
-                        self.turbine_aep_mwh.shape[1],
+                        self.turbine_potential_energy.shape[1],
                         axis=1,
                     ),
                     0.0,
@@ -977,6 +977,22 @@ class Project(FromDictMixin):
 
             n_years = self.turbine_potential_energy.index.year.unique().size
             self.project_potential_energy = self.turbine_potential_energy.values.sum() / n_years
+
+            self.turbine_production_energy = production
+            self.connect_floris_to_turbines(x_col=self.floris_x_col, y_col=self.floris_y_col)
+            self.turbine_production_energy.columns = self.floris_turbine_order
+            self.turbine_production_energy = (
+                self.turbine_production_energy.where(
+                    np.repeat(
+                        zero_power_filter.reshape(-1, 1),
+                        self.turbine_production_energy.shape[1],
+                        axis=1,
+                    ),
+                    0.0,
+                )
+                / 1e6
+            )
+            self.project_production_energy = self.turbine_production_energy.values.sum() / n_years
             self.floris_results_type = "time_series"
         else:
             raise ValueError(f"`which` must be one of: 'wind_rose' or 'time_series', not: {which}")
@@ -1673,42 +1689,95 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level losses, in GWh, for the desired ``frequency``.
         """
-        potential = self.energy_potential(
-            frequency="month-year",
-            by="turbine",
-            units="kw",
-        )
+        # Use WOMBAT availability for the base index
+        availability = self.wombat.metrics.production_based_availability(
+            frequency="month-year", by="turbine"
+        ).loc[:, self.floris_turbine_order]
 
-        production = self.energy_production(  # type: ignore
-            "month-year",
-            by="turbine",
-            units="kw",
-        )[self.wombat.metrics.turbine_id]
+        # Retrieve the energy potential and and waked energy based on the appropriate FLORIS method
+        if self.floris_results_type == "wind_rose":
+            potential_energy_gwh = pd.DataFrame(
+                0.0, dtype=float, index=availability.index, columns=["drop"]
+            )
+            potential_energy_gwh = potential_energy_gwh.merge(
+                self.turbine_potential_energy,
+                how="left",
+                left_on="month",
+                right_index=True,
+            ).drop(labels=["drop"], axis=1)
+            potential_energy_gwh = potential_energy_gwh / 1000
 
-        losses = potential - production
+            waked_energy_gwh = pd.DataFrame(
+                0.0, dtype=float, index=availability.index, columns=["drop"]
+            )
+            waked_energy_gwh = waked_energy_gwh.merge(
+                self.turbine_production_energy,
+                how="left",
+                left_on="month",
+                right_index=True,
+            ).drop(labels=["drop"], axis=1)
+            waked_energy_gwh = waked_energy_gwh / 1000
 
-        if ratio:
-            return losses.sum(axis=0).sum() / potential.sum(axis=0).sum()
+        elif self.floris_results_type == "time_series":
+            potential_energy_gwh = (
+                self.turbine_potential_energy.groupby(
+                    [
+                        self.turbine_potential_energy.index.year,
+                        self.turbine_potential_energy.index.month,
+                    ]
+                )
+                .sum()
+                .loc[availability.index]
+            ) / 1000
+            potential_energy_gwh.index.names = ["year", "month"]
+
+            waked_energy_gwh = (
+                self.turbine_production_energy.groupby(
+                    [
+                        self.turbine_production_energy.index.year,
+                        self.turbine_production_energy.index.month,
+                    ]
+                )
+                .sum()
+                .loc[availability.index]
+            ) / 1000
+            waked_energy_gwh.index.names = ["year", "month"]
+
+        losses = potential_energy_gwh - waked_energy_gwh
 
         if units == "kw":
-            losses = losses
+            losses = losses * 1e6
+            potential = potential_energy_gwh * 1e6
         if units == "mw":
-            losses = losses / 1e3
+            losses = losses * 1e3
+            potential = potential_energy_gwh * 1e3
         if units == "gw":
-            losses = losses / 1e6
+            losses = losses
+            potential = potential_energy_gwh
 
         unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
+        name = f"Energy Losses ({'%' if not ratio else unit_map[units]})"
         if by == "windfarm":
-            losses = losses.sum(axis=1).to_frame(f"Energy Losses ({unit_map[units]})")
+            losses = losses.sum(axis=1).to_frame(name)
+            potential = potential.sum(axis=1).to_frame(name)
 
         # Aggregate to the desired frequency level (nothing required for month-year)
         if frequency == "annual":
             losses = losses.reset_index(drop=False).groupby("year").sum().drop(columns=["month"])
+            potential = (
+                potential.reset_index(drop=False).groupby("year").sum().drop(columns=["month"])
+            )
         elif frequency == "project":
             if by == "turbine":
-                losses = losses.sum(axis=0).to_frame(name=f"Energy Losses ({unit_map[units]})").T
+                losses = losses.sum(axis=0).to_frame(name).T
+                potential = potential.sum(axis=0).to_frame(name).T
             else:
                 losses = losses.values.sum()
+                potential = potential.values.sum()
+
+        if ratio:
+            return losses / potential
+
         if aep:
             if frequency != "project":
                 raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
