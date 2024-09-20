@@ -1617,16 +1617,10 @@ class Project(FromDictMixin):
             units="kw",
         )
 
-        production = self.energy_production(  # type: ignore
-            "month-year",
-            by="turbine",
-            units="kw",
-        )[self.wombat.metrics.turbine_id]
-
-        losses = potential - production
-
         # Compute total loss ratio
         total_loss_ratio = self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
+
+        losses = potential * total_loss_ratio
 
         # display loss breakdown
         if losses_breakdown:
@@ -1840,6 +1834,9 @@ class Project(FromDictMixin):
     ) -> float:
         """Calculate total losses based on environmental, availability, wake, technical, and
         electrical losses.
+
+        .. note:: This method treats different types of losses as efficiencies and is applied 
+        as in Equation 1 from Beiter et al. 2020 (https://www.nrel.gov/docs/fy21osti/77384.pdf).
 
         Parameters
         ----------
