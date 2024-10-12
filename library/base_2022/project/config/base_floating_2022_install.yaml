@@ -6,14 +6,14 @@ site:
   mean_windspeed: 8.41  # avg from weather profile in the Humboldt site
 plant:
   layout: grid
-  num_turbines: 50
+  num_turbines: 67
   row_spacing: 7  # COE Review 2021
   substation_distance: 1
   turbine_spacing: 7  # COE Review 2021
 landfall:
   interconnection_distance: 8 # COE Review 2021
   trench_length: 6  # COE Review 2021
-turbine: 12MW_generic
+turbine: 15MW_generic
 oss_design:
   num_substations: 1
 port:
@@ -29,6 +29,7 @@ mooring_install_vessel: demand_adjusted_support_vessel
 oss_install_vessel: demand_adjusted_floating_heavy_lift_vessel
 support_vessel: demand_adjusted_support_vessel
 towing_vessel: demand_adjusted_towing_vessel
+ahts_vessel: demand_adjusted_support_vessel
 towing_vessel_groups:
   num_groups : 1 # note these numbers are different than the default for ORBIT- I believe ORCA assumes only one installation group of 3 vessels total for floating
   station_keeping_vessels: 1
@@ -37,12 +38,13 @@ towing_vessel_groups:
 # Module Specific
 substructure:
   takt_time: 168
+  ahts_vessel: demand_adjusted_support_vessel
 OffshoreSubstationInstallation:
   feeder: demand_adjusted_floating_barge
 array_system_design:
   free_cable_length: 0.5
   cables:
-  - XLPE_630mm_66kV
+  - _XLPE_630mm_66kV
   location_data: base_floating_2022_layout
 export_system_design:
   cables: XLPE_1000m_220kV

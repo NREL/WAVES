@@ -39,7 +39,7 @@ oss_design:
   num_substations: 1
 array_system_design:
   cables:
-  - XLPE_630mm_66kV
+  - _XLPE_630mm_66kV
   location_data: base_fixed_bottom_2022_layout
 export_system_design:
   cables: XLPE_1000m_220kV
