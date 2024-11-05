@@ -1,0 +1,27 @@
+name: Anchor Handling Tug
+charter_days: 3  # needs to be here, but doesn't do anything
+equipment_rate: 42000
+strategy: requests
+strategy_threshold: 1  # needs to be here, but doesn't do anything
+onsite: false
+capability: AHV
+speed: 24.08 # 24 kph = 13 knots
+tow_speed: 9.26
+unmoor_hours: 1
+reconnection_hours: 1
+mobilization_cost: 325000
+mobilization_days: 14
+max_windspeed_transport: 20
+max_windspeed_repair: 20
+max_waveheight_transport: 3
+max_waveheight_repair: 3
+workday_start: 0
+workday_end: 24
+crew_transfer_time: 0.25
+port_distance: 0  # will get automatically set from the port configuration if not provided
+n_crews: 1
+crew:
+  day_rate: 0
+  n_day_rate: 0
+  hourly_rate: 0
+  n_hourly_rate: 0

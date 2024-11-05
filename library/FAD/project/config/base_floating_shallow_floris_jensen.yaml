@@ -1,0 +1,279 @@
+description: Shallow FAD Layout using Jensen-Jimenez
+farm:
+  layout_x:
+  - 12822.7
+  - 13404.7
+  - 13986.7
+  - 11388.4
+  - 11970.4
+  - 12552.3
+  - 13134.3
+  - 13716.3
+  - 14298.3
+  - 9954.03
+  - 10536
+  - 11118
+  - 11700
+  - 12282
+  - 12863.9
+  - 13445.9
+  - 14027.9
+  - 7937.71
+  - 8519.69
+  - 9101.67
+  - 9683.65
+  - 10265.6
+  - 10847.6
+  - 11429.6
+  - 12011.6
+  - 12593.6
+  - 6503.36
+  - 7085.34
+  - 7667.32
+  - 8249.3
+  - 8831.28
+  - 9413.27
+  - 9995.25
+  - 10577.2
+  - 5069.01
+  - 5650.99
+  - 6232.98
+  - 6814.96
+  - 7396.94
+  - 7978.92
+  - 8560.9
+  - 9142.88
+  - 3052.68
+  - 3634.67
+  - 4216.65
+  - 4798.63
+  - 5380.61
+  - 5962.59
+  - 6544.57
+  - 7126.55
+  - 7708.54
+  - 1618.34
+  - 2200.32
+  - 2782.3
+  - 3364.28
+  - 3946.26
+  - 4528.24
+  - 5110.23
+  - 5692.21
+  - 1929.93
+  - 2511.92
+  - 3093.9
+  - 3675.88
+  - 4257.86
+  - 1659.55
+  - 2241.53
+  - 2823.51
+
+
+  layout_y:
+  - 1677.22
+  - 3276.2
+  - 4875.18
+  - 2199.28
+  - 3798.26
+  - 5397.24
+  - 6996.22
+  - 8595.2
+  - 10194.2
+  - 2721.34
+  - 4320.32
+  - 5919.3
+  - 7518.28
+  - 9117.26
+  - 10716.2
+  - 12315.2
+  - 13914.2
+  - 1644.42
+  - 3243.4
+  - 4842.38
+  - 6441.36
+  - 8040.34
+  - 9639.32
+  - 11238.3
+  - 12837.3
+  - 14436.3
+  - 2166.48
+  - 3765.46
+  - 5364.44
+  - 6963.42
+  - 8562.4
+  - 10161.4
+  - 11760.4
+  - 13359.3
+  - 2688.54
+  - 4287.52
+  - 5886.5
+  - 7485.48
+  - 9084.46
+  - 10683.4
+  - 12282.4
+  - 13881.4
+  - 1611.61
+  - 3210.6
+  - 4809.58
+  - 6408.56
+  - 8007.54
+  - 9606.52
+  - 11205.5
+  - 12804.5
+  - 14403.5
+  - 2133.67
+  - 3732.66
+  - 5331.64
+  - 6930.62
+  - 8529.6
+  - 10128.6
+  - 11727.6
+  - 13326.5
+  - 7452.68
+  - 9051.66
+  - 10650.6
+  - 12249.6
+  - 13848.6
+  - 11172.7
+  - 12771.7
+  - 14370.7
+
+
+  turbine_library_path: ../../turbines
+  turbine_type:
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+  - iea_15MW_240m
+
+floris_version: v3.0.0
+flow_field:
+  air_density: 1.225
+  reference_wind_height: -1
+  turbulence_intensity: 0.06
+  wind_directions:
+  - 270.0
+  wind_shear: 0.12
+  wind_speeds:
+  - 8.41  # avg from weather profile in the Humboldt site
+  wind_veer: 0.0
+logging:
+  console:
+    enable: true
+    level: WARNING
+  file:
+    enable: false
+    level: WARNING
+name: Shallow FAD Layout Jensen
+solver:
+  turbine_grid_points: 3
+  type: turbine_grid
+wake:
+  enable_secondary_steering: true
+  enable_transverse_velocities: true
+  enable_yaw_added_recovery: true
+  model_strings:
+    combination_model: sosfs
+    deflection_model: jimenez
+    turbulence_model: crespo_hernandez
+    velocity_model: jensen
+  wake_deflection_parameters:
+    gauss:
+      ad: 0.0
+      alpha: 0.58
+      bd: 0.0
+      beta: 0.077
+      dm: 1.0
+      ka: 0.38
+      kb: 0.004
+    jimenez:
+      ad: 0.0
+      bd: 0.0
+      kd: 0.05
+  wake_turbulence_parameters:
+    crespo_hernandez:
+      ai: 0.8
+      constant: 0.5
+      downstream: -0.32
+      initial: 0.1
+  wake_velocity_parameters:
+    cc:
+      a_f: 3.11
+      a_s: 0.179367259
+      alpha_mod: 1.0
+      b_f: -0.68
+      b_s: 0.0118889215
+      c_f: 2.41
+      c_s1: 0.0563691592
+      c_s2: 0.13290157
+    gauss:
+      alpha: 0.58
+      beta: 0.077
+      ka: 0.38
+      kb: 0.004
+    jensen:
+      we: 0.05
