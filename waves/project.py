@@ -5,6 +5,7 @@ FLORIS (AEP) simulation libraries for a simplified modeling workflow.
 from __future__ import annotations
 
 import json
+import warnings
 from copy import deepcopy
 from typing import TYPE_CHECKING
 from pathlib import Path
@@ -1574,7 +1575,7 @@ class Project(FromDictMixin):
         per_capacity: str | None = None,
         environmental_loss_ratio: float | None = None,
         aep: bool = False,
-        losses_breakdown: bool = False,
+        breakdown: bool = False,
     ) -> pd.DataFrame:
         """Computes the energy losses for the simulation by subtracting the energy production from
         the potential energy production.
@@ -1597,9 +1598,12 @@ class Project(FromDictMixin):
             configuration. Defaults to 0.0159.
         aep : bool, optional
             AEP for the annualized losses. Only used for :py:attr:`frequency` = "project".
-        losses_breakdown : bool, optional
+        breakdown : bool, optional
             Flag to return the losses breakdown including environmental, availability, wake,
             technical, electrical losses, and total losses.
+
+            .. note:: Returns the project-level breakdown only, regardless of :py:arg:`frequency`
+                input.
 
         Raises
         ------
@@ -1621,9 +1625,12 @@ class Project(FromDictMixin):
         total_loss_ratio = self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
 
         losses = potential * total_loss_ratio
+        assert isinstance(losses, pd.DataFrame)
 
         # display loss breakdown
-        if losses_breakdown:
+        if breakdown:
+            if frequency != "project":
+                warnings.warn("`frequency` must be 'project' when `breakdown=True`")
             return self.losses_breakdown(environmental_loss_ratio=environmental_loss_ratio)
 
         unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
@@ -1835,7 +1842,7 @@ class Project(FromDictMixin):
         """Calculate total losses based on environmental, availability, wake, technical, and
         electrical losses.
 
-        .. note:: This method treats different types of losses as efficiencies and is applied 
+        .. note:: This method treats different types of losses as efficiencies and is applied
         as in Equation 1 from Beiter et al. 2020 (https://www.nrel.gov/docs/fy21osti/77384.pdf).
 
         Parameters
@@ -1901,8 +1908,8 @@ class Project(FromDictMixin):
         if environmental_loss_ratio is None:
             if (environmental_loss_ratio := self.environmental_loss_ratio) is None:
                 raise ValueError(
-                    "`environmental_loss_ratio` wasn't defined in the Project settings or in the method"
-                    " keyword arguments."
+                    "`environmental_loss_ratio` wasn't defined in the Project settings or in the"
+                    " method keyword arguments."
                 )
 
         values = [
@@ -2007,6 +2014,7 @@ class Project(FromDictMixin):
             raise ValueError('``by`` must be one of "windfarm" or "turbine".')
         by_turbine = by == "turbine"
 
+        numerator: pd.DataFrame
         if which == "net":
             numerator = (
                 1 - self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
@@ -2016,7 +2024,7 @@ class Project(FromDictMixin):
                 units="kw",
             )
         else:
-            numerator: pd.DataFrame = self.energy_potential(
+            numerator = self.energy_potential(
                 frequency="month-year",
                 by="turbine",
                 units="kw",
