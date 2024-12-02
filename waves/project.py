@@ -2559,3 +2559,27 @@ class Project(FromDictMixin):
         results_df.index = pd.Index([simulation_name])
         results_df.index.name = "Project"
         return results_df
+
+
+    def generate_report_lcoe_breakdown(
+        self,
+    ) -> pd.DataFrame:
+        """Generates a single a dataframe of all the desired LCOE metrics from the project.
+
+        .. note:: This structure is in line with the required structure for plotting routines
+        in the Cost of Wind Energy Review
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas.DataFrame containing all of the required LCOE outputs for plotting 
+            routines in the Cost of Wind Energy Review 
+
+        Raises
+        ------
+        ValueError
+            Raised if ...
+        """
