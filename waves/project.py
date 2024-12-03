@@ -1533,7 +1533,8 @@ class Project(FromDictMixin):
 
         # Convert naming from energy_potential()
         if by == "windfarm":
-            energy.columns = energy.columns.str.replace("Potential", "Production")
+            if frequency != "project":
+                energy.columns = energy.columns.str.replace("Potential", "Production")
         if frequency == "project":
             if by == "turbine":
                 energy.index = energy.index.str.replace("Potential", "Production")
@@ -1604,8 +1605,8 @@ class Project(FromDictMixin):
             raise ValueError("`units` must be one of 'gw', 'mw', or 'kw'.")
 
         potential = self.energy_potential(
-            "month-year",
-            by="turbine",
+            frequency=frequency,
+            by=by,
             units=units,
         )
 
@@ -1618,7 +1619,8 @@ class Project(FromDictMixin):
 
         # Convert naming from energy_potential()
         if by == "windfarm":
-            losses.columns = losses.columns.str.replace("Potential", "Losses")
+            if frequency != "project":
+                losses.columns = losses.columns.str.replace("Potential", "Losses")
         if frequency == "project":
             if by == "turbine":
                 losses.index = losses.index.str.replace("Potential", "Losses")
