@@ -1779,8 +1779,10 @@ class Project(FromDictMixin):
         """
         if self.turbine_type == "floating":
             return 1 - (1 - 0.01) * (1 - 0.001) * (1 - 0.001)
-        else:
+        elif self.turbine_type == "fixed":
             return 0.01
+        else:
+            raise NotImplementedError("land-based is not currently modeled")
 
     def electrical_loss_ratio(self) -> float:
         """Calculate electrical losses based on ORBIT parameters.
