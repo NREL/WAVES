@@ -1672,27 +1672,34 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level losses, in GWh, for the desired ``frequency``.
         """
+        # Check the frequency input
+        opts = ("project", "annual", "month-year")
+        if frequency not in opts:
+            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
+
+        # Check the units
+        unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
+        if units not in unit_map:
+            raise ValueError("`units` must be one of 'gw', 'mw', or 'kw'.")
+
         # Use WOMBAT availability for the base index
-        availability = self.wombat.metrics.production_based_availability(
+        base_ix = self.wombat.metrics.production_based_availability(
             frequency="month-year", by="turbine"
-        ).loc[:, self.floris_turbine_order]
+        ).index
+
+        potential_energy_gwh = self.energy_potential(
+            frequency="month-year",
+            by="turbine",
+            units="gw",
+        )
+        if TYPE_CHECKING:
+            assert isinstance(potential_energy_gwh, pd.DataFrame)
+
+        # TODO: CHECK THIS WORKS
 
         # Retrieve the energy potential and and waked energy based on the appropriate FLORIS method
         if self.floris_results_type == "wind_rose":
-            potential_energy_gwh = pd.DataFrame(
-                0.0, dtype=float, index=availability.index, columns=["drop"]
-            )
-            potential_energy_gwh = potential_energy_gwh.merge(
-                self.turbine_potential_energy,
-                how="left",
-                left_on="month",
-                right_index=True,
-            ).drop(labels=["drop"], axis=1)
-            potential_energy_gwh = potential_energy_gwh / 1000
-
-            waked_energy_gwh = pd.DataFrame(
-                0.0, dtype=float, index=availability.index, columns=["drop"]
-            )
+            waked_energy_gwh = pd.DataFrame(0.0, dtype=float, index=base_ix, columns=["drop"])
             waked_energy_gwh = waked_energy_gwh.merge(
                 self.turbine_production_energy,
                 how="left",
@@ -1702,18 +1709,6 @@ class Project(FromDictMixin):
             waked_energy_gwh = waked_energy_gwh / 1000
 
         elif self.floris_results_type == "time_series":
-            potential_energy_gwh = (
-                self.turbine_potential_energy.groupby(
-                    [
-                        self.turbine_potential_energy.index.year,
-                        self.turbine_potential_energy.index.month,
-                    ]
-                )
-                .sum()
-                .loc[availability.index]
-            ) / 1000
-            potential_energy_gwh.index.names = ["year", "month"]
-
             waked_energy_gwh = (
                 self.turbine_production_energy.groupby(
                     [
@@ -1722,7 +1717,7 @@ class Project(FromDictMixin):
                     ]
                 )
                 .sum()
-                .loc[availability.index]
+                .loc[base_ix]
             ) / 1000
             waked_energy_gwh.index.names = ["year", "month"]
 
