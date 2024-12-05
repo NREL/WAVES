@@ -2562,37 +2562,35 @@ class Project(FromDictMixin):
 
 
     def generate_report_lcoe_breakdown(self) -> pd.DataFrame:
-        """Generates a single dataframe of all the desired LCOE metrics from the project.
+        """Generates a single dataframe of all the desired LCOE metrics from the project."""
 
-        .. note:: This structure is in line with the required structure for plotting routines
-        in the Cost of Wind Energy Review
-
-        Parameters
-        ----------
-        Returns
-        -------
-        pd.DataFrame
-            A pandas.DataFrame containing all of the required LCOE outputs for plotting
-            routines in the Cost of Wind Energy Review
-        """
         # Static values
         FCR = self.fixed_charge_rate
         Net_AEP = self.energy_production(units="mw", per_capacity="mw", aep=True, with_losses=True)
         Net_AEP = Net_AEP / 1000
 
-        capex_data = self.orbit.capex_breakdown_per_kw
+        try:
+            capex_data = self.orbit.capex_detailed_soft_capex_breakdown_per_kw
+        except:
+            capex_data = self.orbit.capex_breakdown_per_kw
 
         data = []
-        
+    
+        # Create a list to track the original order of components
+        component_order = []
+
         for component, capex_value_per_kw in capex_data.items():
+            # Track the original order
+            component_order.append(component)
+
             # Determine the CapEx category based on the component name
             if 'Installation' in component:
                 category = 'Balance of System CapEx'
             elif any(keyword in component for keyword in ['Construction', 'Decommissioning', 
-                                                          'Financing', 'Contingency', 'Soft']):
+                                                      'Financing', 'Contingency', 'Soft']):
                 category = 'Financial CapEx'
             elif any(keyword in component for keyword in ['Turbine', 'Nacelle', 'Blades', 
-                                                          'Tower', "RNA"]):
+                                                      'Tower', "RNA"]):
                 category = 'Turbine'
             else:
                 category = 'Balance of System CapEx'  # Default category for anything else
@@ -2607,14 +2605,18 @@ class Project(FromDictMixin):
                    'Value ($/kW-yr)', 'Net AEP (MWh/kW/yr)', 'Value ($/MWh)']
         df = pd.DataFrame(data, columns=columns)
 
+        # Add the 'Original Order' column to preserve the initial ordering of components
+        df['Original Order'] = df['Component'].apply(lambda x: component_order.index(x))
+
+        # Now handle OpEx
         opex_data = self.wombat.metrics.opex(frequency='annual', by_category=True)
-    
+
         # Calculate the average values per column for OpEx
         opex_averages = opex_data.mean()
 
         # Calculate the OpEx value in $/kW-yr by dividing the averages by self.capacity
         opex_averages = opex_averages / self.capacity(units="kw")
-    
+
         # For each OpEx component (excluding the generic "OpEx"), create a new row
         for opex_component, opex_value in opex_averages.items():
             if opex_component != 'OpEx':  # Exclude the generic "OpEx"
@@ -2625,7 +2627,8 @@ class Project(FromDictMixin):
                     self.fixed_charge_rate,  # FCR
                     opex_value,  # The actual OpEx value in $/kW-yr
                     Net_AEP,  # Net AEP in MWh/kW/yr
-                    opex_value / Net_AEP  # Value ($/MWh) for the OpEx component
+                    opex_value / Net_AEP, # Value ($/MWh) for the OpEx component
+                    None
                 ]
                 df.loc[len(df)] = opex_row
 
@@ -2636,8 +2639,14 @@ class Project(FromDictMixin):
         df['Category'] = pd.Categorical(df['Category'], categories=order_of_categories, ordered=True)
         df = df.sort_values(by='Category')
 
+        # Sort within each category by the original order of components
+        df = df.sort_values(by=['Category', 'Original Order'])
+
         # Remove rows where 'Value ($/kW-yr)' is zero
         df = df[df['Value ($/kW-yr)'] != 0]
+
+        # Drop the 'Original Order' column before returning the dataframe
+        df = df.drop(columns=['Original Order'])
 
         # Reset index and return the dataframe
         df = df.reset_index(drop=True)
