@@ -1461,62 +1461,12 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level energy prodcution, in GWh, for the desired ``frequency``.
         """
-        # Use WOMBAT availability for the base index
-        base_ix = self.wombat.metrics.production_based_availability(
-            frequency="month-year", by="turbine"
-        ).index
-
-        if self.floris_results_type == "wind_rose":
-            energy_gwh = pd.DataFrame(0.0, dtype=float, index=base_ix, columns=["drop"])
-            energy_gwh = energy_gwh.merge(
-                self.turbine_potential_energy,
-                how="left",
-                left_on="month",
-                right_index=True,
-            ).drop(labels=["drop"], axis=1)
-            energy_gwh = energy_gwh / 1000
-
-        elif self.floris_results_type == "time_series":
-            energy_gwh = (
-                self.turbine_potential_energy.groupby(
-                    [
-                        self.turbine_potential_energy.index.year,
-                        self.turbine_potential_energy.index.month,
-                    ]
-                )
-                .sum()
-                .loc[base_ix]
-            ) / 1000
-            energy_gwh.index.names = ["year", "month"]
-
-        unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
-        if by == "windfarm":
-            energy_gwh = energy_gwh.sum(axis=1).to_frame(f"Energy Potential ({unit_map[units]})")
-
-        # Aggregate to the desired frequency level (nothing required for month-year)
-        if frequency == "annual":
-            energy_gwh = (
-                energy_gwh.reset_index(drop=False).groupby("year").sum().drop(columns=["month"])
-            )
-        elif frequency == "project":
-            if by == "turbine":
-                energy_gwh = (
-                    energy_gwh.sum(axis=0).to_frame(name=f"Energy Potential ({unit_map[units]})").T
-                )
-            else:
-                energy_gwh = energy_gwh.values.sum()
-
-        if aep:
-            if frequency != "project":
-                raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
-            energy_gwh /= self.operations_years
-
-        if units == "kw":
-            energy = energy_gwh * 1e6
-        if units == "mw":
-            energy = energy_gwh * 1e3
-        if units == "gw":
-            energy = energy_gwh
+        energy = self._get_floris_energy(
+            which="potential",
+            frequency=frequency,
+            by=by,
+            units=units,
+        )
 
         if per_capacity is None:
             return energy
@@ -1737,8 +1687,11 @@ class Project(FromDictMixin):
             losses = potential_energy - waked_energy
         else:
             losses = potential_energy - waked_energy.values
-            losses.index = losses.index.str.replace("Potential", "Losses")
             losses.columns = losses.columns.str.replace("Potential", "Losses")
+            try:
+                losses.index = losses.index.str.replace("Potential", "Losses")
+            except AttributeError:
+                pass  # no need for multi index compatibility
 
         unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
         name = f"Energy Losses ({unit_map[units]})"
@@ -1747,8 +1700,11 @@ class Project(FromDictMixin):
             if is_float:
                 return losses / potential_energy
             losses /= potential_energy.values
-            losses.index = losses.index.str.replace(name, "Loss Ratio")
             losses.columns = losses.columns.str.replace(name, "Loss Ratio")
+            try:
+                losses.index = losses.index.str.replace(name, "Loss Ratio")
+            except AttributeError:
+                pass  # no need for multi index compatibility
 
         if aep:
             if frequency != "project":
@@ -1838,15 +1794,15 @@ class Project(FromDictMixin):
                 )
 
         availability = 1 - self.availability(which="energy", frequency="project", by="windfarm")
-        wake = self.wake_losses(ratio=True)
-        technical = self.technical_loss_ratio()
-        electrical = self.electrical_loss_ratio()
-        total_loss = 1 - (
+        wake_loss_ratio = self.wake_losses(ratio=True)
+        technical_loss_ratio = self.technical_loss_ratio()
+        electrical_loss_ratio = self.electrical_loss_ratio()
+        total_loss_ratio = 1 - (
             (1 - environmental_loss_ratio)
             * (1 - (availability))
-            * (1 - wake)
-            * (1 - technical)
-            * (1 - electrical)
+            * (1 - wake_loss_ratio)
+            * (1 - technical_loss_ratio)
+            * (1 - electrical_loss_ratio)
         )
         if breakdown:
             loss_types = [
@@ -1858,14 +1814,22 @@ class Project(FromDictMixin):
                 "Total Losses",
             ]
             loss_breakdown = pd.DataFrame(
-                [environmental_loss_ratio, availability, wake, technical, electrical, total_loss],
+                [
+                    environmental_loss_ratio,
+                    availability,
+                    wake_loss_ratio,
+                    technical_loss_ratio,
+                    electrical_loss_ratio,
+                    total_loss_ratio,
+                ],
                 index=loss_types,
                 columns=["Loss Ratio"],
             )
             return loss_breakdown
 
-        return total_loss
+        return total_loss_ratio
 
+    @validate_common_inputs(which=["frequency", "by"])
     def availability(
         self, which: str, frequency: str = "project", by: str = "windfarm"
     ) -> pd.DataFrame | float:
@@ -1911,6 +1875,7 @@ class Project(FromDictMixin):
             return availability.values[0, 0]
         return availability
 
+    @validate_common_inputs(which=["frequency", "by"])
     def capacity_factor(
         self,
         which: str,
@@ -1946,13 +1911,6 @@ class Project(FromDictMixin):
         if which not in ("net", "gross"):
             raise ValueError('``which`` must be one of "net" or "gross".')
 
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
-
-        by = by.lower().strip()
-        if by not in ("windfarm", "turbine"):
-            raise ValueError('``by`` must be one of "windfarm" or "turbine".')
         by_turbine = by == "turbine"
 
         numerator: pd.DataFrame
@@ -2025,6 +1983,7 @@ class Project(FromDictMixin):
             capacity = capacity.sum(axis=1).to_frame(name=f"{which.title()} Capacity Factor")
         return numerator / capacity
 
+    @validate_common_inputs(which=["frequency", "per_capacity"])
     def opex(
         self, frequency: str = "project", per_capacity: str | None = None
     ) -> pd.DataFrame | float:
@@ -2055,6 +2014,7 @@ class Project(FromDictMixin):
         per_capacity = per_capacity.lower()
         return opex / self.capacity(per_capacity)
 
+    @validate_common_inputs(which=["frequency"])
     def revenue(
         self,
         frequency: str = "project",
@@ -2080,11 +2040,6 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The revenue stream of the wind farm at the provided frequency.
         """
-        # Check the frequency input
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
-
         # Check that an offtake_price exists
         if offtake_price is None:
             if (offtake_price := self.offtake_price) is None:
@@ -2109,6 +2064,7 @@ class Project(FromDictMixin):
         per_capacity = per_capacity.lower()
         return revenue / self.capacity(per_capacity)
 
+    @validate_common_inputs(which=["frequency"])
     def capex_breakdown(
         self,
         frequency: str = "month-year",
@@ -2180,11 +2136,6 @@ class Project(FromDictMixin):
         TypeError
             Raised if a valid starting date can't be found for the installation.
         """
-        # Check the frequency input
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
-
         # Find a valid starting date for the installation processes
         if (start_date := installation_start_date) is None:
             if (start_date := self.orbit_start_date) is None:
@@ -2325,6 +2276,7 @@ class Project(FromDictMixin):
             return capex_df
         return capex_df.CapEx.to_frame()
 
+    @validate_common_inputs(which=["frequency"])
     def cash_flow(
         self,
         frequency: str = "month-year",
@@ -2546,6 +2498,7 @@ class Project(FromDictMixin):
             return cost_df
         return cost_df.cash_flow.to_frame()
 
+    @validate_common_inputs(which=["frequency"])
     def npv(
         self,
         frequency: str = "project",
@@ -2579,11 +2532,6 @@ class Project(FromDictMixin):
         pd.DataFrame
             The project net prsent value at the desired time resolution.
         """
-        # Check the frequency input
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
-
         # Check that the discout rate exists
         if discount_rate is None:
             if (discount_rate := self.discount_rate) is None:
