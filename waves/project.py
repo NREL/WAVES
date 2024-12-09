@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from pathlib import Path
 from functools import reduce, partial
 from itertools import product
@@ -30,6 +30,7 @@ from wombat.core.data_classes import FromDictMixin
 from waves.utilities import (
     load_yaml,
     resolve_path,
+    landbosse_runner,
     check_monthly_wind_rose,
     create_monthly_wind_rose,
     run_parallel_time_series_floris,
@@ -158,6 +159,9 @@ class Project(FromDictMixin):
     floris_config : str | pathlib.Path | dict | None
         The FLORIS configuration file name or dictionary. If None, will not set up
         the FLORIS simulation component.
+    landbosse_config : str | pathlib.Path | dict | None
+        The LandBOSSE configuration file name or dictionary. If None, will not set up
+        the LandBOSSE simulation component.
     connect_floris_to_layout : bool, optional
         If True, automatically connect the FLORIS and WOMBAT layout files, so that
         the simulation results can be linked. If False, don't connec the two models.
@@ -238,11 +242,8 @@ class Project(FromDictMixin):
     floris_config: str | Path | dict | None = field(
         default=None, validator=attrs.validators.instance_of((str, Path, dict, type(None)))
     )
-    landbosse_config_directory: str | Path | None = field(
-        default=None, validator=attrs.validators.instance_of((str, Path, type(None)))
-    )
-    landbosse_install_directory: str | Path | None = field(
-        default=None, validator=attrs.validators.instance_of((str, Path, type(None)))
+    landbosse_config: str | Path | dict | None = field(
+        default=None, validator=attrs.validators.instance_of((str, Path, dict, type(None)))
     )
     orbit_start_date: str | None = field(default=None)
     orbit_weather_cols: list[str] = field(
@@ -300,9 +301,11 @@ class Project(FromDictMixin):
     weather: pd.DataFrame = field(init=False)
     orbit_config_dict: dict = field(factory=dict, init=False)
     wombat_config_dict: dict = field(factory=dict, init=False)
+    landbosse_config_dict: dict = field(factory=dict, init=False)
     floris_config_dict: dict = field(factory=dict, init=False)
     wombat: Simulation = field(init=False)
     orbit: ProjectManager = field(init=False)
+    landbosse: landbosse_runner.LandBOSSERunner = field(init=False)
     floris: FlorisInterface = field(init=False)
     project_wind_rose: WindRose = field(init=False)
     monthly_wind_rose: WindRose = field(init=False)
@@ -323,11 +326,12 @@ class Project(FromDictMixin):
             weather_path = self.library_path / "weather" / self.weather_profile
             self.weather = load_weather(weather_path)
         self.setup_orbit()
+        self.setup_landbosse()
         self.setup_wombat()
         self.setup_floris()
         if self.connect_floris_to_layout:
             self.connect_floris_to_turbines()
-        if self.connect_orbit_array_design:
+        if self.connect_orbit_array_design and self.orbit_config is not None:
             self.connect_orbit_cable_lengths()
 
     # **********************************************************************************************
@@ -445,14 +449,13 @@ class Project(FromDictMixin):
             "orbit_config": self.orbit_config_dict,
             "wombat_config": wombat_config_dict,
             "floris_config": self.floris_config_dict,
+            "landbosse_config": self.landbosse_config_dict,
             "weather_profile": self.weather_profile,
             "orbit_weather_cols": self.orbit_weather_cols,
             "floris_windspeed": self.floris_windspeed,
             "floris_wind_direction": self.floris_wind_direction,
             "floris_x_col": self.floris_x_col,
             "floris_y_col": self.floris_y_col,
-            "landbosse_config_directory": self.landbosse_config_directory,
-            "landbosse_install_directory": self.landbosse_install_directory,
         }
         return config_dict
 
@@ -535,6 +538,37 @@ class Project(FromDictMixin):
         else:
             self.floris_config_dict = self.floris_config
         self.floris = FlorisInterface(configuration=self.floris_config_dict)
+
+    def setup_landbosse(self) -> None:
+        """Creates the LandBOSSE runner object and readies it for running an analysis."""
+        if self.landbosse_config is None:
+            print("No LandBOSSE configuration provided, skipping model setup.")
+            return
+
+        if isinstance(self.landbosse_config, str | Path):
+            landbosse_config = self.library_path / "project/config" / self.landbosse_config
+            self.landbosse_config_dict = load_config(landbosse_config)
+        else:
+            self.landbosse_config_dict = self.landbosse_config
+
+        if self.report_config is not None:
+            self.landbosse_config_dict["id"] = self.report_config["name"]
+        else:
+            self.landbosse_config_dict["id"] = ""
+
+        landbosse_table_path = (
+            self.library_path / "project/config" / self.landbosse_config_dict["data_tables"]
+        )
+        landbosse_table_dict = pd.read_excel(landbosse_table_path, sheet_name=None)
+        self.landbosse_config_dict["data_table"] = landbosse_table_dict
+
+        if TYPE_CHECKING:
+            assert isinstance(self.weather, pd.DataFrame)  # mypy helper
+
+        self.landbosse = landbosse_runner.LandBOSSERunner(
+            input_config=self.landbosse_config_dict,
+            weather=self.weather,
+        )
 
     def connect_floris_to_turbines(self, x_col: str = "floris_x", y_col: str = "floris_y"):
         """Generates ``floris_turbine_order`` from the WOMBAT ``Windfarm.layout_df``.
@@ -867,14 +901,18 @@ class Project(FromDictMixin):
         self.turbine_production_energy = calculate_monthly_wind_rose_results(
             turbine_production_power, freq_monthly
         )
-        self.turbine_production_energy.columns = self.floris_turbine_order  # Mwh
+
+        if self.connect_floris_to_layout:
+            self.turbine_production_energy.columns = self.floris_turbine_order  # MWh
         self.project_production_energy = self.turbine_production_energy.values.sum()
 
         # Calculate the monthly potential contribution to AEP from the wind rose
         self.turbine_potential_energy = calculate_monthly_wind_rose_results(
             turbine_potential_power, freq_monthly
         )
-        self.turbine_potential_energy.columns = self.floris_turbine_order  # Mwh
+
+        if self.connect_floris_to_layout:
+            self.turbine_potential_energy.columns = self.floris_turbine_order  # MWh
         self.project_potential_energy = self.turbine_potential_energy.values.sum()
 
     def run_floris(
@@ -1033,12 +1071,15 @@ class Project(FromDictMixin):
                 {"cut_in_wind_speed": cut_in_wind_speed, "cut_out_wind_speed": cut_out_wind_speed}
             )
 
-        if "orbit" not in skip:
+        if hasattr(self, "orbit") and "orbit" not in skip:
             self.orbit.run()
+        elif hasattr(self, "landbosse") and "landbosse" not in skip:
+            self.landbosse.run()
+        else:
+            raise ValueError("Must use either ORBIT or LandBOSSE to calculate CAPEX")
+
         if "wombat" not in skip:
             self.wombat.run()
-        if "landbosse" not in skip:
-            self.run_landbosse()
         if "floris" not in skip:
             if TYPE_CHECKING:
                 assert isinstance(which_floris, str)
@@ -1052,121 +1093,12 @@ class Project(FromDictMixin):
                 nodes=nodes,
             )
 
-    def run_landbosse(self):
-        """Create landbosse input files based on orbit and wombat outputs, then run landbosse."""
-        # probably a horribly inefficient way to get WTG info
-        farm = self.floris_config_dict["farm"]
-        dir_wtg = self.library_path / farm["turbine_library_path"]
-        wtg = set(farm["turbine_type"])
-        assert len(wtg) == 1, "More than one turbine type not implemented."
-        wtg = next(iter(wtg))
-        with open(dir_wtg / (wtg + ".yaml")) as f:  # type: ignore
-            wtg_config = yaml.safe_load(f)
-
-        # Create a dict containing various outputs from the other models
-        # to write into the LandBOSSE input project list
-        lb_project_list_input = {
-            "Project ID": self.report_config["name"],  # type: ignore
-            "Project data file": self.report_config["name"],  # type: ignore
-            "Total project construction time (months)": self.orbit.installation_time
-            / 24.0
-            / 365.25
-            * 12.0,  # TODO is installation time given in hours?
-            "Turbine rating MW": self.turbine_rating(),
-            "Hub height m": wtg_config["hub_height"],
-            "Rotor diameter m": wtg_config["rotor_diameter"],
-            "Turbine spacing (times rotor diameter)": self.orbit.config["plant"]["turbine_spacing"],
-            "Row spacing (times rotor diameter)": self.orbit.config["plant"]["row_spacing"],
-            "Number of turbines": self.n_turbines(),
-            "Wind shear exponent": self.floris_config_dict["flow_field"]["wind_shear"],
-        }
-
-        path_lb_project_list = (
-            self.library_path
-            / "project/config"
-            / self.config_dict["landbosse_config_directory"]
-            / "project_list.xlsx"
-        )
-        lb_project_list = pd.read_excel(path_lb_project_list)
-        assert (
-            len(lb_project_list.index) == 1
-        ), "Running more than one LandBOSSE project is not supported"
-        assert all(
-            c in lb_project_list.columns for c in lb_project_list_input
-        ), "Cannot add a new column to the LandBOSSE project list"
-        lb_project_list = lb_project_list.assign(**lb_project_list_input)
-        lb_project_list.to_excel(path_lb_project_list, index=False)
-
-        # TODO using surface temperature and pressure instead of 100m
-        lb_weather_columns = [
-            "surface_temperature",
-            "surface_pressure",
-            "wind_direction_100m",
-            "windspeed_100m",
-        ]
-        lb_weather = self.weather[lb_weather_columns].copy()
-
-        lb_weather["surface_temperature"] -= 273.15  # convert to deg C
-        lb_weather["surface_pressure"] /= 101_325.0  # convert to atmospheres
-
-        # LandBOSSE project data
-        path_lb_project_data = (
-            self.library_path
-            / "project/config"
-            / self.config_dict["landbosse_config_directory"]
-            / "project_data"
-            / (self.report_config["name"] + ".xlsx")  # type: ignore
-        )
-
-        # Read existing weather data from the LandBOSSE project data
-        lb_weather_excel = pd.read_excel(
-            path_lb_project_data,
-            sheet_name="weather_window",
-            header=None,
-        )
-
-        # Replace the existing weather data with the weather data from WAVES
-        lb_weather_excel = pd.concat(
-            (
-                # Get the first rows from the existing dataframe so the headers don't change
-                # exclude first column since it is all-NaT and pandas throws an error
-                # when concating all-NaN columns
-                lb_weather_excel.iloc[:5, 1:],
-                # concat the new weather data below the old headers
-                lb_weather.reset_index().set_axis(range(len(lb_weather.columns) + 1), axis=1),
-            )
-        ).sort_index(axis=1)
-        with pd.ExcelWriter(
-            path_lb_project_data, if_sheet_exists="replace", mode="a", engine="openpyxl"
-        ) as ew:
-            # Replace the old weather data with the WAVES weather data using the old headers
-            lb_weather_excel.to_excel(
-                ew,
-                sheet_name="weather_window",
-                index=False,
-                header=False,
-            )
-
-        # super janky way to import and run landbosse
-        import os
-        import importlib.util
-
-        os.environ["LANDBOSSE_INPUT_DIR"] = str(self.library_path / "project/config/landbosse")
-        os.environ["LANDBOSSE_OUTPUT_DIR"] = str(self.library_path / "results")
-
-        spec = importlib.util.spec_from_file_location(
-            "main",
-            Path(self.landbosse_install_directory).resolve() / "main.py",  # type: ignore
-        )
-        landbosse_module = importlib.util.module_from_spec(spec)  # type: ignore
-        spec.loader.exec_module(landbosse_module)  # type: ignore
-        landbosse_module.main()
-
     def reinitialize(
         self,
         orbit_config: str | Path | dict | None = None,
         wombat_config: str | Path | dict | None = None,
         floris_config: str | Path | dict | None = None,
+        landbosse_config: str | Path | dict | None = None,
     ) -> None:
         """Enables a user to reinitialize one or multiple of the CapEx, OpEx, and AEP
         models.
@@ -1179,10 +1111,17 @@ class Project(FromDictMixin):
             WOMBAT configuation file or dictionary. Defaults to None.
         floris_config : (str | Path | dict | None, optional
             FLORIS configuration file or dictionary. Defaults to None.
+        landbosse_config : (str | Path | dict | None, optional
+            LandBOSSE configuration file or dictionary. Defaults to None.
         """
         if orbit_config is not None:
             self.orbit_config = orbit_config
             self.setup_orbit()
+        elif landbosse_config is not None:
+            self.landbosse_config = landbosse_config
+            self.setup_landbosse()
+        else:
+            raise ValueError("Must use ORBIT or LandBOSSE to calculate capex")
 
         if wombat_config is not None:
             self.wombat_config = wombat_config
@@ -1271,13 +1210,20 @@ class Project(FromDictMixin):
         RuntimeError
             Raised if no model configurations were provided on initialization.
         """
-        if self.orbit_config is not None:
-            return self.orbit.num_turbines
-        if self.wombat_config is not None:
-            return len(self.wombat.windfarm.turbine_id)
-        if self.floris_config is not None:
-            return self.floris.farm.n_turbines
-        raise RuntimeError("No models were provided, cannot calculate value.")
+        num_turbines_all = {
+            "orbit": self.orbit.num_turbines if hasattr(self, "orbit") else None,
+            "landbosse": (
+                self.landbosse.result.project_parameters["Number of turbines"]
+                if hasattr(self, "landbosse")
+                else None
+            ),
+            "wombat": len(self.wombat.windfarm.turbine_id) if hasattr(self, "wombat") else None,
+            "floris": (
+                self.floris.floris.farm.n_turbines if self.floris_config is not None else None
+            ),
+        }
+        num_turbines = check_dict_consistent(num_turbines_all, "num_turbines")
+        return num_turbines
 
     def turbine_rating(self) -> float:
         """Calculates the average turbine rating, in MW, of all the turbines in the project.
@@ -1292,25 +1238,43 @@ class Project(FromDictMixin):
         RuntimeError
             Raised if no model configurations were provided on initialization.
         """
-        if self.orbit_config is not None:
-            return self.orbit.turbine_rating
-        if self.wombat_config is not None:
-            return self.wombat.windfarm.capacity / 1000 / self.n_turbines
-        raise RuntimeError("No models were provided, cannot calculate value.")
+        turbine_rating_all = {
+            "orbit": self.orbit.turbine_rating if hasattr(self, "orbit") else None,
+            "landbosse": (
+                self.landbosse.result.project_parameters["Turbine rating MW"]
+                if hasattr(self, "landbosse")
+                else None
+            ),
+            "wombat": (
+                self.wombat.windfarm.capacity / 1000 / self.n_turbines()
+                if hasattr(self, "wombat")
+                else None
+            ),
+        }
+        turbine_rating = check_dict_consistent(turbine_rating_all, "turbine_rating")
+        return turbine_rating
 
     def n_substations(self) -> int:
-        """Calculates the number of subsations in the project.
+        """Calculates the number of substations in the project.
 
         Returns
         -------
         int
             The number of substations in the project.
         """
-        if self.orbit_config is not None or "OffshoreSubstationDesign" not in self.orbit._phases:
-            return self.orbit_config_dict["oss_design"]["num_substations"]
-        if self.wombat_config is not None:
-            return len(self.wombat.windfarm.substation_id)
-        raise RuntimeError("No models wer provided, cannot calculate value.")
+        n_substations_all = {
+            "orbit": (
+                self.orbit_config_dict["oss_design"]["num_substations"]
+                if hasattr(self, "orbit") and "OffshoreSubstationDesign" not in self.orbit._phases
+                else None
+            ),
+            "landbosse": (1 if hasattr(self, "landbosse") else None),
+            "wombat": (
+                len(self.wombat.windfarm.substation_id) if hasattr(self, "wombat") else None
+            ),
+        }
+        n_substations = check_dict_consistent(n_substations_all, "n_substations")
+        return n_substations
 
     def capacity(self, units: str = "mw") -> float:
         """Calculates the project's capacity in the desired units of kW, MW, or GW.
@@ -1332,12 +1296,19 @@ class Project(FromDictMixin):
         ValueError
             Raised if an invalid units input was provided.
         """
-        if self.orbit_config is not None:
-            capacity = self.orbit.capacity
-        elif self.wombat_config is not None:
-            capacity = self.wombat.windfarm.capacity / 1000
-        else:
-            raise RuntimeError("No models wer provided, cannot calculate value.")
+        capacity_all = {
+            "orbit": (self.orbit.capacity if hasattr(self, "orbit") else None),
+            "landbosse": (
+                (
+                    self.landbosse.result.project_parameters["Turbine rating MW"]
+                    * self.landbosse.result.project_parameters["Number of turbines"]
+                )
+                if hasattr(self, "landbosse")
+                else None
+            ),
+            "wombat": (self.wombat.windfarm.capacity / 1000 if hasattr(self, "wombat") else None),
+        }
+        capacity = float(check_dict_consistent(capacity_all, "capacity"))
 
         units = units.lower()
         if units == "kw":
@@ -1349,10 +1320,11 @@ class Project(FromDictMixin):
         raise ValueError("`units` must be one of: 'kw', 'mw', or 'gw'.")
 
     def capex(
-        self, breakdown: bool = False, per_capacity: str | None = None
+        self,
+        breakdown: bool = False,
+        per_capacity: str | None = None,
     ) -> pd.DataFrame | float:
-        """Provides a thin wrapper to ORBIT's ``ProjectManager`` CapEx calculations that
-        can provide a breakdown of total or normalize it by the project's capacity, in MW.
+        """Calculate capital expenditure (CapEx) using ORBIT or LandBOSSE outputs.
 
         Parameters
         ----------
@@ -1364,21 +1336,23 @@ class Project(FromDictMixin):
             None, then the unnormalized CapEx is returned, otherwise it must be one of "kw",
             "mw", or "gw". Defaults to None.
 
+        Raises
+        ------
+        RuntimeError
+            Raised if neither ORBIT nor LandBOSSE have been run.
+
         Returns
         -------
         pd.DataFrame | float
             Project CapEx, normalized by :py:attr:`per_capacity`, if using, as either a
             pandas DataFrame if :py:attr:`breakdown` is True, otherwise, a float total.
         """
-        if breakdown:
-            capex = pd.DataFrame.from_dict(
-                self.orbit.capex_breakdown, orient="index", columns=["CapEx"]
-            )
-            capex.loc["Total"] = self.orbit.total_capex
+        if self.orbit_config is not None:
+            capex = self.capex_orbit(breakdown)
+        elif self.landbosse_config is not None:
+            capex = self.capex_landbosse(breakdown)
         else:
-            capex = pd.DataFrame(
-                [self.orbit.total_capex], columns=["CapEx"], index=pd.Index(["Total"])
-            )
+            raise RuntimeError("Must run ORBIT or LandBOSSE to calculate capex.")
 
         if per_capacity is None:
             if breakdown:
@@ -1394,6 +1368,66 @@ class Project(FromDictMixin):
             return capex
         return capex.values[0, 1]
 
+    def capex_landbosse(
+        self,
+        breakdown: bool = False,
+    ) -> pd.DataFrame | float:
+        """Calculates project CapEx from LandBOSSE result, in MW.
+
+        Parameters
+        ----------
+        breakdown : bool, optional
+            Provide a detailed view of the CapEx breakdown, and a total, which is
+            the sum of the BOS, turbine, project, and soft CapEx categories. Defaults to False.
+
+        Returns
+        -------
+        pd.DataFrame | float
+            Project CapEx, normalized by :py:attr:`per_capacity`, if using, as either a
+            pandas DataFrame if :py:attr:`breakdown` is True, otherwise, a float total.
+        """
+        capex_landbosse = (
+            self.landbosse.result.operation_cost.groupby("operation_id")["cost_per_project"]
+            .sum()
+            .rename("CapEx")
+        )
+        capex_total = capex_landbosse.sum()
+        if breakdown:
+            capex = capex_landbosse
+            capex.loc["Total"] = capex_total
+        else:
+            capex = pd.DataFrame(data=[capex_total], columns=["CapEx"], index=pd.Index(["Total"]))
+
+        return capex
+
+    def capex_orbit(self, breakdown: bool = False) -> pd.DataFrame:
+        """Provides a thin wrapper to ORBIT's ``ProjectManager`` CapEx calculations that
+        can provide a breakdown of total or normalize it by the project's capacity, in MW.
+
+        Parameters
+        ----------
+        breakdown : bool, optional
+            Provide a detailed view of the CapEx breakdown, and a total, which is
+            the sum of the BOS, turbine, project, and soft CapEx categories. Defaults to False.
+
+        Returns
+        -------
+        pd.DataFrame
+            Project CapEx, normalized by :py:attr:`per_capacity`, if using, as either a
+            pandas DataFrame if :py:attr:`breakdown` is True, otherwise, a float total.
+        """
+        if breakdown:
+            capex = pd.DataFrame.from_dict(
+                self.orbit.capex_breakdown, orient="index", columns=["CapEx"]
+            )
+            capex.loc["Total"] = self.orbit.total_capex
+        else:
+            capex = pd.DataFrame(
+                [self.orbit.total_capex], columns=["CapEx"], index=pd.Index(["Total"])
+            )
+
+        return capex
+
     def array_system_total_cable_length(self):
         """Calculates the total length of the cables in the array system, in km.
 
@@ -1407,16 +1441,29 @@ class Project(FromDictMixin):
         ValueError
             Raised if neither ``ArraySystemDesign`` nor ``CustomArraySystem`` design
             were created in ORBIT.
+        RuntimeError
+            Raised if neither ORBIT nor LandBOSSE have been run.
         """
-        if "ArraySystemDesign" in self.orbit._phases:
-            array = self.orbit._phases["ArraySystemDesign"]
-        elif "CustomArraySystemDesign" in self.orbit._phases:
-            array = self.orbit._phases["CustomArraySystemDesign"]
-        else:
-            raise ValueError("No array system design was included in the ORBIT configuration.")
+        if hasattr(self, "orbit"):
+            if "ArraySystemDesign" in self.orbit._phases:
+                array = self.orbit._phases["ArraySystemDesign"]
+            elif "CustomArraySystemDesign" in self.orbit._phases:
+                array = self.orbit._phases["CustomArraySystemDesign"]
+            else:
+                raise ValueError("No array system design was included in the ORBIT configuration.")
 
-        # TODO: Fix ORBIT bug for nansum
-        return np.nansum(array.sections_cable_lengths)
+            # TODO: Fix ORBIT bug for nansum
+            return np.nansum(array.sections_cable_lengths)
+
+        elif hasattr(self, "landbosse"):
+            landbosse_vars = self.landbosse.result.model_variables
+            return landbosse_vars.loc[
+                landbosse_vars["variable_df_key_col_name"] == "Total cable length",
+                "value",
+            ].squeeze()
+
+        else:
+            raise RuntimeError("Must use either ORBIT or LandBOSSE to estimate array cable length")
 
     def export_system_total_cable_length(self):
         """Calculates the total length of the cables in the export system, in km.
@@ -1430,16 +1477,27 @@ class Project(FromDictMixin):
         ------
         ValueError
             Raised if ``ExportSystemDesign`` was not created in ORBIT.
+        RuntimeError
+            Raised if neither ORBIT nor LandBOSSE have been run.
         """
-        try:
-            return self.orbit._phases["ExportSystemDesign"].total_length
-        except KeyError:
-            return self.orbit._phases["ElectricalDesign"].total_length
-        except KeyError:
-            raise ValueError(
-                "Neither an `ElectricalDesign` nor an `ExportSystemDesign` phase were defined to be"
-                " able to calculate this metric."
-            )
+        if hasattr(self, "orbit"):
+            try:
+                return self.orbit._phases["ExportSystemDesign"].total_length
+            except KeyError:
+                return self.orbit._phases["ElectricalDesign"].total_length
+            except KeyError:
+                raise ValueError(
+                    "Neither an `ElectricalDesign` nor an `ExportSystemDesign` phase were defined"
+                    " to be able to calculate this metric."
+                )
+        elif hasattr(self, "landbosse"):
+            landbosse_vars = self.landbosse.result.model_variables
+            return landbosse_vars.loc[
+                landbosse_vars["variable_df_key_col_name"] == "Cable Length to Substation (km)",
+                "value",
+            ].squeeze()
+        else:
+            raise RuntimeError("Must use either ORBIT or LandBOSSE to estimate export cable length")
 
     # Operational metrics
 
@@ -1858,7 +1916,12 @@ class Project(FromDictMixin):
         _potential = self.wombat.metrics.potential.loc[
             :, ["year", "month"] + self.wombat.metrics.turbine_id
         ]
-        _capacity = np.ones((_potential.shape[0], self.n_turbines())) * np.array(
+
+        num_turbines = self.n_turbines()
+        if num_turbines != len(self.wombat.metrics.turbine_capacities):
+            raise ValueError("The number of turbines is not consistent between the models")
+
+        _capacity = np.ones((_potential.shape[0], num_turbines)) * np.array(
             self.wombat.metrics.turbine_capacities
         )
         capacity = (
@@ -2679,3 +2742,35 @@ class Project(FromDictMixin):
         results_df.index = pd.Index([simulation_name])
         results_df.index.name = "Project"
         return results_df
+
+
+def check_dict_consistent(dict_values: dict, output_name: str) -> Any:
+    """Check a dictionary to ensure all values are equal to each other (or None).
+
+    Parameters
+    ----------
+    dict_values : dict
+        Dictionary containing values to checks.
+    output_name : str
+        Name of the output (for error messages only).
+
+    Returns
+    -------
+    Any
+        If the dictionary values are consistent
+
+    Raises
+    ------
+    ValueError
+        Raised if any of the keys of :py:attr:`metrics_dict` aren't implemented methods.
+    """
+    values = set(dict_values.values()).difference({None})
+    num_unique_values = len(values)
+    if num_unique_values == 0:
+        raise ValueError(f"No models produce an output for {output_name:s}")
+    elif num_unique_values > 1:
+        raise ValueError(
+            f"Conflicting value of {output_name:s} between models: {str(dict_values):s}"
+        )
+    else:
+        return values.pop()
