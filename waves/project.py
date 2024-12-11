@@ -2560,95 +2560,107 @@ class Project(FromDictMixin):
         results_df.index.name = "Project"
         return results_df
 
-
     def generate_report_lcoe_breakdown(self) -> pd.DataFrame:
-        """Generates a single dataframe of all the desired LCOE metrics from the project."""
-
+        """Generates a single dataframe containing all the necessary LCOE metrics from the project,
+        which are required to produce LCOE waterfall charts and CapEx donut charts for the Cost of
+        Wind Energy Review. The dataframe provides a detailed breakdown, showing the contribution
+        of each CapEx and OpEx component (from ORBIT and WOMBAT) to the LCOE in $/MWh.
+        """
         # Static values
-        FCR = self.fixed_charge_rate
-        Net_AEP = self.energy_production(units="mw", per_capacity="mw", aep=True, with_losses=True)
-        Net_AEP = Net_AEP / 1000
+        fcr = self.fixed_charge_rate
+        net_aep = self.energy_production(units="mw", per_capacity="kw", aep=True, with_losses=True)
 
+        # Handle CapEx outputs from ORBIT
         try:
             capex_data = self.orbit.capex_detailed_soft_capex_breakdown_per_kw
-        except:
+        except AttributeError:
             capex_data = self.orbit.capex_breakdown_per_kw
 
-        data = []
-    
-        # Create a list to track the original order of components
-        component_order = []
+        turbine_components = ("Turbine", "Nacelle", "Blades", "Tower", "RNA")
+        financial_components = (
+            "Construction",
+            "Decommissioning",
+            "Financing",
+            "Contingency",
+            "Soft",
+        )
+        columns = [
+            "Component",
+            "Category",
+            "Value ($/kW)",
+            "Fixed charge rate (FCR) (real)",
+            "Value ($/kW-yr)",
+            "Net AEP (MWh/kW/yr)",
+            "Value ($/MWh)",
+        ]
 
-        for component, capex_value_per_kw in capex_data.items():
-            # Track the original order
-            component_order.append(component)
+        df = pd.DataFrame.from_dict(capex_data, orient="index", columns=["Value ($/kW)"])
+        df["Category"] = "BOS"
+        df.loc[df.index.isin(turbine_components), "Category"] = "Turbine"
+        df.loc[df.index.isin(financial_components), "Category"] = "Financial CapEx"
+        df.Category = df.Category.str.replace("BOS", "Balance of System CapEx")
 
-            # Determine the CapEx category based on the component name
-            if 'Installation' in component:
-                category = 'Balance of System CapEx'
-            elif any(keyword in component for keyword in ['Construction', 'Decommissioning', 
-                                                      'Financing', 'Contingency', 'Soft']):
-                category = 'Financial CapEx'
-            elif any(keyword in component for keyword in ['Turbine', 'Nacelle', 'Blades', 
-                                                      'Tower', "RNA"]):
-                category = 'Turbine'
-            else:
-                category = 'Balance of System CapEx'  # Default category for anything else
+        df["Fixed charge rate (FCR) (real)"] = fcr
+        df["Value ($/kW-yr)"] = df["Value ($/kW)"] * fcr
+        df["Value ($/MWh)"] = df["Value ($/kW-yr)"] / net_aep
+        df["Net AEP (MWh/kW/yr)"] = net_aep
+        df = df.reset_index(drop=False)
+        df = df.rename(columns={"index": "Component"})
 
-            value_kw = capex_value_per_kw 
-            value_kw_yr = value_kw * FCR  
-            value_mwh = value_kw_yr / Net_AEP 
-            data.append([component, category, value_kw, FCR, value_kw_yr, Net_AEP, value_mwh])
+        # Handle OpEx outputs from WOMBAT
+        opex = (
+            self.wombat.metrics.opex(frequency="annual", by_category=True)
+            .mean(axis=0)
+            .to_frame("Value ($/kW-yr)")
+            .join(
+                self.wombat.metrics.opex(frequency="annual", by_category=True)
+                .sum(axis=0)
+                .to_frame("Value ($/kW)")
+            )
+            .drop("OpEx")
+        )
+        opex /= self.capacity("kw")
+        opex.index = opex.index.str.replace("_", " ").str.title()
+        opex.index.name = "Component"
+        opex["Category"] = "OpEx"
+        opex["Fixed charge rate (FCR) (real)"] = fcr
+        opex["Net AEP (MWh/kW/yr)"] = net_aep
+        opex["Value ($/MWh)"] = opex["Value ($/kW-yr)"] / net_aep
+        opex = opex.reset_index(drop=False)[columns]
 
-        # Create the dataframe for LCOE report
-        columns = ['Component', 'Category', 'Value ($/kW)', 'Fixed charge rate (FCR) (real)', 
-                   'Value ($/kW-yr)', 'Net AEP (MWh/kW/yr)', 'Value ($/MWh)']
-        df = pd.DataFrame(data, columns=columns)
-
-        # Add the 'Original Order' column to preserve the initial ordering of components
-        df['Original Order'] = df['Component'].apply(lambda x: component_order.index(x))
-
-        # Now handle OpEx
-        opex_data = self.wombat.metrics.opex(frequency='annual', by_category=True)
-
-        # Calculate the average values per column for OpEx
-        opex_averages = opex_data.mean()
-
-        # Calculate the OpEx value in $/kW-yr by dividing the averages by self.capacity
-        opex_averages = opex_averages / self.capacity(units="kw")
-
-        # For each OpEx component (excluding the generic "OpEx"), create a new row
-        for opex_component, opex_value in opex_averages.items():
-            if opex_component != 'OpEx':  # Exclude the generic "OpEx"
-                opex_row = [
-                    opex_component.replace("_", " ").title(),  # Component name
-                    'OpEx',  # Category
-                    "NA",  # Leave the Value ($/kW) blank 
-                    self.fixed_charge_rate,  # FCR
-                    opex_value,  # The actual OpEx value in $/kW-yr
-                    Net_AEP,  # Net AEP in MWh/kW/yr
-                    opex_value / Net_AEP, # Value ($/MWh) for the OpEx component
-                    None
-                ]
-                df.loc[len(df)] = opex_row
+        # Concatenate CapEx and OpEx rows
+        df = pd.concat((df, opex)).reset_index(drop=True).reset_index(names=["Original Order"])
 
         # Define the desired order of categories for sorting
-        order_of_categories = ['Turbine', 'Balance of System CapEx', 'Financial CapEx', 'OpEx']
+        order_of_categories = ["Turbine", "Balance of System CapEx", "Financial CapEx", "OpEx"]
 
         # Sort the dataframe based on the custom category order
-        df['Category'] = pd.Categorical(df['Category'], categories=order_of_categories, ordered=True)
-        df = df.sort_values(by='Category')
+        df["Category"] = pd.Categorical(
+            df["Category"], categories=order_of_categories, ordered=True
+        )
+        df = df.sort_values(by="Category")
+        df = (
+            df.sort_values(by=["Category", "Original Order"])
+            .drop(columns=["Original Order"])
+            .reset_index(drop=True)
+        )
 
-        # Sort within each category by the original order of components
-        df = df.sort_values(by=['Category', 'Original Order'])
+        # Remove rows where 'Value ($/MWh)' is zero to avoid 0 values on annual reporting charts
+        df = df[df["Value ($/MWh)"] != 0]
 
-        # Remove rows where 'Value ($/kW-yr)' is zero
-        df = df[df['Value ($/kW-yr)'] != 0]
-
-        # Drop the 'Original Order' column before returning the dataframe
-        df = df.drop(columns=['Original Order'])
+        # Re-order the columns so that it is more intuitive for the analyst
+        df = df[
+            [
+                "Component",
+                "Category",
+                "Value ($/kW)",
+                "Fixed charge rate (FCR) (real)",
+                "Value ($/kW-yr)",
+                "Net AEP (MWh/kW/yr)",
+                "Value ($/MWh)",
+            ]
+        ]
 
         # Reset index and return the dataframe
         df = df.reset_index(drop=True)
-    
         return df
