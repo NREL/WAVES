@@ -2559,3 +2559,107 @@ class Project(FromDictMixin):
         results_df.index = pd.Index([simulation_name])
         results_df.index.name = "Project"
         return results_df
+
+    def generate_report_lcoe_breakdown(self) -> pd.DataFrame:
+        """Generates a single dataframe containing all the necessary LCOE metrics from the project,
+        which are required to produce LCOE waterfall charts and CapEx donut charts for the Cost of
+        Wind Energy Review. The dataframe provides a detailed breakdown, showing the contribution
+        of each CapEx and OpEx component (from ORBIT and WOMBAT) to the LCOE in $/MWh.
+        """
+        # Static values
+        fcr = self.fixed_charge_rate
+        net_aep = self.energy_production(units="mw", per_capacity="kw", aep=True, with_losses=True)
+
+        # Handle CapEx outputs from ORBIT
+        try:
+            capex_data = self.orbit.capex_detailed_soft_capex_breakdown_per_kw
+        except AttributeError:
+            capex_data = self.orbit.capex_breakdown_per_kw
+
+        turbine_components = ("Turbine", "Nacelle", "Blades", "Tower", "RNA")
+        financial_components = (
+            "Construction",
+            "Decommissioning",
+            "Financing",
+            "Contingency",
+            "Soft",
+        )
+        columns = [
+            "Component",
+            "Category",
+            "Value ($/kW)",
+            "Fixed charge rate (FCR) (real)",
+            "Value ($/kW-yr)",
+            "Net AEP (MWh/kW/yr)",
+            "Value ($/MWh)",
+        ]
+
+        df = pd.DataFrame.from_dict(capex_data, orient="index", columns=["Value ($/kW)"])
+        df["Category"] = "BOS"
+        df.loc[df.index.isin(turbine_components), "Category"] = "Turbine"
+        df.loc[df.index.isin(financial_components), "Category"] = "Financial CapEx"
+        df.Category = df.Category.str.replace("BOS", "Balance of System CapEx")
+
+        df["Fixed charge rate (FCR) (real)"] = fcr
+        df["Value ($/kW-yr)"] = df["Value ($/kW)"] * fcr
+        df["Value ($/MWh)"] = df["Value ($/kW-yr)"] / net_aep
+        df["Net AEP (MWh/kW/yr)"] = net_aep
+        df = df.reset_index(drop=False)
+        df = df.rename(columns={"index": "Component"})
+
+        # Handle OpEx outputs from WOMBAT
+        opex = (
+            self.wombat.metrics.opex(frequency="annual", by_category=True)
+            .mean(axis=0)
+            .to_frame("Value ($/kW-yr)")
+            .join(
+                self.wombat.metrics.opex(frequency="annual", by_category=True)
+                .sum(axis=0)
+                .to_frame("Value ($/kW)")
+            )
+            .drop("OpEx")
+        )
+        opex /= self.capacity("kw")
+        opex.index = opex.index.str.replace("_", " ").str.title()
+        opex.index.name = "Component"
+        opex["Category"] = "OpEx"
+        opex["Fixed charge rate (FCR) (real)"] = fcr
+        opex["Net AEP (MWh/kW/yr)"] = net_aep
+        opex["Value ($/MWh)"] = opex["Value ($/kW-yr)"] / net_aep
+        opex = opex.reset_index(drop=False)[columns]
+
+        # Concatenate CapEx and OpEx rows
+        df = pd.concat((df, opex)).reset_index(drop=True).reset_index(names=["Original Order"])
+
+        # Define the desired order of categories for sorting
+        order_of_categories = ["Turbine", "Balance of System CapEx", "Financial CapEx", "OpEx"]
+
+        # Sort the dataframe based on the custom category order
+        df["Category"] = pd.Categorical(
+            df["Category"], categories=order_of_categories, ordered=True
+        )
+        df = (
+            df.sort_values(by=["Category", "Original Order"])
+            .drop(columns=["Original Order"])
+            .reset_index(drop=True)
+        )
+
+        # Remove rows where 'Value ($/MWh)' is zero to avoid 0 values on annual reporting charts
+        df = df[df["Value ($/MWh)"] != 0]
+
+        # Re-order the columns so that it is more intuitive for the analyst
+        df = df[
+            [
+                "Component",
+                "Category",
+                "Value ($/kW)",
+                "Fixed charge rate (FCR) (real)",
+                "Value ($/kW-yr)",
+                "Net AEP (MWh/kW/yr)",
+                "Value ($/MWh)",
+            ]
+        ]
+
+        # Reset index and return the dataframe
+        df = df.reset_index(drop=True)
+        return df
