@@ -2638,7 +2638,6 @@ class Project(FromDictMixin):
         df["Category"] = pd.Categorical(
             df["Category"], categories=order_of_categories, ordered=True
         )
-        df = df.sort_values(by="Category")
         df = (
             df.sort_values(by=["Category", "Original Order"])
             .drop(columns=["Original Order"])
