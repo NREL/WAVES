@@ -2663,3 +2663,9 @@ class Project(FromDictMixin):
         # Reset index and return the dataframe
         df = df.reset_index(drop=True)
         return df
+
+    def generate_report_project_details(self) -> pd.DataFrame:
+        """Generates a single dataframe containing all the project details following the format
+        from the table at slide 64 in the Cost of Wind Energy Review: 2024 Edition
+        (https://www.nrel.gov/docs/fy25osti/91775.pdf).
+        """
