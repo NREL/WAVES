@@ -27,14 +27,18 @@ from floris.tools import FlorisInterface
 from floris.tools.wind_rose import WindRose
 from wombat.core.data_classes import FromDictMixin
 
+# TODO TEMP
+sys.path.append(str(Path("./../LandBOSSE").resolve()))
+from landbosse import landbosse_runner  # noqa: E402
+
 from waves.utilities import (
-    load_yaml,
-    resolve_path,
-    landbosse_runner,
+    calculate_monthly_wind_rose_results,
     check_monthly_wind_rose,
     create_monthly_wind_rose,
+    load_yaml,
+    resolve_path,
     run_parallel_time_series_floris,
-    calculate_monthly_wind_rose_results,
+    validators,
 )
 
 
@@ -1222,7 +1226,8 @@ class Project(FromDictMixin):
                 self.floris.floris.farm.n_turbines if self.floris_config is not None else None
             ),
         }
-        num_turbines = check_dict_consistent(num_turbines_all, "num_turbines")
+        validators.check_dict_consistent(num_turbines_all, "num_turbines")
+        num_turbines = set(num_turbines_all.values()).difference({None}).pop()
         return num_turbines
 
     def turbine_rating(self) -> float:
@@ -1251,7 +1256,8 @@ class Project(FromDictMixin):
                 else None
             ),
         }
-        turbine_rating = check_dict_consistent(turbine_rating_all, "turbine_rating")
+        validators.check_dict_consistent(turbine_rating_all, "turbine_rating")
+        turbine_rating = set(turbine_rating_all.values()).difference({None}).pop()
         return turbine_rating
 
     def n_substations(self) -> int:
@@ -1273,7 +1279,8 @@ class Project(FromDictMixin):
                 len(self.wombat.windfarm.substation_id) if hasattr(self, "wombat") else None
             ),
         }
-        n_substations = check_dict_consistent(n_substations_all, "n_substations")
+        validators.check_dict_consistent(n_substations_all, "n_substations")
+        n_substations = set(n_substations_all.values()).difference({None}).pop()
         return n_substations
 
     def capacity(self, units: str = "mw") -> float:
@@ -1308,7 +1315,8 @@ class Project(FromDictMixin):
             ),
             "wombat": (self.wombat.windfarm.capacity / 1000 if hasattr(self, "wombat") else None),
         }
-        capacity = float(check_dict_consistent(capacity_all, "capacity"))
+        validators.check_dict_consistent(capacity_all, "capacity")
+        capacity = float(set(capacity_all.values()).difference({None}).pop())
 
         units = units.lower()
         if units == "kw":
@@ -2742,35 +2750,3 @@ class Project(FromDictMixin):
         results_df.index = pd.Index([simulation_name])
         results_df.index.name = "Project"
         return results_df
-
-
-def check_dict_consistent(dict_values: dict, output_name: str) -> Any:
-    """Check a dictionary to ensure all values are equal to each other (or None).
-
-    Parameters
-    ----------
-    dict_values : dict
-        Dictionary containing values to checks.
-    output_name : str
-        Name of the output (for error messages only).
-
-    Returns
-    -------
-    Any
-        If the dictionary values are consistent
-
-    Raises
-    ------
-    ValueError
-        Raised if any of the keys of :py:attr:`metrics_dict` aren't implemented methods.
-    """
-    values = set(dict_values.values()).difference({None})
-    num_unique_values = len(values)
-    if num_unique_values == 0:
-        raise ValueError(f"No models produce an output for {output_name:s}")
-    elif num_unique_values > 1:
-        raise ValueError(
-            f"Conflicting value of {output_name:s} between models: {str(dict_values):s}"
-        )
-    else:
-        return values.pop()
