@@ -28,6 +28,7 @@ from floris.tools.wind_rose import WindRose
 from wombat.core.data_classes import FromDictMixin
 
 # TODO TEMP
+import sys
 sys.path.append(str(Path("./../LandBOSSE").resolve()))
 from landbosse import landbosse_runner  # noqa: E402
 
