@@ -1926,8 +1926,6 @@ class Project(FromDictMixin):
         ]
 
         num_turbines = self.n_turbines()
-        if num_turbines != len(self.wombat.metrics.turbine_capacities):
-            raise ValueError("The number of turbines is not consistent between the models")
 
         _capacity = np.ones((_potential.shape[0], num_turbines)) * np.array(
             self.wombat.metrics.turbine_capacities
