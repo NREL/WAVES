@@ -334,6 +334,9 @@ class Project(FromDictMixin):
         self.setup_landbosse()
         self.setup_wombat()
         self.setup_floris()
+
+        self.check_consistent_config()
+
         if self.connect_floris_to_layout:
             self.connect_floris_to_turbines()
         if self.connect_orbit_array_design and self.orbit_config is not None:
@@ -476,6 +479,41 @@ class Project(FromDictMixin):
         config_dict = self.config_dict
         with open(self.library_path / "project/config" / config_file, "w") as f:
             yaml.dump(config_dict, f, default_flow_style=False)
+
+    def check_consistent_config(self) -> None:
+        """Check the configurations of the models after they have been set up to ensure the basic
+        inputs to each model are consistent.
+        """
+
+        num_turbines = {
+            "wombat": len(self.wombat.windfarm.turbine_id),
+            "floris": self.floris.floris.farm.n_turbines,
+        }
+
+        project_capacity = {
+            "wombat": self.wombat.windfarm.capacity / 1000.0,
+            # "floris": I DONT KNOW,  # TODO
+        }
+
+        num_substations = {
+            "wombat": len(self.wombat.windfarm.substation_id),
+            # "floris": Not relevant?,  # TODO,
+        }
+
+        if bool(self.orbit_config_dict):
+            num_turbines["orbit"] = self.orbit_config_dict["plant"]["num_turbines"]
+            orbit_num_substation = self.orbit_config_dict.get("oss_design", {}).get("num_substations")
+            if orbit_num_substation is not None:
+                num_substations["orbit"] = orbit_num_substation
+
+        if bool(self.landbosse_config_dict):
+            num_turbines["landbosse"] = self.landbosse_config_dict["num_turbines"]
+            project_capacity["landbosse"] = self.landbosse_config_dict["turbine_rating_MW"] * num_turbines["landbosse"]
+            num_substations["landbosse"] = 1
+
+        validators.check_dict_consistent(num_turbines, "num_turbines")
+        validators.check_dict_consistent(project_capacity, "project_capacity")
+        validators.check_dict_consistent(num_substations, "num_substations")
 
     # **********************************************************************************************
     # Setup and setup assisting methods
@@ -1135,6 +1173,8 @@ class Project(FromDictMixin):
         if floris_config is not None:
             self.floris_config = floris_config
             self.setup_floris()
+
+        self.check_consistent_config()
 
         return
 
