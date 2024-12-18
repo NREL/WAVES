@@ -14,7 +14,7 @@ foundation_depth_m: 2.36  # Depth of concrete foundation (m)
 rated_thrust_N: 589000  # Rated horizontal thrust of turbine (N)
 bearing_pressure_Pa: 191521  # Bearing pressure capacity of soil underneath foundations (Pa)
 gust_velocity_50_year_m/s: 59.5  # 50 year wind gust velocity (m/s)
-line_frequency: 60  # Electrical frequency of grid (Hz
+line_frequency: 60  # Electrical frequency of grid (Hz)
 combined_homerun_trench_length_km: 50  # Combined homerun trench length to substation (km) (optional - can be null but cannot be omitted)
 non_erection_wind_delay_critical_height_m: 10  # When calculating wind delays for non-erection tasks, shear values to this height (m)
 non_erection_wind_delay_critical_wind_speed_m/s: 15  # When calculating wind delays for non-erection tasks, wind speeds above this value will force work to stop (m/s)
