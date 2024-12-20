@@ -35,6 +35,7 @@ from waves.utilities import (
     run_parallel_time_series_floris,
     calculate_monthly_wind_rose_results,
 )
+from waves.utilities.validators import validate_common_inputs
 
 
 def convert_to_multi_index(
@@ -126,6 +127,8 @@ class Project(FromDictMixin):
     ----------
     library_path : str | pathlib.Path
         The file path where the configuration data for ORBIT, WOMBAT, and FLORIS can be found.
+    turbine_type : str
+        The type of wind turbine used. Must be one of "land", "fixed", or "floating".
     weather_profile : str | pathlib.Path
         The file path where the weather profile data is located, with the following column
         requirements:
@@ -181,9 +184,9 @@ class Project(FromDictMixin):
         Interest rate paid on the cash flows. Defaults to None.
     reinvestment_rate : float, optional
         Interest rate paid on the cash flows upon reinvestment. Defaults to None.
-    loss_ratio : float, optional
-        Additional non-wake losses to deduct from the total energy production. Should be
-        represented as a decimal in the range of [0, 1]. Defaults to None.
+    environmental_loss_ratio : float, optional
+        Percentage of environmental losses to deduct from the total energy production. Should be
+        represented as a decimal in the range of [0, 1]. Defaults to 0.0159.
     orbit_start_date : str | None
         The date to use for installation phase start timings that are set to "0" in the
         ``install_phases`` configuration. If None the raw configuration data will be used.
@@ -228,6 +231,7 @@ class Project(FromDictMixin):
     """
 
     library_path: Path = field(converter=resolve_path)
+    turbine_type: str = field(converter=str.lower, validator=attrs.validators.instance_of(str))
     weather_profile: str = field(converter=str)
     orbit_config: str | Path | dict | None = field(
         default=None, validator=attrs.validators.instance_of((str, Path, dict, type(None)))
@@ -262,6 +266,9 @@ class Project(FromDictMixin):
     fixed_charge_rate: float = field(
         default=0.0582, validator=attrs.validators.instance_of((float, type(None)))
     )
+    environmental_loss_ratio: float = field(
+        default=0.0159, validator=attrs.validators.instance_of((float, type(None)))
+    )
     discount_rate: float = field(
         default=None, validator=attrs.validators.instance_of((float, type(None)))
     )
@@ -269,9 +276,6 @@ class Project(FromDictMixin):
         default=None, validator=attrs.validators.instance_of((float, type(None)))
     )
     reinvestment_rate: float = field(
-        default=None, validator=attrs.validators.instance_of((float, type(None)))
-    )
-    loss_ratio: float = field(
         default=None, validator=attrs.validators.instance_of((float, type(None)))
     )
     soft_capex_date: tuple[int, int] | list[tuple[int, int]] | None = field(
@@ -351,6 +355,25 @@ class Project(FromDictMixin):
         if not value.is_dir():
             raise ValueError(f"The input path to {attribute.name}: {value} is not a directory.")
 
+    @turbine_type.validator  # type: ignore
+    def validate_turbine_type(self, attribute: attrs.Attribute, value: str) -> None:
+        """Validates that :py:attr`turbine_type` is one of "land", "fixed", or "floating".
+
+        Parameters
+        ----------
+        attribute : attrs.Attribute
+            The attrs Attribute information/metadata/configuration.
+        value : str
+            The user input.
+
+        Raises
+        ------
+        ValueError
+            Raised if not one of "land", "fixed", or "floating".
+        """
+        if value not in ("land", "fixed", "floating"):
+            raise ValueError(f"{attribute.name} must be one 'land', 'fixed', or floating'.")
+
     @report_config.validator  # type: ignore
     def validate_report_config(self, attribute: attrs.Attribute, value: dict | None) -> None:
         """Validates the user input for :py:attr:`report_config`.
@@ -376,7 +399,7 @@ class Project(FromDictMixin):
             raise ValueError("`report_config` must be a dictionary, if provided")
 
         if "name" not in value:
-            raise KeyError("A key, value pair for `name` must be provided.")
+            raise KeyError("A key, value pair for `name` must be provided for the simulation name.")
 
     # **********************************************************************************************
     # Configuration methods
@@ -713,9 +736,9 @@ class Project(FromDictMixin):
         )
         zero_power_filter = np.full((weather.shape[0]), True)
         if cut_out_wind_speed is not None:
-            zero_power_filter = weather.windspeed < cut_out_wind_speed
+            zero_power_filter = weather.windspeed.to_numpy() < cut_out_wind_speed
         if cut_in_wind_speed is not None:
-            zero_power_filter &= weather.windspeed >= cut_in_wind_speed
+            zero_power_filter &= weather.windspeed.to_numpy() >= cut_in_wind_speed
 
         args = [
             (
@@ -932,20 +955,20 @@ class Project(FromDictMixin):
             self.floris_results_type = "wind_rose"
 
         elif which == "time_series":
+            self.connect_floris_to_turbines(x_col=self.floris_x_col, y_col=self.floris_y_col)
             parallel_args, zero_power_filter = self.preprocess_monthly_floris(
                 reinitialize_kwargs, run_kwargs, cut_in_wind_speed, cut_out_wind_speed
             )
-            fi_dict, turbine_powers = run_parallel_time_series_floris(parallel_args, nodes)
+            fi_dict, potential, production = run_parallel_time_series_floris(parallel_args, nodes)
 
             self._fi_dict = fi_dict
-            self.turbine_aep_mwh = turbine_powers
-            self.connect_floris_to_turbines(x_col=self.floris_x_col, y_col=self.floris_y_col)
+            self.turbine_potential_energy = potential
             self.turbine_potential_energy.columns = self.floris_turbine_order
             self.turbine_potential_energy = (
                 self.turbine_potential_energy.where(
                     np.repeat(
                         zero_power_filter.reshape(-1, 1),
-                        self.turbine_aep_mwh.shape[1],
+                        self.turbine_potential_energy.shape[1],
                         axis=1,
                     ),
                     0.0,
@@ -954,7 +977,23 @@ class Project(FromDictMixin):
             )
 
             n_years = self.turbine_potential_energy.index.year.unique().size
-            self.project_potential_energy = self.turbine_potential_energy.values.sum() / n_years
+            self.project_potential_energy = self.turbine_potential_energy.values.sum()
+
+            self.turbine_production_energy = production
+            self.connect_floris_to_turbines(x_col=self.floris_x_col, y_col=self.floris_y_col)
+            self.turbine_production_energy.columns = self.floris_turbine_order
+            self.turbine_production_energy = (
+                self.turbine_production_energy.where(
+                    np.repeat(
+                        zero_power_filter.reshape(-1, 1),
+                        self.turbine_production_energy.shape[1],
+                        axis=1,
+                    ),
+                    0.0,
+                )
+                / 1e6
+            )
+            self.project_production_energy = self.turbine_production_energy.values.sum() / n_years
             self.floris_results_type = "time_series"
         else:
             raise ValueError(f"`which` must be one of: 'wind_rose' or 'time_series', not: {which}")
@@ -1192,6 +1231,7 @@ class Project(FromDictMixin):
             return len(self.wombat.windfarm.substation_id)
         raise RuntimeError("No models wer provided, cannot calculate value.")
 
+    @validate_common_inputs(which=["units"])
     def capacity(self, units: str = "mw") -> float:
         """Calculates the project's capacity in the desired units of kW, MW, or GW.
 
@@ -1222,12 +1262,11 @@ class Project(FromDictMixin):
         units = units.lower()
         if units == "kw":
             return capacity * 1000
-        if units == "mw":
-            return capacity
         if units == "gw":
             return capacity / 1000
-        raise ValueError("`units` must be one of: 'kw', 'mw', or 'gw'.")
+        return capacity
 
+    @validate_common_inputs(which=["per_capacity"])
     def capex(
         self, breakdown: bool = False, per_capacity: str | None = None
     ) -> pd.DataFrame | float:
@@ -1265,7 +1304,6 @@ class Project(FromDictMixin):
                 return capex
             return capex.values[0, 0]
 
-        per_capacity = per_capacity.lower()
         capacity = self.capacity(per_capacity)
         unit_map = {"kw": "kW", "mw": "MW", "gw": "GW"}
         capex[f"CapEx per {unit_map[per_capacity]}"] = capex / capacity
@@ -1323,6 +1361,66 @@ class Project(FromDictMixin):
 
     # Operational metrics
 
+    @validate_common_inputs(which=["frequency", "by", "units"])
+    def _get_floris_energy(
+        self, which: str, frequency: str = "project", by: str = "windfarm", units: str = "gw"
+    ) -> pd.DataFrame | float:
+        unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
+
+        # Check the floris basis
+        if which not in ("potential", "production"):
+            raise ValueError("`which` should be one of 'potential' or 'production'")
+
+        if which == "potential":
+            energy = self.turbine_potential_energy
+        else:
+            energy = self.turbine_production_energy
+        if by == "windfarm":
+            energy = energy.sum(axis=1).to_frame(f"Energy {which.title()} ({unit_map[units]})")
+
+        # Use WOMBAT availability for the base index
+        base_ix = self.wombat.metrics.production_based_availability(
+            frequency="month-year", by="turbine"
+        ).index
+
+        if self.floris_results_type == "wind_rose":
+            energy_gwh = pd.DataFrame(0.0, dtype=float, index=base_ix, columns=["drop"])
+            energy_gwh = energy_gwh.merge(
+                energy,
+                how="left",
+                left_on="month",
+                right_index=True,
+            ).drop(labels=["drop"], axis=1)
+            energy_gwh /= 1000
+        else:
+            energy_gwh = (
+                energy.groupby([energy.index.year, energy.index.month]).sum().loc[base_ix]
+            ) / 1000
+            energy_gwh.index.names = ["year", "month"]
+
+        # Aggregate to the desired frequency level (nothing required for month-year)
+        if frequency == "annual":
+            energy_gwh = (
+                energy_gwh.reset_index(drop=False).groupby("year").sum().drop(columns=["month"])
+            )
+        elif frequency == "project":
+            if by == "turbine":
+                energy_gwh = (
+                    energy_gwh.sum(axis=0)
+                    .to_frame(name=f"Energy {which.title()} ({unit_map[units]})")
+                    .T
+                )
+            else:
+                energy_gwh = energy_gwh.values.sum()
+
+        # Convert the  units
+        if units == "kw":
+            return energy_gwh * 1e6
+        if units == "mw":
+            return energy_gwh * 1e3
+        return energy_gwh
+
+    @validate_common_inputs(which=["frequency", "by", "units", "per_capacity"])
     def energy_potential(
         self,
         frequency: str = "project",
@@ -1332,7 +1430,7 @@ class Project(FromDictMixin):
         aep: bool = False,
     ) -> pd.DataFrame | float:
         """Computes the potential energy production, or annual potential energy production, in GWh,
-        for the simulation by extrapolating the monthly contributions to AEP if FLORIS (wtihout
+        for the simulation by extrapolating the monthly contributions to AEP if FLORIS (without
         wakes) results were computed by a wind rose, or using the time series results.
 
         Parameters
@@ -1343,6 +1441,8 @@ class Project(FromDictMixin):
         by : str, optional
             One of "windfarm" (project level) or "turbine" (turbine level) to
             indicate what level to calculate the energy production.
+        units : str, optional
+            One of "gw", "mw", or "kw" to determine the units for energy production.
         per_capacity : str, optional
             Provide the energy production normalized by the project's capacity, in the desired
             units. If None, then the unnormalized energy production is returned, otherwise it must
@@ -1361,77 +1461,33 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level energy prodcution, in GWh, for the desired ``frequency``.
         """
-        availability = self.wombat.metrics.production_based_availability(
-            frequency="month-year", by="turbine"
-        ).loc[:, self.floris_turbine_order]
-        if self.floris_results_type == "wind_rose":
-            power = pd.DataFrame(0.0, dtype=float, index=availability.index, columns=["drop"])
-            power = power.merge(
-                self.turbine_potential_energy,
-                how="left",
-                left_on="month",
-                right_index=True,
-            ).drop(labels=["drop"], axis=1)
-            energy_gwh = power / 1000
-
-        if self.floris_results_type == "time_series":
-            energy_gwh = self.turbine_aep_mwh / 1000
-            energy_gwh *= (
-                self.turbine_potential_energy.assign(
-                    year=energy_gwh.index.year, month=energy_gwh.index.month
-                )
-                .groupby(["year", "month"])
-                .sum()
-                .loc[energy_gwh.index]
-            )
-
-        unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
-        if by == "windfarm":
-            energy_gwh = energy_gwh.sum(axis=1).to_frame(f"Energy Losses ({unit_map[units]})")
-
-        # Aggregate to the desired frequency level (nothing required for month-year)
-        if frequency == "annual":
-            energy_gwh = (
-                energy_gwh.reset_index(drop=False).groupby("year").sum().drop(columns=["month"])
-            )
-        elif frequency == "project":
-            if by == "turbine":
-                energy_gwh = (
-                    energy_gwh.sum(axis=0).to_frame(name=f"Energy Losses ({unit_map[units]})").T
-                )
-            else:
-                energy_gwh = energy_gwh.values.sum()
-
-        if aep:
-            if frequency != "project":
-                raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
-            energy_gwh /= self.operations_years
-
-        if units == "kw":
-            energy = energy_gwh * 1e6
-        if units == "mw":
-            energy = energy_gwh * 1e3
-        if units == "gw":
-            energy = energy_gwh
+        energy = self._get_floris_energy(
+            which="potential",
+            frequency=frequency,
+            by=by,
+            units=units,
+        )
 
         if per_capacity is None:
             return energy
         return energy / self.capacity(per_capacity)
 
+    @validate_common_inputs(which=["frequency", "by", "units", "per_capacity"])
     def energy_production(
         self,
         frequency: str = "project",
         by: str = "windfarm",
         units: str = "gw",
         per_capacity: str | None = None,
-        with_losses: bool = False,
-        loss_ratio: float | None = None,
+        environmental_loss_ratio: float | None = None,
         aep: bool = False,
     ) -> pd.DataFrame | float:
-        """Computes the energy production, or annual energy production, in GWh, for the simulation
-        by extrapolating the monthly contributions to AEP if FLORIS (with wakes) results were
-        computed by a wind rose, or using the time series results, and multiplying it by the WOMBAT
-        monthly availability (``Metrics.production_based_availability``).
+        """Computes the energy production, or annual energy production.
+
+        To compute the losses, the total loss ratio  from :py:method:`loss_ratio` is applied
+        to each time step (e.g., month for month-year) rather than using each time  step's losses.
+        This lower resolution apporach to turbine and time step energy stems from the nature of the
+        loss method itself, which is intended for farm-level results.
 
         Parameters
         ----------
@@ -1441,18 +1497,16 @@ class Project(FromDictMixin):
         by : str, optional
             One of "windfarm" (project level) or "turbine" (turbine level) to
             indicate what level to calculate the energy production.
+        units : str, optional
+            One of "gw", "mw", or "kw" to determine the units for energy production.
         per_capacity : str, optional
             Provide the energy production normalized by the project's capacity, in the desired
             units. If None, then the unnormalized energy production is returned, otherwise it must
             be one of "kw", "mw", or "gw". Defaults to None.
-        with_losses : bool, optional
-            Use the :py:attr:`loss_ratio` or :py:attr:`Project.loss_ratio` to post-hoc
-            consider non-wake and non-availability losses in the energy production aggregation.
-            Defaults to False.
-        loss_ratio : float, optional
-            The decimal non-wake and non-availability losses ratio to apply to the energy
-            production. If None, then it will attempt to use the :py:attr:`loss_ratio` provided
-            in the Project configuration. Defaults to None.
+        environmental_loss_ratio : float, optional
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
+            configuration. Defaults to 0.0159.
         aep : bool, optional
             Flag to return the energy production normalized by the number of years the plan is in
             operation. Note that :py:attr:`frequency` must be "project" for this to be computed.
@@ -1467,92 +1521,47 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level energy prodcution, in GWh, for the desired ``frequency``.
         """
-        # Check the frequency input
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
+        energy = self.energy_potential(
+            frequency=frequency,
+            by=by,
+            units=units,
+        )
 
-        # For the wind rose outputs, only consider project-level availability because
-        # wind rose AEP is a long-term estimation of energy production
-        availability = self.wombat.metrics.production_based_availability(
-            frequency="month-year", by="turbine"
-        ).loc[:, self.floris_turbine_order]
-        if self.floris_results_type == "wind_rose":
-            power = pd.DataFrame(0.0, dtype=float, index=availability.index, columns=["drop"])
-            power = power.merge(
-                self.turbine_production_energy,
-                how="left",
-                left_on="month",
-                right_index=True,
-            ).drop(labels=["drop"], axis=1)
-            energy_gwh = availability * power / 1000
+        if TYPE_CHECKING:
+            assert isinstance(energy, pd.DataFrame)
 
-        if self.floris_results_type == "time_series":
-            energy_gwh = self.turbine_aep_mwh / 1000
-            energy_gwh *= (
-                self.turbine_potential_energy.assign(
-                    year=energy_gwh.index.year, month=energy_gwh.index.month
-                )
-                .groupby(["year", "month"])
-                .sum()
-                .loc[energy_gwh.index]
-            )
-
+        # Convert naming from energy_potential()
         if by == "windfarm":
-            energy_gwh = energy_gwh.sum(axis=1).to_frame("Energy Production (GWh)")
-
-        # Aggregate to the desired frequency level (nothing required for month-year)
-        if frequency == "annual":
-            energy_gwh = (
-                energy_gwh.reset_index(drop=False).groupby("year").sum().drop(columns=["month"])
-            )
-        elif frequency == "project":
-            if by == "turbine":
-                energy_gwh = energy_gwh.sum(axis=0).to_frame(name="Energy Production (GWh)").T
-            else:
-                energy_gwh = energy_gwh.values.sum()
-
-        if with_losses:
-            # Check that a loss_ratio exists
-            if loss_ratio is None:
-                if (loss_ratio := self.loss_ratio) is None:
-                    raise ValueError(
-                        "`loss_ratio` wasn't defined in the Project settings or in the method"
-                        " keyword arguments."
-                    )
-            # Get the base production numbers from WOMBAT
-            base_production = self.energy_potential(frequency=frequency, by=by, units="gw")
-            energy_gwh -= base_production * loss_ratio
-
-        if aep:
             if frequency != "project":
-                raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
-            energy_gwh /= self.operations_years
+                energy.columns = energy.columns.str.replace("Potential", "Production")
+        if frequency == "project":
+            if by == "turbine":
+                energy.index = energy.index.str.replace("Potential", "Production")
 
-        if units == "kw":
-            energy = energy_gwh * 1e6
-        if units == "mw":
-            energy = energy_gwh * 1e3
-        if units == "gw":
-            energy = energy_gwh
+        energy *= 1 - self.loss_ratio(environmental_loss_ratio)
 
         if per_capacity is None:
             return energy
 
         return energy / self.capacity(per_capacity)
 
+    @validate_common_inputs(which=["frequency", "by", "units", "per_capacity"])
     def energy_losses(
         self,
         frequency: str = "project",
         by: str = "windfarm",
         units: str = "gw",
         per_capacity: str | None = None,
-        with_losses: bool = False,
-        loss_ratio: float | None = None,
+        environmental_loss_ratio: float | None = None,
         aep: bool = False,
     ) -> pd.DataFrame:
         """Computes the energy losses for the simulation by subtracting the energy production from
         the potential energy production.
+
+        To compute the losses, the total loss ratio  from :py:method:`loss_ratio` is applied
+        to each time step (e.g., month for month-year) rather than using each time  step's losses.
+        This lower resolution apporach to turbine and time step energy stems from the nature of the
+        loss method itself, which is intended for farm-level results.
 
         Parameters
         ----------
@@ -1562,18 +1571,16 @@ class Project(FromDictMixin):
         by : str, optional
             One of "windfarm" (project level) or "turbine" (turbine level) to
             indicate what level to calculate the energy production.
+        units : str, optional
+            One of "gw", "mw", or "kw" to determine the units for energy production.
         per_capacity : str, optional
             Provide the energy production normalized by the project's capacity, in the desired
             units. If None, then the unnormalized energy production is returned, otherwise it must
             be one of "kw", "mw", or "gw". Defaults to None.
-        with_losses : bool, optional
-            Use the :py:attr:`loss_ratio` or :py:attr:`Project.loss_ratio` to post-hoc
-            consider non-wake and non-availability losses in the energy production aggregation.
-            Defaults to False.
-        loss_ratio : float, optional
-            The decimal non-wake and non-availability losses ratio to apply to the energy
-            production. If None, then it will attempt to use the :py:attr:`loss_ratio` provided
-            in the Project configuration. Defaults to None.
+        environmental_loss_ratio : float, optional
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
+            configuration. Defaults to 0.0159.
         aep : bool, optional
             AEP for the annualized losses. Only used for :py:attr:`frequency` = "project".
 
@@ -1588,42 +1595,241 @@ class Project(FromDictMixin):
             The wind farm-level energy prodcution, in GWh, for the desired ``frequency``.
         """
         potential = self.energy_potential(
-            "month-year",
-            by="turbine",
-            units="kw",
+            frequency=frequency,
+            by=by,
+            units=units,
         )
-        production = self.energy_production(  # type: ignore
-            "month-year",
-            by="turbine",
-            units="kw",
-            with_losses=with_losses,
-            loss_ratio=loss_ratio,
-        )[self.wombat.metrics.turbine_id]
-        losses = potential - production
 
-        unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
+        # Compute total loss ratio
+        total_loss_ratio = self.loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
+        losses = potential * total_loss_ratio
+
+        if TYPE_CHECKING:
+            assert isinstance(losses, pd.DataFrame)
+
+        # Convert naming from energy_potential()
         if by == "windfarm":
-            losses = losses.sum(axis=1).to_frame(f"Energy Losses ({unit_map[units]})")
-
+            if frequency != "project":
+                losses.columns = losses.columns.str.replace("Potential", "Losses")
         if frequency == "project":
-            losses = losses.sum(axis=0)
-            if by == "windfarm":
-                losses = losses.values[0]
-            if aep:
-                losses /= self.operations_years
-        elif frequency == "annual":
-            losses = losses.groupby("year").sum()
-
-        if units == "mw":
-            losses /= 1e3
-        elif units == "gw":
-            losses /= 1e6
+            if by == "turbine":
+                losses.index = losses.index.str.replace("Potential", "Losses")
 
         if per_capacity is None:
             return losses
 
         return losses / self.capacity(per_capacity)
 
+    @validate_common_inputs(which=["frequency", "by", "units", "per_capacity"])
+    def wake_losses(
+        self,
+        frequency: str = "project",
+        by: str = "windfarm",
+        units: str = "kw",
+        per_capacity: str | None = None,
+        aep: bool = False,
+        ratio: bool = False,
+    ) -> pd.DataFrame | float:
+        """Computes the wake losses, in GWh, for the simulation by extrapolating the
+        monthly wake loss contributions to AEP if FLORIS (with wakes) results were
+        computed by a wind rose, or using the time series results.
+
+        Parameters
+        ----------
+        frequency : str, optional
+            One of "project" (project total), "annual" (annual total), or "month-year"
+            (monthly totals for each year).
+        by : str, optional
+            One of "windfarm" (project level) or "turbine" (turbine level) to
+            indicate what level to calculate the wake losses.
+        per_capacity : str, optional
+            Provide the wake losses normalized by the project's capacity, in the desired
+            units. If None, then the unnormalized energy production is returned, otherwise it must
+            be one of "kw", "mw", or "gw". Defaults to None.
+        aep : bool, optional
+            Flag to return the wake losses normalized by the number of years the plan is in
+            operation. Note that :py:attr:`frequency` must be "project" for this to be computed.
+        ratio : bool, optional
+            Flag to return the wake loss ratio or the ratio of wake losses to the potential energy
+            generation.
+
+        Raises
+        ------
+        ValueError
+            Raised if ``frequency`` is not one of: "project", "annual", "month-year".
+
+        Returns
+        -------
+        pd.DataFrame | float
+            The wind farm-level losses, in GWh, for the desired ``frequency``.
+        """
+        unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
+
+        # Use WOMBAT availability for the base index
+        potential_energy = self._get_floris_energy(
+            which="potential",
+            frequency=frequency,
+            by=by,
+            units=units,
+        )
+        waked_energy = self._get_floris_energy(
+            which="production",
+            frequency=frequency,
+            by=by,
+            units=units,
+        )
+        if TYPE_CHECKING:
+            assert isinstance(potential_energy, pd.DataFrame)
+            assert isinstance(waked_energy, pd.DataFrame)
+
+        is_float = by == "windfarm" and frequency == "project"
+        if is_float:
+            losses = potential_energy - waked_energy
+        else:
+            losses = potential_energy - waked_energy.values
+            losses.columns = losses.columns.str.replace("Potential", "Losses")
+            try:
+                losses.index = losses.index.str.replace("Potential", "Losses")
+            except AttributeError:
+                pass  # no need for multi index compatibility
+
+        unit_map = {"kw": "kWh", "mw": "MWh", "gw": "GWh"}
+        name = f"Energy Losses ({unit_map[units]})"
+
+        if ratio:
+            if is_float:
+                return losses / potential_energy
+            losses /= potential_energy.values
+            losses.columns = losses.columns.str.replace(name, "Loss Ratio")
+            try:
+                losses.index = losses.index.str.replace(name, "Loss Ratio")
+            except AttributeError:
+                pass  # no need for multi index compatibility
+
+        if aep:
+            if frequency != "project":
+                raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
+            losses /= self.operations_years
+
+        if per_capacity is None:
+            return losses
+        return losses / self.capacity(per_capacity)
+
+    def technical_loss_ratio(self) -> float:
+        """Calculate technical losses based on the project type.
+
+        This method is adopted from ORCA where a 1% hysterisis loss is applied for fixed-bottom
+        turbines. For floating turbines, this is 1% hysterisis, 0.1% for onboard equipment, and 0.1%
+        for rotor misalignment (0.01197901 total).
+
+        Returns
+        -------
+        float
+            The technical loss ratio.
+        """
+        if self.turbine_type == "floating":
+            return 1 - (1 - 0.01) * (1 - 0.001) * (1 - 0.001)
+        elif self.turbine_type == "fixed":
+            return 0.01
+        else:
+            raise NotImplementedError("land-based is not currently modeled")
+
+    def electrical_loss_ratio(self) -> float:
+        """Calculate electrical losses based on ORBIT parameters.
+
+        Returns
+        -------
+        float
+            The electrical loss ratio.
+
+        """
+        depth = self.orbit_config_dict["site"]["depth"]
+        distance_to_landfall = self.orbit_config_dict["site"]["distance_to_landfall"]
+        # ORCA formula
+        electrical_loss_ratio = (
+            2.20224112
+            + 0.000604121 * depth
+            + 0.0407303367321603 * distance_to_landfall
+            + -0.0003712532582 * distance_to_landfall**2
+            + 0.0000016525338 * distance_to_landfall**3
+            + -0.000000003547544 * distance_to_landfall**4
+            + 0.0000000000029271 * distance_to_landfall**5
+        ) / 100
+
+        return electrical_loss_ratio
+
+    def loss_ratio(
+        self,
+        environmental_loss_ratio: float | None = None,
+        breakdown: bool = False,
+    ) -> pd.DataFrame | float:
+        """Calculate total losses based on environmental, availability, wake, technical, and
+        electrical losses.
+
+        .. note:: This method treats different types of losses as efficiencies and is applied
+        as in Equation 1 from Beiter et al. 2020 (https://www.nrel.gov/docs/fy21osti/77384.pdf).
+
+        Parameters
+        ----------
+        environmental_loss_ratio : float, optional
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
+            configuration. Defaults to 0.0159.
+        breakdown : bool, optional
+            Flag to return the losses breakdown including environmental, availability, wake,
+            technical, electrical losses, and total losses.
+
+        Returns
+        -------
+        float | pd.DataFrame
+            The total loss ratio, or the DataFrame of all loss ratios.
+
+        """
+        # Check that the environmental loos ratio exists
+        if environmental_loss_ratio is None:
+            if (environmental_loss_ratio := self.environmental_loss_ratio) is None:
+                raise ValueError(
+                    "`environmental_loss_ratio` wasn neither defined in the Project settings nor"
+                    " provided in the keyword arguments."
+                )
+
+        availability = 1 - self.availability(which="energy", frequency="project", by="windfarm")
+        wake_loss_ratio = self.wake_losses(ratio=True)
+        technical_loss_ratio = self.technical_loss_ratio()
+        electrical_loss_ratio = self.electrical_loss_ratio()
+        total_loss_ratio = 1 - (
+            (1 - environmental_loss_ratio)
+            * (1 - (availability))
+            * (1 - wake_loss_ratio)
+            * (1 - technical_loss_ratio)
+            * (1 - electrical_loss_ratio)
+        )
+        if breakdown:
+            loss_types = [
+                "Environmental Losses",
+                "Availability Losses",
+                "Wake Losses",
+                "Technical Losses",
+                "Electrical Losses",
+                "Total Losses",
+            ]
+            loss_breakdown = pd.DataFrame(
+                [
+                    environmental_loss_ratio,
+                    availability,
+                    wake_loss_ratio,
+                    technical_loss_ratio,
+                    electrical_loss_ratio,
+                    total_loss_ratio,
+                ],
+                index=loss_types,
+                columns=["Loss Ratio"],
+            )
+            return loss_breakdown
+
+        return total_loss_ratio
+
+    @validate_common_inputs(which=["frequency", "by"])
     def availability(
         self, which: str, frequency: str = "project", by: str = "windfarm"
     ) -> pd.DataFrame | float:
@@ -1669,13 +1875,13 @@ class Project(FromDictMixin):
             return availability.values[0, 0]
         return availability
 
+    @validate_common_inputs(which=["frequency", "by"])
     def capacity_factor(
         self,
         which: str,
         frequency: str = "project",
         by: str = "windfarm",
-        with_losses: bool = False,
-        loss_ratio: float | None = None,
+        environmental_loss_ratio: float | None = None,
     ) -> pd.DataFrame | float:
         """Calculates the capacity factor over a project's lifetime as a single value, annual
         average, or monthly average for the whole windfarm or by turbine.
@@ -1689,19 +1895,12 @@ class Project(FromDictMixin):
             One of "project", "annual", "monthly", or "month-year". Defaults to "project".
         by : str
             One of "windfarm" or "turbine". Defaults to "windfarm".
-        with_losses : bool, optional
-            Use the :py:attr:`loss_ratio` or :py:attr:`Project.loss_ratio` to post-hoc
-            consider non-wake and non-availability losses in the energy production aggregation.
-            Defaults to False.
 
             .. note:: This will only be checked for :py:attr:`which` = "net".
-
-        loss_ratio : float, optional
-            The decimal non-wake and non-availability losses ratio to apply to the energy
-            production. If None, then it will attempt to use the :py:attr:`loss_ratio` provided
-            in the Project configuration. Defaults to None.
-
-            .. note:: This will only be used when for :py:attr:`which` = "net".
+        environmental_loss_ratio : float, optional
+            The decimal environmental loss ratio to apply to the energy production. If None, then
+            it will attempt to use the :py:attr:`environmental_loss_ratio` provided in the Project
+            configuration. Defaults to 0.0159.
 
         Returns
         -------
@@ -1712,22 +1911,16 @@ class Project(FromDictMixin):
         if which not in ("net", "gross"):
             raise ValueError('``which`` must be one of "net" or "gross".')
 
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
-
-        by = by.lower().strip()
-        if by not in ("windfarm", "turbine"):
-            raise ValueError('``by`` must be one of "windfarm" or "turbine".')
         by_turbine = by == "turbine"
 
+        numerator: pd.DataFrame
         if which == "net":
-            numerator = self.energy_production(
+            numerator = (
+                1 - self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
+            ) * self.energy_potential(
                 frequency="month-year",
                 by="turbine",
                 units="kw",
-                with_losses=with_losses,
-                loss_ratio=loss_ratio,
             )
         else:
             numerator = self.energy_potential(
@@ -1790,6 +1983,7 @@ class Project(FromDictMixin):
             capacity = capacity.sum(axis=1).to_frame(name=f"{which.title()} Capacity Factor")
         return numerator / capacity
 
+    @validate_common_inputs(which=["frequency", "per_capacity"])
     def opex(
         self, frequency: str = "project", per_capacity: str | None = None
     ) -> pd.DataFrame | float:
@@ -1820,6 +2014,7 @@ class Project(FromDictMixin):
         per_capacity = per_capacity.lower()
         return opex / self.capacity(per_capacity)
 
+    @validate_common_inputs(which=["frequency"])
     def revenue(
         self,
         frequency: str = "project",
@@ -1845,11 +2040,6 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The revenue stream of the wind farm at the provided frequency.
         """
-        # Check the frequency input
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
-
         # Check that an offtake_price exists
         if offtake_price is None:
             if (offtake_price := self.offtake_price) is None:
@@ -1874,6 +2064,7 @@ class Project(FromDictMixin):
         per_capacity = per_capacity.lower()
         return revenue / self.capacity(per_capacity)
 
+    @validate_common_inputs(which=["frequency"])
     def capex_breakdown(
         self,
         frequency: str = "month-year",
@@ -1945,11 +2136,6 @@ class Project(FromDictMixin):
         TypeError
             Raised if a valid starting date can't be found for the installation.
         """
-        # Check the frequency input
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
-
         # Find a valid starting date for the installation processes
         if (start_date := installation_start_date) is None:
             if (start_date := self.orbit_start_date) is None:
@@ -2085,11 +2271,12 @@ class Project(FromDictMixin):
         elif frequency == "project":
             capex_df = capex_df.sum(axis=0).to_frame(name="Cash Flow").T
 
-        capex_df["Capex"] = capex_df.sum(axis=1).sort_index()
+        capex_df["CapEx"] = capex_df.sum(axis=1).sort_index()
         if breakdown:
             return capex_df
         return capex_df.CapEx.to_frame()
 
+    @validate_common_inputs(which=["frequency"])
     def cash_flow(
         self,
         frequency: str = "month-year",
@@ -2311,6 +2498,7 @@ class Project(FromDictMixin):
             return cost_df
         return cost_df.cash_flow.to_frame()
 
+    @validate_common_inputs(which=["frequency"])
     def npv(
         self,
         frequency: str = "project",
@@ -2344,11 +2532,6 @@ class Project(FromDictMixin):
         pd.DataFrame
             The project net prsent value at the desired time resolution.
         """
-        # Check the frequency input
-        opts = ("project", "annual", "month-year")
-        if frequency not in opts:
-            raise ValueError(f"`frequency` must be one of {opts}.")  # type: ignore
-
         # Check that the discout rate exists
         if discount_rate is None:
             if (discount_rate := self.discount_rate) is None:
@@ -2484,7 +2667,7 @@ class Project(FromDictMixin):
         capex = self.capex(per_capacity="kw") if capex is None else capex
         opex = self.opex(per_capacity="kw") if opex is None else opex
         if aep is None:
-            aep = self.energy_production(units="mw", per_capacity="mw", aep=True, with_losses=True)
+            aep = self.energy_production(units="mw", per_capacity="mw", aep=True)
         if TYPE_CHECKING:
             assert isinstance(capex, float) and isinstance(opex, float) and isinstance(aep, float)
         return (capex * self.fixed_charge_rate + opex / self.operations_years) / (aep / 1000)

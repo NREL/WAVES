@@ -19,7 +19,7 @@ from floris.tools.wind_rose import WindRose
 
 def run_chunked_time_series_floris(
     args: tuple,
-) -> tuple[tuple[int, int], FlorisInterface, pd.DataFrame]:
+) -> tuple[tuple[int, int], FlorisInterface, pd.DataFrame, pd.DataFrame]:
     """Runs ``fi.calculate_wake()`` over a chunk of a larger time series analysis and
     returns the individual turbine powers for each corresponding time.
 
@@ -39,9 +39,10 @@ def run_chunked_time_series_floris(
 
     Returns
     -------
-    tuple[tuple[int, int], FlorisInterface, pd.DataFrame]
+    tuple[tuple[int, int], FlorisInterface, pd.DataFrame, pd.DataFrame]
         The ``chunk_id``, a reinitialized ``fi`` using the appropriate wind parameters
-        that can be used for further post-processing, and the resulting turbine powers.
+        that can be used for further post-processing, and the resulting turbine potential and
+        production powers.
     """
     fi: FlorisInterface = args[0]
     weather: pd.DataFrame = args[1]
@@ -49,18 +50,25 @@ def run_chunked_time_series_floris(
     reinit_kwargs: dict = args[3]
     run_kwargs: dict = args[4]
 
+    # Reinitialize the FLORIS interface
     reinit_kwargs["wind_directions"] = weather.wind_direction.values
     reinit_kwargs["wind_speeds"] = weather.windspeed.values
     fi.reinitialize(time_series=True, **reinit_kwargs)
+
+    # Calculate energy potential
+    fi.calculate_no_wake(**run_kwargs)
+    potential_df = pd.DataFrame(fi.get_turbine_powers()[:, 0, :], index=weather.index)
+
+    # Calculate waked energy production
     fi.calculate_wake(**run_kwargs)
-    power_df = pd.DataFrame(fi.get_turbine_powers()[:, 0, :], index=weather.index)
-    return chunk_id, fi, power_df
+    production_df = pd.DataFrame(fi.get_turbine_powers()[:, 0, :], index=weather.index)
+    return chunk_id, fi, potential_df, production_df
 
 
 def run_parallel_time_series_floris(
     args_list: list[tuple[FlorisInterface, pd.DataFrame, tuple[int, int], dict, dict]],
     nodes: int = -1,
-) -> tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame]:
+) -> tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame, pd.DataFrame]:
     """Runs the time series floris calculations in parallel.
 
     Parameters
@@ -76,21 +84,24 @@ def run_parallel_time_series_floris(
     -------
     tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame]
         A dictionary of the ``chunk_id`` and ``FlorisInterface`` object, and the full turbine power
-        dataframe (without renamed columns).
+        potential and production dataframes (without renamed columns).
     """
     nodes = int(mp.cpu_count() * 0.7) if nodes == -1 else nodes
     with mp.Pool(nodes) as pool:
         with tqdm(total=len(args_list), desc="Time series energy calculation") as pbar:
-            df_list = []
+            df_potential_list = []
+            df_production_list = []
             fi_dict = {}
-            for chunk_id, fi, df in pool.imap_unordered(run_chunked_time_series_floris, args_list):
-                df_list.append(df)
-                fi_dict[chunk_id] = fi
+            for i, fi, df1, df2 in pool.imap_unordered(run_chunked_time_series_floris, args_list):
+                df_potential_list.append(df1)
+                df_production_list.append(df2)
+                fi_dict[i] = fi
                 pbar.update()
 
     fi_dict = dict(sorted(fi_dict.items()))
-    turbine_power_df = pd.concat(df_list).sort_index()
-    return fi_dict, turbine_power_df
+    turbine_potential_df = pd.concat(df_potential_list).sort_index()
+    turbine_production_df = pd.concat(df_production_list).sort_index()
+    return fi_dict, turbine_potential_df, turbine_production_df
 
 
 # **************************************************************************************************
