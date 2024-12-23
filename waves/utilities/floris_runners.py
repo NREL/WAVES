@@ -8,8 +8,7 @@ import multiprocessing as mp
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from floris.tools import FlorisInterface
-from floris.tools.wind_rose import WindRose
+from floris import WindRose, TimeSeries
 
 
 # **************************************************************************************************
@@ -125,9 +124,10 @@ def create_single_month_wind_rose(weather_df: pd.DataFrame, month: int) -> tuple
     tuple[int, WindRose]
         A tuple of the :py:attr:`month` passed and the final ``WindRose`` object.
     """
-    wd, ws = weather_df.loc[weather_df.index.month == month, ["wd", "ws"]].values.T
-    wind_rose = WindRose()
-    _ = wind_rose.make_wind_rose_from_user_data(wd, ws)
+    wd, ws, ti = weather_df.loc[weather_df.index.month == month].values.T
+    wind_rose = TimeSeries(
+        wind_directions=wd, wind_speeds=ws, turbulence_intensities=ti
+    ).to_WindRose()
     return (month, wind_rose)
 
 
@@ -139,8 +139,6 @@ def create_monthly_wind_rose(weather_df: pd.DataFrame) -> dict[int, WindRose]:
     ----------
     weather_df : pd.DataFrame
         The weather profile used to create long-term, month-based ``WindRose`` objects
-    month : int
-        The month of the year to create a ``WindRose`` object.
 
     Returns
     -------
@@ -148,7 +146,11 @@ def create_monthly_wind_rose(weather_df: pd.DataFrame) -> dict[int, WindRose]:
         A dictionary of the integer month and the long-term ``WindRose`` object associated
         with all the wind conditions during that month.
     """
-    return dict(create_single_month_wind_rose(weather_df, month) for month in range(1, 13))
+    monthly_wr = {
+        month: create_single_month_wind_rose(weather_df=weather_df, month=month)
+        for month in range(1, 13)
+    }
+    return monthly_wr
 
 
 def check_monthly_wind_rose(
@@ -173,29 +175,37 @@ def check_monthly_wind_rose(
         The :py:attr:`monthly_wind_rose` but with an missing wind conditions added into
         the ``WindRose`` with 0 frequency.
     """
-    project_df = project_wind_rose.df
-    wr_combinations = list(map(tuple, project_df[["wd", "ws"]].values))
+    project_df = pd.DataFrame(
+        project_wind_rose.freq_table,
+        columns=project_wind_rose.wind_speeds,
+        index=project_wind_rose.wind_directions,
+    )
+    project_shape = project_df.shape
+    project_wd = project_wind_rose.wind_directions
+    project_ws = project_wind_rose.wind_speeds
     for month, wind_rose in monthly_wind_rose.items():
-        if wind_rose.df.shape == project_df.shape:
+        if wind_rose.freq_table.shape == project_shape:
             continue
 
         # Find the missing combinations, add them to the wind rose DataFrame, and resort
-        wr_df = wind_rose.df
-        missing = set(wr_combinations).difference(list(map(tuple, wr_df[["wd", "ws"]].values)))
-        missing_df = pd.DataFrame([], columns=wr_df.columns)
-        missing_df[["wd", "ws"]] = list(missing)
-        missing_df.freq_val = 0.0
-        wr_df = pd.concat([wr_df, missing_df]).sort_values(["wd", "ws"])
+        wr_df = pd.DataFrame(
+            wind_rose.freq_table, columns=wind_rose.wind_speeds, index=wind_rose.wind_directions
+        )
+        missing_wd = list(set(project_wd).difference(wind_rose.wind_directions))
+        missing_ws = list(set(project_ws).difference(wind_rose.wind_speeds))
+        wr_df.loc[missing_wd] = 0
+        wr_df.loc[:, missing_ws] = 0
+        wr_df = wr_df.sort_index().T.sort_index().T
+        if wr_df.shape != project_shape:
+            raise ValueError("The monthly wind rose was unable to be resampled.")
 
-        # Tidy up the WindRose object itself to ensure it can be used correctly
-        # Note: taken from the WindRose.read_wind_rose_csv() method without renormalizing the
-        # frequency data because we're only adding in missing values with 0 frequency
-        wind_rose.df = wr_df
-
-        # Call the resample function in order to set all the internal variables
-        wind_rose.internal_resample_wind_speed(ws=wr_df.ws.unique())
-        wind_rose.internal_resample_wind_direction(wd=wr_df.wd.unique())
-        monthly_wind_rose[month] = wind_rose
+        # Recreate the WindRose object with the missing wd/ws values added back in
+        monthly_wind_rose[month] = WindRose(
+            wind_directions=wr_df.index.values,
+            wind_speeds=wr_df.columns.values,
+            freq_table=wr_df.values,
+            ti_table=wind_rose.ti_table,
+        )
 
     return monthly_wind_rose
 
