@@ -2924,8 +2924,8 @@ class Project(FromDictMixin):
                 self.determine_substructure_type(),  # Substructure type
                 self.orbit.config["site"]["distance"],  # Distance to port
                 self.orbit.config["site"]["distance_to_landfall"],  # Distance to landfall
-                "--",  # Cut-in wind speed
-                "--",  # Cut-out wind speed
+                self.cut_in_windspeed(),  # Cut-in wind speed
+                self.cut_out_windspeed(),  # Cut-out wind speed
                 "-",  # Average annual wind speed at 50 m (Is this needed?)
                 "-",  # Average annual wind speed at hub height
                 "-",  # Shear exponent
@@ -2961,3 +2961,63 @@ class Project(FromDictMixin):
     
         # Return Unknown if no substructure type is found
         return "Unknown"
+
+    def cut_in_windspeed(self):
+        
+        turbine_data = self.floris.floris.farm.turbine_definitions[0]["power_thrust_table"]
+        
+        # Extract power and wind_speed lists from the floris turbine dictionary
+        power = turbine_data['power']
+        wind_speed = turbine_data['wind_speed']
+    
+        # Find the index of the maximum power
+        max_power = max(power)
+        max_power_index = power.index(max_power)
+    
+        # Identify the wind speed at the max power
+        max_power_wind_speed = wind_speed[max_power_index]
+    
+        # Identify the wind speeds with 0 power
+        zero_power_indices = [i for i, p in enumerate(power) if p == 0]
+    
+        # Filter the zero power indices to find those where wind speed is lower than the max power wind speed
+        valid_zero_power_indices = [i for i in zero_power_indices if wind_speed[i] < max_power_wind_speed]
+    
+        if not valid_zero_power_indices:
+            return None  # No valid zero power wind speeds below max power wind speed
+    
+        # Get the latest index of the zero power wind speeds
+        latest_zero_power_index = valid_zero_power_indices[-1]
+    
+        # Return the wind speed at the next index (index + 1)
+        return wind_speed[latest_zero_power_index + 1]
+
+    def cut_out_windspeed(self):
+
+        turbine_data = self.floris.floris.farm.turbine_definitions[0]["power_thrust_table"]
+        
+        # Extract power and wind_speed lists from the floris turbine dictionary
+        power = turbine_data['power']
+        wind_speed = turbine_data['wind_speed']
+    
+        # Find the index of the maximum power
+        max_power = max(power)
+        max_power_index = power.index(max_power)
+    
+        # Identify the wind speed at the max power
+        max_power_wind_speed = wind_speed[max_power_index]
+    
+        # Identify the wind speeds with 0 power
+        zero_power_indices = [i for i, p in enumerate(power) if p == 0]
+    
+        # Filter the zero power indices to find those where wind speed is greater than the max power wind speed
+        valid_zero_power_indices = [i for i in zero_power_indices if wind_speed[i] > max_power_wind_speed]
+    
+        if not valid_zero_power_indices:
+            return None  # No valid zero power wind speeds below max power wind speed
+    
+        # Get the earliest index of the zero power wind speeds
+        earliest_zero_power_index = valid_zero_power_indices[0]
+    
+        # Return the wind speed at the previous index (index - 1)
+        return wind_speed[earliest_zero_power_index - 1]
