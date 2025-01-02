@@ -20,6 +20,7 @@ import networkx as nx
 import pyarrow.csv  # pylint: disable=W0611
 import numpy_financial as npf
 import matplotlib.pyplot as plt
+import math
 from attrs import field, define
 from ORBIT import ProjectManager, load_config
 from wombat.core import Simulation
@@ -1468,6 +1469,11 @@ class Project(FromDictMixin):
             units=units,
         )
 
+        if aep:
+            if frequency != "project":
+                raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
+            energy /= self.operations_years
+
         if per_capacity is None:
             return energy
         return energy / self.capacity(per_capacity)
@@ -1540,6 +1546,11 @@ class Project(FromDictMixin):
 
         energy *= 1 - self.loss_ratio(environmental_loss_ratio)
 
+        if aep:
+            if frequency != "project":
+                raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
+            energy /= self.operations_years
+        
         if per_capacity is None:
             return energy
 
@@ -1815,15 +1826,15 @@ class Project(FromDictMixin):
             ]
             loss_breakdown = pd.DataFrame(
                 [
-                    environmental_loss_ratio,
-                    availability,
-                    wake_loss_ratio,
-                    technical_loss_ratio,
-                    electrical_loss_ratio,
-                    total_loss_ratio,
+                    100 * environmental_loss_ratio,
+                    100 * availability,
+                    100 * wake_loss_ratio,
+                    100 * technical_loss_ratio,
+                    100 * electrical_loss_ratio,
+                    100 * total_loss_ratio,
                 ],
                 index=loss_types,
-                columns=["Loss Ratio"],
+                columns=["Loss Ratio (%)"],
             )
             return loss_breakdown
 
@@ -1916,7 +1927,7 @@ class Project(FromDictMixin):
         numerator: pd.DataFrame
         if which == "net":
             numerator = (
-                1 - self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
+                1 - self.loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
             ) * self.energy_potential(
                 frequency="month-year",
                 by="turbine",
@@ -2751,7 +2762,7 @@ class Project(FromDictMixin):
         """
         # Static values
         fcr = self.fixed_charge_rate
-        net_aep = self.energy_production(units="mw", per_capacity="kw", aep=True, with_losses=True)
+        net_aep = self.energy_production(units="mw", per_capacity="kw", aep=True)
 
         # Handle CapEx outputs from ORBIT
         try:
@@ -2846,3 +2857,107 @@ class Project(FromDictMixin):
         # Reset index and return the dataframe
         df = df.reset_index(drop=True)
         return df
+
+    def generate_report_project_details(self) -> pd.DataFrame:
+        """Generates a single dataframe containing all the project details following the format
+        from the table at slide 64 in the Cost of Wind Energy Review: 2024 Edition
+        (https://www.nrel.gov/docs/fy25osti/91775.pdf).
+        """
+        # Define the project details template
+        project_details = {
+            "Assumption": [
+                "Wind plant capacity",
+                "Number of turbines",
+                "Turbine rating",
+                "Rotor diameter",
+                "Hub height",
+                "Specific power",
+                "Water depth",
+                "Substructure type",
+                "Distance to port",
+                "Distance to landfall",
+                "Cut-in wind speed",
+                "Cut-out wind speed",
+                "Average annual wind speed at 50 m",
+                "Average annual wind speed at hub height",
+                "Shear exponent",
+                "Weibull k",
+                "Total system losses",
+                "Availability",
+                "Gross energy capture",
+                "Net energy capture",
+                "Gross capacity factor",
+                "Net capacity factor"
+            ],
+            "Units": [
+                "MW",
+                "Number",
+                "MW",
+                "m",
+                "m",
+                "W/m2",
+                "m",
+                "-",
+                "km",
+                "km",
+                "m/s",
+                "m/s",
+                "m/s",
+                "m/s",
+                "",
+                "",
+                "%",
+                "%",
+                "MWh/MW/year",
+                "MWh/MW/year",
+                "%",
+                "%"
+            ],
+            "Value": [
+                self.capacity("mw"),  # Wind plant capacity
+                self.orbit.num_turbines,  # Number of turbines
+                self.orbit.turbine_rating,  # Turbine rating
+                self.orbit.config["turbine"]["rotor_diameter"],  # Rotor diameter
+                self.orbit.config["turbine"]["hub_height"],  # Hub height
+                self.orbit.config["turbine"]["turbine_rating"]*1000000/(math.pi*(self.orbit.config["turbine"]["rotor_diameter"]/2)**2),  # Specific power
+                self.orbit.config["site"]["depth"],  # Water depth
+                self.determine_substructure_type(),  # Substructure type
+                self.orbit.config["site"]["distance"],  # Distance to port
+                self.orbit.config["site"]["distance_to_landfall"],  # Distance to landfall
+                "--",  # Cut-in wind speed
+                "--",  # Cut-out wind speed
+                "-",  # Average annual wind speed at 50 m (Is this needed?)
+                "-",  # Average annual wind speed at hub height
+                "-",  # Shear exponent
+                "-",  # Weibull k
+                100*self.loss_ratio(),  # Total system losses
+                100*self.availability(which="energy", frequency="project", by="windfarm"),  # Availability
+                self.energy_potential(units="mw", per_capacity="mw", aep=True),  # Gross energy capture
+                self.energy_production(units="mw", per_capacity="mw", aep=True),  # Net energy capture
+                100*self.capacity_factor(which = "gross", frequency = "project", by = "windfarm"),  # Gross capacity factor
+                100*self.capacity_factor(which = "net", frequency = "project", by = "windfarm")  # Net capacity factor
+            ]
+        }
+
+        # Create a DataFrame from the template
+        df = pd.DataFrame(project_details)
+
+        return df
+
+    def determine_substructure_type(self):
+        """Define the substructure type from the ORBIT configuration file.
+        """
+
+        project_data = self.orbit.config["design_phases"]
+        # Define the possible substructure types
+        substructure_types = ["Monopile", "SemiSubmersible", "Jacket", "Spar"]
+
+        # Iterate over the design_phases to check for the substructure type
+        for phase in project_data:
+            # Check if any substructure type is present in the phase name
+            for substructure in substructure_types:
+                if substructure.lower() in phase.lower():
+                    return substructure
+    
+        # Return Unknown if no substructure type is found
+        return "Unknown"
