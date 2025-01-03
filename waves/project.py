@@ -2926,8 +2926,8 @@ class Project(FromDictMixin):
                 self.orbit.config["site"]["distance_to_landfall"],  # Distance to landfall
                 self.cut_in_windspeed(),  # Cut-in wind speed
                 self.cut_out_windspeed(),  # Cut-out wind speed
-                "-",  # Average annual wind speed at 50 m (Is this needed?)
-                "-",  # Average annual wind speed at hub height
+                self.average_wind_speed(50),  # Average annual wind speed at 50 m 
+                self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),  # Average annual wind speed at hub height
                 "-",  # Shear exponent
                 "-",  # Weibull k
                 100*self.loss_ratio(),  # Total system losses
@@ -3021,3 +3021,11 @@ class Project(FromDictMixin):
     
         # Return the wind speed at the previous index (index - 1)
         return wind_speed[earliest_zero_power_index - 1]
+
+    def average_wind_speed(self, height):
+        column_name = "windspeed_" + str(height) + "m"
+        try:
+            return self.weather[column_name].mean()
+        except KeyError:
+            print("wind speed at " + str(height) + "m not provided at " + str(self.library_path) + "\\weather\\" + str(self.weather_profile) + "\nPlease, add a column to the weather .csv file with the name 'windspeed_" + str(height) + "m', and the respective wind speed data")
+            return "wind speed at " + str(height) + "m not provided"
