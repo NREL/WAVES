@@ -21,12 +21,14 @@ import pyarrow.csv  # pylint: disable=W0611
 import numpy_financial as npf
 import matplotlib.pyplot as plt
 import math
+import re
 from attrs import field, define
 from ORBIT import ProjectManager, load_config
 from wombat.core import Simulation
 from floris.tools import FlorisInterface
 from floris.tools.wind_rose import WindRose
 from wombat.core.data_classes import FromDictMixin
+import warnings
 
 from waves.utilities import (
     load_yaml,
@@ -2928,7 +2930,7 @@ class Project(FromDictMixin):
                 self.cut_out_windspeed(),  # Cut-out wind speed
                 self.average_wind_speed(50),  # Average annual wind speed at 50 m 
                 self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),  # Average annual wind speed at hub height
-                "-",  # Shear exponent
+                np.mean(self.compute_shear(self.weather, self.identify_windspeed_columns_and_heights(self.weather), False)),  # Shear exponent
                 "-",  # Weibull k
                 100*self.loss_ratio(),  # Total system losses
                 100*self.availability(which="energy", frequency="project", by="windfarm"),  # Availability
@@ -3029,3 +3031,89 @@ class Project(FromDictMixin):
         except KeyError:
             print("wind speed at " + str(height) + "m not provided at " + str(self.library_path) + "\\weather\\" + str(self.weather_profile) + "\nPlease, add a column to the weather .csv file with the name 'windspeed_" + str(height) + "m', and the respective wind speed data")
             return "wind speed at " + str(height) + "m not provided"
+
+
+    def compute_shear(self,
+        data: pd.DataFrame, ws_heights: dict[str, float], return_reference_values: bool = False
+    ) -> pd.Series | tuple[pd.Series, float, pd.Series]:
+        """
+        Computes shear coefficient between wind speed measurements using the power law.
+        The shear coefficient is obtained by evaluating the expression for an OLS regression coefficient.
+
+        Args:
+            data(:obj:`pandas.DataFrame`): A pandas ``DataFrame`` with wind speed columns that correspond
+                to the keys of :py:attr:`ws_heights`.
+            ws_heights(:obj:`dict[str, float]`): A dictionary with wind speed column names of :py:attr:`data` as
+                keys and their respective sensor heights (m) as values.
+            return_reference_values(:obj: `bool`): If True, this function returns a three element tuple
+                where the first element is the array of shear exponents, the second element is the
+                reference height (float), and the third element is the array of reference wind speeds.
+                These reference values can be used for extrapolating wind speed. Defaults to False.
+
+        Returns:
+            :obj:`pandas.Series` | :obj:`tuple[pandas.Series, float, pandas.Series]`: If
+                :py:attr:`return_reference_values` is False, return just the shear coefficient
+                (unitless), else return the shear coefficent (unitless), reference height (m), and
+                reference wind speed (m/s).
+        """
+
+        # Extract the wind speed columns from `data` and create "u" 2-D array; where element
+        # [i,j] is the wind speed measurement at the ith timestep and jth sensor height
+    
+    
+        u: np.ndarray = np.column_stack(tuple(data.loc[:, col].copy() if col is not None else col for col in ws_heights))
+
+        # create "z" 2_D array; columns are filled with the sensor height
+        z: np.ndarray = np.repeat([[*ws_heights.values()]], len(data), axis=0)
+
+        # take log of z & u
+        with warnings.catch_warnings():  # suppress log division by zero warning.
+            warnings.filterwarnings("ignore", r"divide by zero encountered in log")
+            u = np.log(u)
+            z = np.log(z)
+
+        # correct -inf or NaN if any.
+        nan_or_ninf = np.logical_or(np.isneginf(u), np.isnan(u))
+        if np.any(nan_or_ninf):
+            # replace -inf or NaN with zero or NaN in u and corresponding location in z such that these
+            # elements are excluded from the regression.
+            u[nan_or_ninf] = 0
+            z[nan_or_ninf] = np.nan
+
+        # shift rows of z by the mean of z to simplify shear calculation
+        z = z - (np.nanmean(z, axis=1))[:, None]
+
+        # finally, replace NaN's in z by zero so those points are effectively excluded from the regression
+        z[np.isnan(z)] = 0
+
+        # compute shear based on simple linear regression
+        alpha = (z * u).sum(axis=1) / (z * z).sum(axis=1)
+
+        if not return_reference_values:
+            return alpha
+
+        else:
+            # compute reference height
+            z_ref: float = np.exp(np.mean(np.log(np.array(list(ws_heights.values())))))
+
+            # replace zeros in u (if any) with NaN
+            u[u == 0] = np.nan
+
+            # compute reference wind speed
+            u_ref = np.exp(np.nanmean(u, axis=1))
+
+            return alpha, z_ref, u_ref
+
+    def identify_windspeed_columns_and_heights(self, df):
+        windspeed_columns = {}
+    
+        # Regex pattern to match "windspeed_{number}m" where the name ends with 'm'
+        pattern = r"windspeed_(\d+)m$"
+    
+        for col in df.columns:
+            match = re.match(pattern, col)
+            if match:
+                number = match.group(1)
+                windspeed_columns[col] = int(number)
+    
+        return dict(list(windspeed_columns.items())[:2])
