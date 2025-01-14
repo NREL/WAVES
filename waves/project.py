@@ -324,6 +324,7 @@ class Project(FromDictMixin):
         if isinstance(self.weather_profile, str | Path):
             weather_path = self.library_path / "weather" / self.weather_profile
             self.weather = load_weather(weather_path)
+            
         self.setup_orbit()
         self.setup_wombat()
         self.setup_floris()
@@ -537,7 +538,8 @@ class Project(FromDictMixin):
         start = self.wombat.env.start_datetime
         end = self.wombat.env.end_datetime
         diff = end - start
-        self.operations_years = round((diff.days + (diff.seconds / 60 / 60) / 24) / 365.25, 1)
+        self.operations_years = round((diff.days + (diff.seconds / 60 / 60) / 24) / 365.25, 1) 
+        
 
     def setup_floris(self) -> None:
         """Creates the FLORIS FlorisInterface object and readies it for running an
@@ -2907,8 +2909,8 @@ class Project(FromDictMixin):
                 "m/s",
                 "m/s",
                 "m/s",
-                "",
-                "",
+                "-",
+                "-",
                 "%",
                 "%",
                 "MWh/MW/year",
@@ -2931,7 +2933,7 @@ class Project(FromDictMixin):
                 self.cut_out_windspeed(),  # Cut-out wind speed
                 self.average_wind_speed(50),  # Average annual wind speed at 50 m 
                 self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),  # Average annual wind speed at hub height
-                np.mean(self.compute_shear(self.weather, self.identify_windspeed_columns_and_heights(self.weather), False)),  # Shear exponent
+                np.mean(self.compute_shear(self.wombat.env.weather.to_pandas(), self.identify_windspeed_columns_and_heights(self.wombat.env.weather.to_pandas()), False)),  # Shear exponent
                 self.fit_weibull_distribution(self.orbit.config["turbine"]["hub_height"]),  # Weibull k
                 100*self.loss_ratio(),  # Total system losses
                 100*self.availability(which="energy", frequency="project", by="windfarm"),  # Availability
@@ -3028,7 +3030,7 @@ class Project(FromDictMixin):
     def average_wind_speed(self, height):
         column_name = "windspeed_" + str(height) + "m"
         try:
-            return self.weather[column_name].mean()
+            return self.wombat.env.weather.to_pandas()[column_name].mean()
         except KeyError:
             print("wind speed at " + str(height) + "m not provided at " + str(self.library_path) + "\\weather\\" + str(self.weather_profile) + "\nPlease, add a column to the weather .csv file with the name 'windspeed_" + str(height) + "m', and the respective wind speed data")
             return "wind speed at " + str(height) + "m not provided"
@@ -3126,7 +3128,7 @@ class Project(FromDictMixin):
 
         windspeed_column = "windspeed_" + str(height) + "m"
 
-        df = self.weather
+        df = self.wombat.env.weather.to_pandas()
     
         # Check if the necessary columns are in the dataframe
         if windspeed_column not in df.columns:
