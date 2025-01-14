@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import math
 import re
 from attrs import field, define
+from scipy import stats
 from ORBIT import ProjectManager, load_config
 from wombat.core import Simulation
 from floris.tools import FlorisInterface
@@ -2931,7 +2932,7 @@ class Project(FromDictMixin):
                 self.average_wind_speed(50),  # Average annual wind speed at 50 m 
                 self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),  # Average annual wind speed at hub height
                 np.mean(self.compute_shear(self.weather, self.identify_windspeed_columns_and_heights(self.weather), False)),  # Shear exponent
-                "-",  # Weibull k
+                self.fit_weibull_distribution(self.orbit.config["turbine"]["hub_height"]),  # Weibull k
                 100*self.loss_ratio(),  # Total system losses
                 100*self.availability(which="energy", frequency="project", by="windfarm"),  # Availability
                 self.energy_potential(units="mw", per_capacity="mw", aep=True),  # Gross energy capture
@@ -3117,3 +3118,26 @@ class Project(FromDictMixin):
                 windspeed_columns[col] = int(number)
     
         return dict(list(windspeed_columns.items())[:2])
+
+
+    def fit_weibull_distribution(self, height, random_seed=1):
+        # Set random seed for reproducibility
+        np.random.seed(random_seed)
+
+        windspeed_column = "windspeed_" + str(height) + "m"
+
+        df = self.weather
+    
+        # Check if the necessary columns are in the dataframe
+        if windspeed_column not in df.columns:
+            print("wind speed at " + str(height) + "m not provided at " + str(self.library_path) + "\\weather\\" + str(self.weather_profile) + "\nPlease, add a column to the weather .csv file with the name 'windspeed_" + str(height) + "m', and the respective wind speed data")
+            return "wind speed at " + str(height) + "m not provided"
+    
+        # Extract windspeed data
+        wind_speed_data = df[windspeed_column]
+    
+        # Fit a Weibull distribution to the wind speed data
+        shape, loc, scale = stats.weibull_min.fit(wind_speed_data, floc=0)  # fixing location to 0 (assuming windspeed is non-negative)
+    
+        # Return the fitted parameters
+        return shape
