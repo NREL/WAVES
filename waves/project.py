@@ -1371,6 +1371,7 @@ class Project(FromDictMixin):
 
     def capex(
         self,
+        *,
         breakdown: bool = False,
         per_capacity: str | None = None,
     ) -> pd.DataFrame | float:
@@ -1398,9 +1399,9 @@ class Project(FromDictMixin):
             pandas DataFrame if :py:attr:`breakdown` is True, otherwise, a float total.
         """
         if self.orbit_config is not None:
-            capex = self.capex_orbit(breakdown)
+            capex = self.capex_orbit(breakdown=breakdown)
         elif self.landbosse_config is not None:
-            capex = self.capex_landbosse(breakdown)
+            capex = self.capex_landbosse(breakdown=breakdown)
         else:
             raise RuntimeError("Must run ORBIT or LandBOSSE to calculate capex.")
 
@@ -1418,10 +1419,7 @@ class Project(FromDictMixin):
             return capex
         return capex.values[0, 1]
 
-    def capex_landbosse(
-        self,
-        breakdown: bool = False,
-    ) -> pd.DataFrame | float:
+    def capex_landbosse(self, *, breakdown: bool = False) -> pd.DataFrame | float:
         """Calculates project CapEx from LandBOSSE result, in MW.
 
         Parameters
@@ -1450,7 +1448,7 @@ class Project(FromDictMixin):
 
         return capex
 
-    def capex_orbit(self, breakdown: bool = False) -> pd.DataFrame:
+    def capex_orbit(self, *, breakdown: bool = False) -> pd.DataFrame:
         """Provides a thin wrapper to ORBIT's ``ProjectManager`` CapEx calculations that
         can provide a breakdown of total or normalize it by the project's capacity, in MW.
 
