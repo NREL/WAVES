@@ -1435,14 +1435,14 @@ class Project(FromDictMixin):
             Project CapEx, normalized by :py:attr:`per_capacity`, if using, as either a
             pandas DataFrame if :py:attr:`breakdown` is True, otherwise, a float total.
         """
-        capex_landbosse = (
+        capex_breakdown = (
             self.landbosse.result.operation_cost.groupby("operation_id")["cost_per_project"]
             .sum()
             .rename("CapEx")
         )
-        capex_total = capex_landbosse.sum()
+        capex_total = capex_breakdown.sum()
         if breakdown:
-            capex = capex_landbosse
+            capex = capex_breakdown
             capex.loc["Total"] = capex_total
         else:
             capex = pd.DataFrame(data=[capex_total], columns=["CapEx"], index=pd.Index(["Total"]))
