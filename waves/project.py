@@ -484,33 +484,34 @@ class Project(FromDictMixin):
         """Check the configurations of the models after they have been set up to ensure the basic
         inputs to each model are consistent.
         """
-
-        num_turbines = {
-            "wombat": len(self.wombat.windfarm.turbine_id),
-            "floris": self.floris.floris.farm.n_turbines,
-        }
-
-        project_capacity = {
-            "wombat": self.wombat.windfarm.capacity / 1000.0,
-            # "floris": I DONT KNOW,  # TODO
-        }
-
-        num_substations = {
-            "wombat": len(self.wombat.windfarm.substation_id),
-            # "floris": Not relevant?,  # TODO,
-        }
+        num_turbines = {}
+        project_capacity = {}
+        num_substations = {}
 
         if bool(self.orbit_config_dict):
             num_turbines["orbit"] = self.orbit_config_dict["plant"]["num_turbines"]
-            orbit_num_substation = self.orbit_config_dict.get("oss_design", {}).get("num_substations")
+            orbit_num_substation = self.orbit_config_dict.get("oss_design", {}).get(
+                "num_substations"
+            )
             if orbit_num_substation is not None:
                 num_substations["orbit"] = orbit_num_substation
 
         if bool(self.landbosse_config_dict):
             num_turbines["landbosse"] = self.landbosse_config_dict["num_turbines"]
-            project_capacity["landbosse"] = self.landbosse_config_dict["turbine_rating_MW"] * num_turbines["landbosse"]
+            project_capacity["landbosse"] = (
+                self.landbosse_config_dict["turbine_rating_MW"] * num_turbines["landbosse"]
+            )
             num_substations["landbosse"] = 1
-    
+
+        if bool(self.wombat_config_dict):
+            num_turbines["wombat"] = len(self.wombat.windfarm.turbine_id)
+            project_capacity["wombat"] = self.wombat.windfarm.capacity / 1000.0
+            num_substations["wombat"] = len(self.wombat.windfarm.substation_id)
+        
+        if bool(self.floris_config_dict):
+            num_turbines["floris"] = self.floris.floris.farm.n_turbines
+
+
         validators.check_dict_consistency(num_turbines, "num_turbines")
         validators.check_dict_consistency(project_capacity, "project_capacity")
         validators.check_dict_consistency(num_substations, "num_substations")
