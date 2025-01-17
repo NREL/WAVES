@@ -1444,6 +1444,7 @@ class Project(FromDictMixin):
         if breakdown:
             capex = capex_breakdown
             capex.loc["Total"] = capex_total
+            capex = capex.to_frame()
         else:
             capex = pd.DataFrame(data=[capex_total], columns=["CapEx"], index=pd.Index(["Total"]))
 
