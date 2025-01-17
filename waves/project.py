@@ -510,10 +510,10 @@ class Project(FromDictMixin):
             num_turbines["landbosse"] = self.landbosse_config_dict["num_turbines"]
             project_capacity["landbosse"] = self.landbosse_config_dict["turbine_rating_MW"] * num_turbines["landbosse"]
             num_substations["landbosse"] = 1
-
-        validators.check_dict_consistent(num_turbines, "num_turbines")
-        validators.check_dict_consistent(project_capacity, "project_capacity")
-        validators.check_dict_consistent(num_substations, "num_substations")
+    
+        validators.check_dict_consistency(num_turbines, "num_turbines")
+        validators.check_dict_consistency(project_capacity, "project_capacity")
+        validators.check_dict_consistency(num_substations, "num_substations")
 
     # **********************************************************************************************
     # Setup and setup assisting methods
@@ -1267,7 +1267,8 @@ class Project(FromDictMixin):
                 self.floris.floris.farm.n_turbines if self.floris_config is not None else None
             ),
         }
-        validators.check_dict_consistent(num_turbines_all, "num_turbines")
+
+        validators.check_dict_consistency(num_turbines_all, "num_turbines")
         num_turbines = set(num_turbines_all.values()).difference({None}).pop()
         return num_turbines
 
@@ -1297,7 +1298,7 @@ class Project(FromDictMixin):
                 else None
             ),
         }
-        validators.check_dict_consistent(turbine_rating_all, "turbine_rating")
+        validators.check_dict_consistency(turbine_rating_all, "turbine_rating")
         turbine_rating = set(turbine_rating_all.values()).difference({None}).pop()
         return turbine_rating
 
@@ -1320,7 +1321,7 @@ class Project(FromDictMixin):
                 len(self.wombat.windfarm.substation_id) if hasattr(self, "wombat") else None
             ),
         }
-        validators.check_dict_consistent(n_substations_all, "n_substations")
+        validators.check_dict_consistency(n_substations_all, "n_substations")
         n_substations = set(n_substations_all.values()).difference({None}).pop()
         return n_substations
 
@@ -1356,7 +1357,7 @@ class Project(FromDictMixin):
             ),
             "wombat": (self.wombat.windfarm.capacity / 1000 if hasattr(self, "wombat") else None),
         }
-        validators.check_dict_consistent(capacity_all, "capacity")
+        validators.check_dict_consistency(capacity_all, "capacity")
         capacity = float(set(capacity_all.values()).difference({None}).pop())
 
         units = units.lower()

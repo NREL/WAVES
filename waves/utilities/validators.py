@@ -5,7 +5,7 @@ WAVES.
 from typing import Any
 
 
-def check_dict_consistent(dict_values: dict, output_name: str) -> Any:
+def check_dict_consistency(dict_values: dict, output_name: str) -> Any:
     """Check a dictionary to ensure all values are equal to each other (or None).
 
     Parameters
