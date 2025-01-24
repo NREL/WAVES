@@ -3047,7 +3047,7 @@ class Project(FromDictMixin):
         """
         if self.turbine_type == "land":
             raise NotImplementedError("Land-based analyses are not yet supported.")
-        
+
         project_data = self.orbit.config["design_phases"]
 
         # Iterate over the design_phases to check for the substructure type
@@ -3060,7 +3060,7 @@ class Project(FromDictMixin):
         elif "SparDesign" in project_data:
             return "Spar"
         else:
-            return "Unknown"       
+            return "Unknown"
 
     def cut_in_windspeed(self):
         """Determine the cut-in wind speed for the turbine based on the power-thrust table.
@@ -3197,21 +3197,18 @@ class Project(FromDictMixin):
             data.
         """
         column_name = "windspeed_" + str(height) + "m"
-        try:
-            return self.wombat.env.weather.to_pandas()[column_name].mean()
-        except KeyError:
-            print(
-                "wind speed at "
-                + str(height)
-                + "m not provided at "
-                + str(self.library_path)
-                + "\\weather\\"
-                + str(self.weather_profile)
-                + "\nPlease, add a column to the weather .csv file with the name 'windspeed_"
-                + str(height)
-                + "m', and the respective wind speed data"
+
+        weather = self.wombat.env.weather
+        if column_name not in weather.columns:
+            msg = (
+                f"Wind speed at {height}m not provided at {str(self.library_path)}\\weather\\"
+                f"{str(self.weather_profile)}\n"
+                f"Please, add a column to the weather .csv file with the name 'windspeed_"
+                f"{height}m, and the respective wind speed data"
             )
-            return "wind speed at " + str(height) + "m not provided"
+            warnings.warn(msg)
+            return f"wind speed at {height}m not provided"
+        return weather[column_name].mean()
 
     def compute_shear(
         self,
@@ -3364,27 +3361,24 @@ class Project(FromDictMixin):
         # Set random seed for reproducibility
         np.random.seed(random_seed)
 
-        windspeed_column = "windspeed_" + str(height) + "m"
+        column_name = "windspeed_" + str(height) + "m"
 
-        df = self.wombat.env.weather.to_pandas()
+        weather = self.wombat.env.weather
 
         # Check if the necessary columns are in the dataframe
-        if windspeed_column not in df.columns:
-            print(
-                "wind speed at "
-                + str(height)
-                + "m not provided at "
-                + str(self.library_path)
-                + "\\weather\\"
-                + str(self.weather_profile)
-                + "\nPlease, add a column to the weather .csv file with the name 'windspeed_"
-                + str(height)
-                + "m', and the respective wind speed data"
+        if column_name not in weather.columns:
+            msg = (
+                f"Wind speed at {height}m not provided at {str(self.library_path)}\\weather\\"
+                f"{str(self.weather_profile)}\n"
+                f"Please, add a column to the weather .csv file with the name 'windspeed_"
+                f"{height}m, and the respective wind speed data"
             )
-            return "wind speed at " + str(height) + "m not provided"
+            # raise KeyError(msg)
+            warnings.warn(msg)
+            return f"wind speed at {height}m not provided"
 
         # Extract windspeed data
-        wind_speed_data = df[windspeed_column]
+        wind_speed_data = weather[column_name]
 
         # Fit a Weibull distribution to the wind speed data
         shape, loc, scale = stats.weibull_min.fit(
