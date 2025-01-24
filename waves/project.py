@@ -3045,6 +3045,9 @@ class Project(FromDictMixin):
         - If no substructure type is found after checking all phases, the function will return
           "Unknown".
         """
+        if self.turbine_type == "land":
+            raise NotImplementedError("Land-based analyses are not yet supported.")
+        
         project_data = self.orbit.config["design_phases"]
         # Define the possible substructure types
         substructure_types = ["Monopile", "SemiSubmersible", "Jacket", "Spar"]
