@@ -3,109 +3,9 @@
 
 from __future__ import annotations
 
-import multiprocessing as mp
-
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 from floris import WindRose, TimeSeries
-
-
-# **************************************************************************************************
-# Time series methods
-# **************************************************************************************************
-
-
-def run_chunked_time_series_floris(
-    args: tuple,
-) -> tuple[tuple[int, int], FlorisInterface, pd.DataFrame, pd.DataFrame]:
-    """Runs ``fi.calculate_wake()`` over a chunk of a larger time series analysis and
-    returns the individual turbine powers for each corresponding time.
-
-    Parameters
-    ----------
-    fi : FlorisInterface
-        A copy of the base ``FlorisInterface`` object.
-    weather : pd.DataFrame
-        A subset of the full weather profile, with only the datetime index and columns:
-        "windspeed" and "wind_direction".
-    chunk_id : tuple[int, int]
-        A tuple of the year and month for the data being processed.
-    reinit_kwargs : dict, optional
-        Any additional reinitialization keyword arguments. Defaults to {}.
-    run_kwargs : dict, optional
-        Any additional calculate_wake keyword arguments. Defaults to {}.
-
-    Returns
-    -------
-    tuple[tuple[int, int], FlorisInterface, pd.DataFrame, pd.DataFrame]
-        The ``chunk_id``, a reinitialized ``fi`` using the appropriate wind parameters
-        that can be used for further post-processing, and the resulting turbine potential and
-        production powers.
-    """
-    fi: FlorisInterface = args[0]
-    weather: pd.DataFrame = args[1]
-    chunk_id: tuple[int, int] = args[2]
-    reinit_kwargs: dict = args[3]
-    run_kwargs: dict = args[4]
-
-    # Reinitialize the FLORIS interface
-    reinit_kwargs["wind_directions"] = weather.wind_direction.values
-    reinit_kwargs["wind_speeds"] = weather.windspeed.values
-    fi.reinitialize(time_series=True, **reinit_kwargs)
-
-    # Calculate energy potential
-    fi.calculate_no_wake(**run_kwargs)
-    potential_df = pd.DataFrame(fi.get_turbine_powers()[:, 0, :], index=weather.index)
-
-    # Calculate waked energy production
-    fi.calculate_wake(**run_kwargs)
-    production_df = pd.DataFrame(fi.get_turbine_powers()[:, 0, :], index=weather.index)
-    return chunk_id, fi, potential_df, production_df
-
-
-def run_parallel_time_series_floris(
-    args_list: list[tuple[FlorisInterface, pd.DataFrame, tuple[int, int], dict, dict]],
-    nodes: int = -1,
-) -> tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame, pd.DataFrame]:
-    """Runs the time series floris calculations in parallel.
-
-    Parameters
-    ----------
-    args_list : list[tuple[FlorisInterface, pd.DataFrame, tuple[int, int], dict, dict]])
-        A list of the chunked by month arguments that get passed to
-        ``run_chunked_time_series_floris``.
-    nodes : int, optional
-        The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
-        available CPUs on the computer. Defaults to -1.
-
-    Returns
-    -------
-    tuple[dict[tuple[int, int], FlorisInterface], pd.DataFrame]
-        A dictionary of the ``chunk_id`` and ``FlorisInterface`` object, and the full turbine power
-        potential and production dataframes (without renamed columns).
-    """
-    nodes = int(mp.cpu_count() * 0.7) if nodes == -1 else nodes
-    with mp.Pool(nodes) as pool:
-        with tqdm(total=len(args_list), desc="Time series energy calculation") as pbar:
-            df_potential_list = []
-            df_production_list = []
-            fi_dict = {}
-            for i, fi, df1, df2 in pool.imap_unordered(run_chunked_time_series_floris, args_list):
-                df_potential_list.append(df1)
-                df_production_list.append(df2)
-                fi_dict[i] = fi
-                pbar.update()
-
-    fi_dict = dict(sorted(fi_dict.items()))
-    turbine_potential_df = pd.concat(df_potential_list).sort_index()
-    turbine_production_df = pd.concat(df_production_list).sort_index()
-    return fi_dict, turbine_potential_df, turbine_production_df
-
-
-# **************************************************************************************************
-# Wind rose methods
-# **************************************************************************************************
 
 
 def create_single_month_wind_rose(weather_df: pd.DataFrame, month: int) -> tuple[int, WindRose]:
@@ -121,14 +21,14 @@ def create_single_month_wind_rose(weather_df: pd.DataFrame, month: int) -> tuple
 
     Returns
     -------
-    tuple[int, WindRose]
-        A tuple of the :py:attr:`month` passed and the final ``WindRose`` object.
+    WindRose
+        Month-specific ``WindRose`` object.
     """
     wd, ws, ti = weather_df.loc[weather_df.index.month == month].values.T
     wind_rose = TimeSeries(
         wind_directions=wd, wind_speeds=ws, turbulence_intensities=ti
     ).to_WindRose()
-    return (month, wind_rose)
+    return wind_rose
 
 
 def create_monthly_wind_rose(weather_df: pd.DataFrame) -> dict[int, WindRose]:
@@ -187,10 +87,14 @@ def check_monthly_wind_rose(
         if wind_rose.freq_table.shape == project_shape:
             continue
 
-        # Find the missing combinations, add them to the wind rose DataFrame, and resort
         wr_df = pd.DataFrame(
             wind_rose.freq_table, columns=wind_rose.wind_speeds, index=wind_rose.wind_directions
         )
+        ti_df = pd.DataFrame(
+            wind_rose.ti_table, columns=wind_rose.wind_speeds, index=wind_rose.wind_directions
+        )
+
+        # Find the missing combinations, add them to the wind rose DataFrame, and resort
         missing_wd = list(set(project_wd).difference(wind_rose.wind_directions))
         missing_ws = list(set(project_ws).difference(wind_rose.wind_speeds))
         wr_df.loc[missing_wd] = 0
@@ -199,12 +103,18 @@ def check_monthly_wind_rose(
         if wr_df.shape != project_shape:
             raise ValueError("The monthly wind rose was unable to be resampled.")
 
+        ti_df.loc[missing_wd] = 0
+        ti_df.loc[:, missing_ws] = 0
+        ti_df = ti_df.sort_index().T.sort_index().T
+        if ti_df.shape != project_shape:
+            raise ValueError("The monthly wind rose was unable to be resampled.")
+
         # Recreate the WindRose object with the missing wd/ws values added back in
         monthly_wind_rose[month] = WindRose(
             wind_directions=wr_df.index.values,
             wind_speeds=wr_df.columns.values,
             freq_table=wr_df.values,
-            ti_table=wind_rose.ti_table,
+            ti_table=ti_df.values,
         )
 
     return monthly_wind_rose
@@ -212,7 +122,7 @@ def check_monthly_wind_rose(
 
 def calculate_monthly_wind_rose_results(
     turbine_power: np.ndarray,
-    freq_monthly: dict[int, np.ndarray],
+    wind_rose_monthly: dict[int, WindRose],
 ) -> pd.DataFrame:
     """Calculate the turbine AEP contribution for each month of a year, in MWh.
 
@@ -221,9 +131,9 @@ def calculate_monthly_wind_rose_results(
     turbine_power : np.ndarray
         The array of turbine powers, with shape (num wd x num ws x num turbines), calculated from
         the possible wind conditions at the site given the turbine layout.
-    freq_monthly : dict[int, np.ndarray]
-        The dictionary of integer months (i.e., 1 for January) and array of frequences, with shape
-        (num wd x num ws), created by the long term wind conditions filtered on the month.
+    wind_rose_monthly : dict[int, WindRose]
+        The dictionary of integer months (i.e., 1 for January) and array of frequences, with
+        ``WindRose`` objects created by the long term wind conditions filtered on the month.
 
     Returns
     -------
@@ -252,10 +162,8 @@ def calculate_monthly_wind_rose_results(
     # Calculate the monthly turbine energy and sum over the turbines to get the farm energy
     turbine_energy = pd.DataFrame.from_dict(
         {
-            m: np.sum(
-                freq_monthly[m].reshape((*freq_monthly[m].shape, 1)) * turbine_power, axis=(0, 1)
-            )
-            for m in freq_monthly
+            m: np.nansum(mwr[:, :, np.newaxis] * turbine_power, axis=(0, 1))
+            for m, mwr in wind_rose_monthly.items()
         },
         orient="index",
     ).sort_index()

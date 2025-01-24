@@ -31,7 +31,6 @@ from waves.utilities import (
     resolve_path,
     check_monthly_wind_rose,
     create_monthly_wind_rose,
-    run_parallel_time_series_floris,
     calculate_monthly_wind_rose_results,
 )
 from waves.utilities.validators import validate_common_inputs
@@ -699,21 +698,17 @@ class Project(FromDictMixin):
     def preprocess_monthly_floris(
         self,
         set_kwargs: dict | None = None,
-        run_kwargs: dict | None = None,
         cut_in_wind_speed: float | None = None,
         cut_out_wind_speed: float | None = None,
-    ) -> tuple[list[tuple[FlorisModel, pd.DataFrame, tuple[int, int], dict, dict]], np.ndarray,]:
+    ) -> tuple[list[tuple[FlorisModel, pd.DataFrame, tuple[int, int], dict]], np.ndarray]:
         """Creates the monthly chunked inputs to run a parallelized FLORIS time series
         analysis.
 
         Parameters
         ----------
-        reinitialize_kwargs : dict | None, optional
+        set_kwargs : dict | None, optional
             Any keyword arguments to be assed to ``FlorisModel.set()``. Defaults to
             None.
-        run_kwargs : dict | None, optional
-            Any keyword arguments to be assed to ``FlorisModel.calculate_wake()``.
-            Defaults to None.
         cut_in_wind_speed : float, optional
             The wind speed, in m/s, at which a turbine will start producing power.
         cut_out_wind_speed : float, optional
@@ -726,19 +721,16 @@ class Project(FromDictMixin):
                 - a copy of the ``FlorisInterface`` object
                 - tuple of year and month
                 - a copy of ``reinitialize_kwargs``
-                - c copy of ``run_kwargs``
         """
         if set_kwargs is None:
             set_kwargs = {}
-        if run_kwargs is None:
-            run_kwargs = {}
 
         month_list = range(1, 13)
         year_list = range(self.operations_start.year, self.operations_end.year + 1)
 
         if TYPE_CHECKING:
             assert isinstance(self.weather, pd.DataFrame)  # mypy helper
-        weather = self.weather.loc[
+        weather: pd.DataFrame = self.weather.loc[
             self.operations_start : self.operations_end,
             [self.floris_windspeed, self.floris_wind_direction],
         ].rename(
@@ -747,7 +739,7 @@ class Project(FromDictMixin):
                 self.floris_wind_direction: "wind_direction",
             }
         )
-        zero_power_filter = np.full((weather.shape[0]), True)
+        zero_power_filter: np.ndarray = np.full((weather.shape[0]), True)
         if cut_out_wind_speed is not None:
             zero_power_filter = weather.windspeed.to_numpy() < cut_out_wind_speed
         if cut_in_wind_speed is not None:
@@ -759,7 +751,6 @@ class Project(FromDictMixin):
                 weather.loc[f"{month}/{year}"],
                 (year, month),
                 set_kwargs,
-                run_kwargs,
             )
             for month, year in product(month_list, year_list)
         ]
@@ -768,7 +759,7 @@ class Project(FromDictMixin):
     def run_wind_rose_aep(
         self,
         full_wind_rose: bool = False,
-        run_kwargs: dict | None = None,
+        set_kwargs: dict | None = None,
     ):
         """Runs the custom FLORIS WindRose AEP methodology that allows for gathering of
         intermediary results.
@@ -778,7 +769,7 @@ class Project(FromDictMixin):
         full_wind_rose : bool, optional
             If True, the full wind profile will be used, otherwise, if False, the wind profile will
             be limited to just the simulation period. Defaults to False.
-        run_kwargs : dict | None, optional
+        set_kwargs : dict | None, optional
             Arguments that are provided to ``FlorisInterface.get_farm_AEP_wind_rose_class()``.
             Defaults to None.
 
@@ -802,8 +793,8 @@ class Project(FromDictMixin):
                     1.0 and with shape equal to (n_wind_directions, n_wind_speeds,
                     n_turbines). Defaults to None.
         """
-        if run_kwargs is None:
-            run_kwargs = {}
+        if set_kwargs is None:
+            set_kwargs = {}
         if full_wind_rose:
             if TYPE_CHECKING:
                 assert isinstance(self.weather, pd.DataFrame)  # mypy helper
@@ -813,9 +804,9 @@ class Project(FromDictMixin):
                 assert isinstance(self.weather, pd.DataFrame)  # mypy helper
             weather = self.weather.loc[self.operations_start : self.operations_end]
         if self.floris_turbulence_intensity is None:
-            ti = self.floris_config_dict["flow_field"]["turbulence_intensities"]
+            ti, *_ = self.floris_config_dict["flow_field"]["turbulence_intensities"]
             ti_col = "floris_turbulence_intensities"
-            weather[ti_col] = ti
+            weather.loc[:, ti_col] = ti
         else:
             ti_col = self.floris_turbulence_intensity
         weather = weather.rename(
@@ -830,60 +821,24 @@ class Project(FromDictMixin):
             turbulence_intensities=ti,
         )
         self.project_wind_rose = project_time_series.to_WindRose()
-        self.monthly_wind_rose = create_monthly_wind_rose(weather, self.project_wind_rose)
+        self.monthly_wind_rose = create_monthly_wind_rose(weather)
         self.monthly_wind_rose = check_monthly_wind_rose(
             self.project_wind_rose, self.monthly_wind_rose
         )
 
+        self.floris.set(wind_data=self.project_wind_rose)
+
         # Table of frequencies (wind directions x wind speeds)
         freq_monthly = {k: wr.freq_table for k, wr in self.monthly_wind_rose.items()}
 
-        # Recreating FlorisInterface.get_farm_AEP() w/o some of the quality checks
-        # because the parameters are coming directly from other FLORIS objects, and
-        # not user inputs
-        wd = self.project_wind_rose.wind_speeds
-        ws = self.project_wind_rose.wind_directions
-        n_wd = wd.size
-        n_ws = ws.size
-        ix_evaluate = ws >= run_kwargs["cut_in_wind_speed"]
-        if run_kwargs["cut_out_wind_speed"] is not None:
-            ix_evaluate &= ws < run_kwargs["cut_out_wind_speed"]
+        yaw_angles = set_kwargs.get("yaw_angles", None)
+        self.floris.set(yaw_angles=yaw_angles)
 
-        farm_potential_power = np.zeros((n_wd, n_ws))
-        farm_production_power = np.zeros((n_wd, n_ws))
-        turbine_potential_power = np.zeros((n_wd, n_ws, self.floris.floris.farm.n_turbines))
-        turbine_production_power = np.zeros((n_wd, n_ws, self.floris.floris.farm.n_turbines))
-        if np.any(ix_evaluate):
-            ws_subset = ws[ix_evaluate]
-            yaw_angles = run_kwargs.get("yaw_angles", None)
-            if yaw_angles is not None:
-                yaw_angles = yaw_angles[:, ix_evaluate]
-
-            self.floris.set(wind_speeds=ws_subset, wind_directions=wd)
-
-            # Calculate the potential energy
-            self.floris.run_no_wake(yaw_angles=yaw_angles)
-            farm_potential_power[:, ix_evaluate] = self.floris.get_farm_power()
-            turbine_potential_power[:, ix_evaluate, :] = self.floris.get_turbine_powers()
-            if (weights := run_kwargs["turbine_weights"]) is not None:
-                turbine_potential_power *= weights
-
-            # Calculate the produced power
-            self.floris.run()
-
-            turbine_production_power[:, ix_evaluate, :] = self.floris.get_turbine_powers()
-            farm_production_power[:, ix_evaluate] = self.floris.get_farm_power()
-            if (weights := run_kwargs["turbine_weights"]) is not None:
-                turbine_production_power *= weights
-        else:
-            self.floris.reinitialize(wind_speeds=ws, wind_directions=wd)
-
-        # Calculate the monthly contribution to AEP from the wind rose
-        self.turbine_production_energy = calculate_monthly_wind_rose_results(
-            turbine_production_power, freq_monthly
-        )
-        self.turbine_production_energy.columns = self.floris_turbine_order  # Mwh
-        self.project_production_energy = self.turbine_production_energy.values.sum()
+        # Calculate the potential energy
+        self.floris.run_no_wake()
+        turbine_potential_power = self.floris.get_turbine_powers()
+        if (weights := set_kwargs["turbine_weights"]) is not None:
+            turbine_potential_power *= weights
 
         # Calculate the monthly potential contribution to AEP from the wind rose
         self.turbine_potential_energy = calculate_monthly_wind_rose_results(
@@ -892,13 +847,25 @@ class Project(FromDictMixin):
         self.turbine_potential_energy.columns = self.floris_turbine_order  # Mwh
         self.project_potential_energy = self.turbine_potential_energy.values.sum()
 
+        # Calculate the produced power
+        self.floris.run()
+
+        turbine_production_power = self.floris.get_turbine_powers()
+        if (weights := set_kwargs["turbine_weights"]) is not None:
+            turbine_production_power *= weights
+
+        # Calculate the monthly contribution to AEP from the wind rose
+        self.turbine_production_energy = calculate_monthly_wind_rose_results(
+            turbine_production_power, freq_monthly
+        )
+        self.turbine_production_energy.columns = self.floris_turbine_order  # Mwh
+        self.project_production_energy = self.turbine_production_energy.values.sum()
+
     def run_floris(
         self,
-        which: str,
-        reinitialize_kwargs: dict | None = None,
-        run_kwargs: dict | None = None,
+        set_kwargs: dict | None = None,
         full_wind_rose: bool = False,
-        cut_in_wind_speed: float = 0.001,
+        cut_in_wind_speed: float | None = None,
         cut_out_wind_speed: float | None = None,
         nodes: int = -1,
     ) -> None:
@@ -908,25 +875,19 @@ class Project(FromDictMixin):
 
         Parameters
         ----------
-        which : str
-            One of "wind_rose" or "time_series" to run either a simulation-level wind rose analysis
-            or hourly time-series analysis for the base AEP model.
-        reinitialize_kwargs : dict | None, optional
+        set_kwargs : dict | None, optional
             Any keyword arguments to be assed to ``FlorisInterface.reinitialize()``. Defaults to
             None.
-        run_kwargs : dict | None, optional
-            Any keyword arguments to be assed to ``FlorisInterface.calculate_wake()``.
-            Defaults to None.
         full_wind_rose : bool, optional
             Indicates, for "wind_rose" analyses ONLY, if the full weather profile from ``weather``
             (True) or the limited, WOMBAT simulation period (False) should be used for analyis.
             Defaults to False.
         cut_in_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will start producing power. Should only be a
-            value if running a time series analysis. Defaults to 0.001.
+            The wind speed, in m/s, at which a turbine will start producing power, if not modeled in
+            the power curve.
         cut_out_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will stop producing power. Should only be a
-            value if running a time series analysis. Defaults to None.
+            The wind speed, in m/s, at which a turbine will stop producing power, if not modeled in
+            the power curve.
         nodes : int, optional
             The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
             available CPUs on the computer. Defaults to -1.
@@ -935,74 +896,25 @@ class Project(FromDictMixin):
         ------
         ValueError: Raised if :py:attr:`which` is not one of "wind_rose" or "time_series".
         """
-        if reinitialize_kwargs is None:
-            reinitialize_kwargs = {}
-        if run_kwargs is None:
-            run_kwargs = {}
+        if set_kwargs is None:
+            set_kwargs = {}
 
-        if which == "wind_rose":
-            # TODO: Change this to be modify the standard behavior, and get the turbine
-            # powers to properly account for availability later
+        # TODO: Change this to be modify the standard behavior, and get the turbine
+        # powers to properly account for availability later
 
-            # Set the FLORIS defaults
-            run_kwargs.setdefault("cut_in_wind_speed", cut_in_wind_speed)
-            run_kwargs.setdefault("cut_out_wind_speed", cut_out_wind_speed)
-            run_kwargs.setdefault("turbine_weights", None)
-            run_kwargs.setdefault("yaw_angles", None)
-            run_kwargs.setdefault("no_wake", False)
+        # Set the FLORIS defaults
+        set_kwargs.setdefault("cut_in_wind_speed", cut_in_wind_speed)
+        set_kwargs.setdefault("cut_out_wind_speed", cut_out_wind_speed)
+        set_kwargs.setdefault("turbine_weights", None)
+        set_kwargs.setdefault("yaw_angles", None)
+        set_kwargs.setdefault("no_wake", False)
 
-            self.run_wind_rose_aep(full_wind_rose=full_wind_rose, run_kwargs=run_kwargs)
-            self.floris_results_type = "wind_rose"
-
-        elif which == "time_series":
-            self.connect_floris_to_turbines(x_col=self.floris_x_col, y_col=self.floris_y_col)
-            parallel_args, zero_power_filter = self.preprocess_monthly_floris(
-                reinitialize_kwargs, run_kwargs, cut_in_wind_speed, cut_out_wind_speed
-            )
-            fi_dict, potential, production = run_parallel_time_series_floris(parallel_args, nodes)
-
-            self._fi_dict = fi_dict
-            self.turbine_potential_energy = potential
-            self.turbine_potential_energy.columns = self.floris_turbine_order
-            self.turbine_potential_energy = (
-                self.turbine_potential_energy.where(
-                    np.repeat(
-                        zero_power_filter.reshape(-1, 1),
-                        self.turbine_potential_energy.shape[1],
-                        axis=1,
-                    ),
-                    0.0,
-                )
-                / 1e6
-            )
-
-            n_years = self.turbine_potential_energy.index.year.unique().size
-            self.project_potential_energy = self.turbine_potential_energy.values.sum()
-
-            self.turbine_production_energy = production
-            self.connect_floris_to_turbines(x_col=self.floris_x_col, y_col=self.floris_y_col)
-            self.turbine_production_energy.columns = self.floris_turbine_order
-            self.turbine_production_energy = (
-                self.turbine_production_energy.where(
-                    np.repeat(
-                        zero_power_filter.reshape(-1, 1),
-                        self.turbine_production_energy.shape[1],
-                        axis=1,
-                    ),
-                    0.0,
-                )
-                / 1e6
-            )
-            self.project_production_energy = self.turbine_production_energy.values.sum() / n_years
-            self.floris_results_type = "time_series"
-        else:
-            raise ValueError(f"`which` must be one of: 'wind_rose' or 'time_series', not: {which}")
+        self.run_wind_rose_aep(full_wind_rose=full_wind_rose, set_kwargs=set_kwargs)
+        self.floris_results_type = "wind_rose"
 
     def run(
         self,
-        which_floris: str | None = None,
-        floris_reinitialize_kwargs: dict | None = None,
-        floris_run_kwargs: dict | None = None,
+        floris_kwargs: dict | None = None,
         full_wind_rose: bool = False,
         skip: list[str] | None = None,
         cut_in_wind_speed: float = 0.001,
@@ -1013,15 +925,8 @@ class Project(FromDictMixin):
 
         Parameters
         ----------
-        which_floris : str | None, optional
-            One of "wind_rose" or "time_series" if computing the farm's AEP based on a wind rose,
-            or based on time series corresponding to the WOMBAT simulation period, respectively.
-            Defaults to None.
-        floris_reinitialize_kwargs : dict | None
-            Any additional ``FlorisInterface.reinitialize`` keyword arguments. Defaults to None.
-        floris_run_kwargs : dict | None
-            Any additional ``FlorisInterface.get_farm_AEP`` or ``FlorisInterface.calculate_wake()``
-            keyword arguments, depending on ``which_floris`` is used. Defaults to None.
+        floris_kwargs : dict | None
+            Any additional ``FlorisModel.set`` keyword arguments. Defaults to None.
         full_wind_rose : bool, optional
             Indicates, for "wind_rose" analyses ONLY, if the full weather profile from ``weather``
             (True) or the limited, WOMBAT simulation period (False) should be used for analyis.
@@ -1030,13 +935,11 @@ class Project(FromDictMixin):
             A list of models to be skipped. This is intended to be used after a model is
             reinitialized with a new or modified configuration. Defaults to None.
         cut_in_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will start producing power. Can also be
-            provided in ``floris_reinitialize_kwargs`` for a wind rose analysis, but must be
-            provided here for a time series analysis. Defaults to 0.001.
+            The wind speed, in m/s, at which a turbine will start producing power, if not modeled
+            in the power curve. Defaults to None.
         cut_out_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will stop producing power. Can also be
-            provided in ``floris_reinitialize_kwargs`` for a wind rose analysis, but must be
-            provided here for a time series analysis. Defaults to None.
+            The wind speed, in m/s, at which a turbine will stop producing power, if not modeled
+            in the power curve. Defaults to None.
         nodes : int, optional
             The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
             available CPUs on the computer. Defaults to -1.
@@ -1046,35 +949,22 @@ class Project(FromDictMixin):
         ValueError
             Raised if ``which_floris`` is not one of "wind_rose" or "time_series".
         """
-        if floris_reinitialize_kwargs is None:
-            floris_reinitialize_kwargs = {}
-        if floris_run_kwargs is None:
-            floris_run_kwargs = {}
+        if floris_kwargs is None:
+            floris_kwargs = {}
         if skip is None:
             skip = []
-        if "floris" not in skip:
-            if which_floris not in ("wind_rose", "time_series"):
-                raise ValueError(
-                    "`which_floris` must be one of: 'wind_rose' or 'time_series' when running"
-                    f" FLORIS, not: {which_floris}"
-                )
 
-        if which_floris == "wind_rose":
-            floris_reinitialize_kwargs.update(
-                {"cut_in_wind_speed": cut_in_wind_speed, "cut_out_wind_speed": cut_out_wind_speed}
-            )
+        floris_kwargs.update(
+            {"cut_in_wind_speed": cut_in_wind_speed, "cut_out_wind_speed": cut_out_wind_speed}
+        )
 
         if "orbit" not in skip:
             self.orbit.run()
         if "wombat" not in skip:
             self.wombat.run()
         if "floris" not in skip:
-            if TYPE_CHECKING:
-                assert isinstance(which_floris, str)
             self.run_floris(
-                which=which_floris,
-                reinitialize_kwargs=floris_reinitialize_kwargs,
-                run_kwargs=floris_run_kwargs,
+                set_kwargs=floris_kwargs,
                 full_wind_rose=full_wind_rose,
                 cut_in_wind_speed=cut_in_wind_speed,
                 cut_out_wind_speed=cut_out_wind_speed,
@@ -1521,6 +1411,9 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level energy prodcution, in GWh, for the desired ``frequency``.
         """
+        if aep and frequency != "project":
+            raise ValueError("When `aep=True`, `frequency` must be 'project'.")
+
         energy = self.energy_potential(
             frequency=frequency,
             by=by,
@@ -1539,6 +1432,9 @@ class Project(FromDictMixin):
                 energy.index = energy.index.str.replace("Potential", "Production")
 
         energy *= 1 - self.loss_ratio(environmental_loss_ratio)
+
+        if aep:
+            energy /= self.operations_years
 
         if per_capacity is None:
             return energy
@@ -1916,7 +1812,7 @@ class Project(FromDictMixin):
         numerator: pd.DataFrame
         if which == "net":
             numerator = (
-                1 - self.total_loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
+                1 - self.loss_ratio(environmental_loss_ratio=environmental_loss_ratio)
             ) * self.energy_potential(
                 frequency="month-year",
                 by="turbine",
@@ -2751,7 +2647,7 @@ class Project(FromDictMixin):
         """
         # Static values
         fcr = self.fixed_charge_rate
-        net_aep = self.energy_production(units="mw", per_capacity="kw", aep=True, with_losses=True)
+        net_aep = self.energy_production(units="mw", per_capacity="kw", aep=True)
 
         # Handle CapEx outputs from ORBIT
         try:
