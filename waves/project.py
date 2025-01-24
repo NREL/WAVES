@@ -3285,17 +3285,16 @@ class Project(FromDictMixin):
         if not return_reference_values:
             return alpha
 
-        else:
-            # compute reference height
-            z_ref: float = np.exp(np.mean(np.log(np.array(list(ws_heights.values())))))
+        # compute reference height
+        z_ref: float = np.exp(np.mean(np.log(np.array(list(ws_heights.values())))))
 
-            # replace zeros in u (if any) with NaN
-            u[u == 0] = np.nan
+        # replace zeros in u (if any) with NaN
+        u[u == 0] = np.nan
 
-            # compute reference wind speed
-            u_ref = np.exp(np.nanmean(u, axis=1))
+        # compute reference wind speed
+        u_ref = np.exp(np.nanmean(u, axis=1))
 
-            return alpha, z_ref, u_ref
+        return alpha, z_ref, u_ref
 
     def identify_windspeed_columns_and_heights(self, df):
         """Identifies columns containing wind speed measurements and their respective sensor
