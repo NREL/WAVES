@@ -3049,18 +3049,18 @@ class Project(FromDictMixin):
             raise NotImplementedError("Land-based analyses are not yet supported.")
         
         project_data = self.orbit.config["design_phases"]
-        # Define the possible substructure types
-        substructure_types = ["Monopile", "SemiSubmersible", "Jacket", "Spar"]
 
         # Iterate over the design_phases to check for the substructure type
-        for phase in project_data:
-            # Check if any substructure type is present in the phase name
-            for substructure in substructure_types:
-                if substructure.lower() in phase.lower():
-                    return substructure
-
-        # Return Unknown if no substructure type is found
-        return "Unknown"
+        if "MonopileDesign" in project_data:
+            return "Monopile"
+        elif "SemiSubmersibleDesign" in project_data:
+            return "Semi-Submersible"
+        elif "JacketDesign" in project_data:
+            return "Jacket"
+        elif "SparDesign" in project_data:
+            return "Spar"
+        else:
+            return "Unknown"       
 
     def cut_in_windspeed(self):
         """Determine the cut-in wind speed for the turbine based on the power-thrust table.
