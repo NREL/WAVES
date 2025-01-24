@@ -2,6 +2,8 @@
 
 ## Unreleased (TBD)
 
+- WAVES will now set the FLORIS `turbine_library_path` setting in the FLORIS `farm` configuration
+  to use "`Project.library_path`/turbines", ensuring that all analysis data will be co-located.
 - Updated dependency stack:
   - FLORIS v4.2.2 or greater is now required
     - Monthly wind rose analysis is now the only supported FLORIS analysis type due to a change in

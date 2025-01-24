@@ -552,6 +552,10 @@ class Project(FromDictMixin):
         else:
             self.floris_config_dict = self.floris_config
 
+        # Ensure the project turbine library is used for the floris turbine library
+        turbine_library = self.library_path / "turbines"
+        self.floris_config_dict["farm"]["turbine_library_path"] = turbine_library
+
         # Check that an array of turbulence intensities is provided in the weather profile to ensure
         # the wind rose and time series methods don't break during runtime.
         if self.floris_turbulence_intensity is None:
