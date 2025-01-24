@@ -163,6 +163,10 @@ class Project(FromDictMixin):
     floris_config : str | pathlib.Path | dict | None
         The FLORIS configuration file name or dictionary. If None, will not set up
         the FLORIS simulation component.
+
+        .. note:: The farm:trubine_library_path is automatically set to use the
+            :py:attr:`library_path` / turbines folder to maintain consistency.
+
     connect_floris_to_layout : bool, optional
         If True, automatically connect the FLORIS and WOMBAT layout files, so that
         the simulation results can be linked. If False, don't connec the two models.

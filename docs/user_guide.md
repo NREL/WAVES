@@ -287,6 +287,15 @@ any interdependencies between model outputs.
 
 .. automethod:: Project.energy_losses
    :noindex:
+
+.. automethod:: Project.loss_ratio
+   :noindex:
+
+.. automethod:: Project.wake_losses
+   :noindex:
+
+.. automethod:: Project.technical_loss_ratio
+   :noindex:
 ```
 
 ### Project Financials
@@ -316,6 +325,18 @@ any interdependencies between model outputs.
    :noindex:
 
 .. automethod:: Project.lcoe
+   :noindex:
+```
+
+### Report Generation
+
+```{eval-rst}
+.. currentmodule:: waves.project
+
+.. automethod:: Project.generate_report
+   :noindex:
+
+.. automethod:: Project.generate_report_lcoe_breakdown
    :noindex:
 ```
 
