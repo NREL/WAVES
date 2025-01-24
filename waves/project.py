@@ -313,7 +313,6 @@ class Project(FromDictMixin):
     project_potential_energy: pd.DataFrame = field(init=False)
     project_production_energy: pd.DataFrame = field(init=False)
     _fi_dict: dict[tuple[int, int], FlorisModel] = field(init=False, factory=dict)
-    floris_results_type: str = field(init=False)
     operations_start: pd.Timestamp = field(init=False)
     operations_end: pd.Timestamp = field(init=False)
     operations_years: int = field(init=False)
@@ -695,67 +694,6 @@ class Project(FromDictMixin):
     # Run methods
     # **********************************************************************************************
 
-    def preprocess_monthly_floris(
-        self,
-        set_kwargs: dict | None = None,
-        cut_in_wind_speed: float | None = None,
-        cut_out_wind_speed: float | None = None,
-    ) -> tuple[list[tuple[FlorisModel, pd.DataFrame, tuple[int, int], dict]], np.ndarray]:
-        """Creates the monthly chunked inputs to run a parallelized FLORIS time series
-        analysis.
-
-        Parameters
-        ----------
-        set_kwargs : dict | None, optional
-            Any keyword arguments to be assed to ``FlorisModel.set()``. Defaults to
-            None.
-        cut_in_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will start producing power.
-        cut_out_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will stop producing power.
-
-        Returns
-        -------
-        tuple[list[tuple[FlorisInterface, pd.DataFrame, tuple[int, int], dict, dict]], np.ndarray]
-            A list of tuples of:
-                - a copy of the ``FlorisInterface`` object
-                - tuple of year and month
-                - a copy of ``reinitialize_kwargs``
-        """
-        if set_kwargs is None:
-            set_kwargs = {}
-
-        month_list = range(1, 13)
-        year_list = range(self.operations_start.year, self.operations_end.year + 1)
-
-        if TYPE_CHECKING:
-            assert isinstance(self.weather, pd.DataFrame)  # mypy helper
-        weather = self.weather.loc[
-            self.operations_start : self.operations_end,
-            [self.floris_windspeed, self.floris_wind_direction],
-        ].rename(
-            columns={
-                self.floris_windspeed: "windspeed",
-                self.floris_wind_direction: "wind_direction",
-            }
-        )
-        zero_power_filter = np.full((weather.shape[0]), True)
-        if cut_out_wind_speed is not None:
-            zero_power_filter = weather.windspeed.to_numpy() < cut_out_wind_speed
-        if cut_in_wind_speed is not None:
-            zero_power_filter &= weather.windspeed.to_numpy() >= cut_in_wind_speed
-
-        args = [
-            (
-                deepcopy(self.floris),
-                weather.loc[f"{month}/{year}"],
-                (year, month),
-                set_kwargs,
-            )
-            for month, year in product(month_list, year_list)
-        ]
-        return args, zero_power_filter
-
     def run_wind_rose_aep(
         self,
         full_wind_rose: bool = False,
@@ -861,14 +799,7 @@ class Project(FromDictMixin):
         self.turbine_production_energy.columns = self.floris_turbine_order  # Mwh
         self.project_production_energy = self.turbine_production_energy.values.sum()
 
-    def run_floris(
-        self,
-        set_kwargs: dict | None = None,
-        full_wind_rose: bool = False,
-        cut_in_wind_speed: float | None = None,
-        cut_out_wind_speed: float | None = None,
-        nodes: int = -1,
-    ) -> None:
+    def run_floris(self, set_kwargs: dict | None = None, full_wind_rose: bool = False) -> None:
         """Runs either a FLORIS wind rose analysis for a simulation-level AEP value
         (``which="wind_rose"``) or a turbine-level time series for the WOMBAT simulation
         period (``which="time_series"``).
@@ -882,15 +813,6 @@ class Project(FromDictMixin):
             Indicates, for "wind_rose" analyses ONLY, if the full weather profile from ``weather``
             (True) or the limited, WOMBAT simulation period (False) should be used for analyis.
             Defaults to False.
-        cut_in_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will start producing power, if not modeled in
-            the power curve.
-        cut_out_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will stop producing power, if not modeled in
-            the power curve.
-        nodes : int, optional
-            The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
-            available CPUs on the computer. Defaults to -1.
 
         Raises
         ------
@@ -899,27 +821,18 @@ class Project(FromDictMixin):
         if set_kwargs is None:
             set_kwargs = {}
 
-        # TODO: Change this to be modify the standard behavior, and get the turbine
-        # powers to properly account for availability later
-
         # Set the FLORIS defaults
-        set_kwargs.setdefault("cut_in_wind_speed", cut_in_wind_speed)
-        set_kwargs.setdefault("cut_out_wind_speed", cut_out_wind_speed)
         set_kwargs.setdefault("turbine_weights", None)
         set_kwargs.setdefault("yaw_angles", None)
         set_kwargs.setdefault("no_wake", False)
 
         self.run_wind_rose_aep(full_wind_rose=full_wind_rose, set_kwargs=set_kwargs)
-        self.floris_results_type = "wind_rose"
 
     def run(
         self,
         floris_kwargs: dict | None = None,
         full_wind_rose: bool = False,
         skip: list[str] | None = None,
-        cut_in_wind_speed: float = 0.001,
-        cut_out_wind_speed: float | None = None,
-        nodes: int = -1,
     ) -> None:
         """Run all three models in serial, or a subset if ``skip`` is used.
 
@@ -934,15 +847,6 @@ class Project(FromDictMixin):
         skip : list[str] | None, optional
             A list of models to be skipped. This is intended to be used after a model is
             reinitialized with a new or modified configuration. Defaults to None.
-        cut_in_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will start producing power, if not modeled
-            in the power curve. Defaults to None.
-        cut_out_wind_speed : float, optional
-            The wind speed, in m/s, at which a turbine will stop producing power, if not modeled
-            in the power curve. Defaults to None.
-        nodes : int, optional
-            The number of nodes to parallelize over. If -1, then it will use the floor of 80% of the
-            available CPUs on the computer. Defaults to -1.
 
         Raises
         ------
@@ -954,22 +858,12 @@ class Project(FromDictMixin):
         if skip is None:
             skip = []
 
-        floris_kwargs.update(
-            {"cut_in_wind_speed": cut_in_wind_speed, "cut_out_wind_speed": cut_out_wind_speed}
-        )
-
         if "orbit" not in skip:
             self.orbit.run()
         if "wombat" not in skip:
             self.wombat.run()
         if "floris" not in skip:
-            self.run_floris(
-                set_kwargs=floris_kwargs,
-                full_wind_rose=full_wind_rose,
-                cut_in_wind_speed=cut_in_wind_speed,
-                cut_out_wind_speed=cut_out_wind_speed,
-                nodes=nodes,
-            )
+            self.run_floris(set_kwargs=floris_kwargs, full_wind_rose=full_wind_rose)
 
     def reinitialize(
         self,
@@ -1273,20 +1167,14 @@ class Project(FromDictMixin):
             frequency="month-year", by="turbine"
         ).index
 
-        if self.floris_results_type == "wind_rose":
-            energy_gwh = pd.DataFrame(0.0, dtype=float, index=base_ix, columns=["drop"])
-            energy_gwh = energy_gwh.merge(
-                energy,
-                how="left",
-                left_on="month",
-                right_index=True,
-            ).drop(labels=["drop"], axis=1)
-            energy_gwh /= 1000
-        else:
-            energy_gwh = (
-                energy.groupby([energy.index.year, energy.index.month]).sum().loc[base_ix]
-            ) / 1000
-            energy_gwh.index.names = ["year", "month"]
+        energy_gwh = pd.DataFrame(0.0, dtype=float, index=base_ix, columns=["drop"])
+        energy_gwh = energy_gwh.merge(
+            energy,
+            how="left",
+            left_on="month",
+            right_index=True,
+        ).drop(labels=["drop"], axis=1)
+        energy_gwh /= 1000
 
         # Aggregate to the desired frequency level (nothing required for month-year)
         if frequency == "annual":
@@ -1944,11 +1832,7 @@ class Project(FromDictMixin):
                     " keyword arguments."
                 )
 
-        if self.floris_results_type == "wind_rose":
-            revenue = self.energy_production(frequency=frequency) * 1000 * offtake_price  # MWh
-        else:
-            revenue = self.energy_production(frequency=frequency) * 1000 * offtake_price  # MWh
-
+        revenue = self.energy_production(frequency=frequency) * 1000 * offtake_price  # MWh
         if frequency != "project":
             if TYPE_CHECKING:
                 assert isinstance(revenue, pd.DataFrame)
