@@ -6,6 +6,7 @@ hub_height_m: 80  # Turbine hub height (m)
 rotor_diameter_m: 77  # Turbine rotor diameter (m)
 turbine_spacing_rotor_diameter: 4  # Layout spacing between turbines in each row, in rotor diameters
 row_spacing_rotor_diameter: 10  # Layout spacing between rows, in rotor diameters
+turbine_capex: 1650  # CapEx of turbine itself ($/kW)
 base_topping_breakpoint: 0.8  # Height at which cranes change from 'Base' to 'Topping', represented as a fraction of hub height
 fuel_cost_usd_per_gal: 1.5  # Cost of fuel per gallon ($/gal)
 turbine_delivery_rate_per_week: 10  # Number of turbine deliveries (all components) per week
@@ -33,7 +34,7 @@ num_highway_permits: 10  # Number of highway permits required
 num_access_roads: 2  # Number of site access roads required
 overtime_multiplier: 1.4  # Labor cost multiplier for overtime work
 allow_same_flag: false  # flag to indicate whether choosing same base and topping crane is allowed (true/false)
-override_total_management_cost_for_distributed: 50  # For distributed wind project, override the calculated management cost and use this value instead
+override_total_management_cost_for_distributed: 0  # For distributed wind project, override the calculated management cost and use this value instead
 markup_contingency: 0.03  # Markup contingency
 markup_warranty_management: 0.0002  # Markup warranty management
 markup_sales_and_use_tax: 0  # Markup sales and use tax
