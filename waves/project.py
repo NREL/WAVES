@@ -1378,6 +1378,8 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level energy prodcution, in GWh, for the desired ``frequency``.
         """
+        if aep and frequency != "project":
+            raise ValueError("When `aep=True`, `frequency` must be 'project'.")
         potential = self.energy_potential(
             frequency=frequency,
             by=by,
@@ -1398,6 +1400,9 @@ class Project(FromDictMixin):
         if frequency == "project":
             if by == "turbine":
                 losses.index = losses.index.str.replace("Potential", "Losses")
+
+        if aep:
+            losses /= self.operations_years
 
         if per_capacity is None:
             return losses
