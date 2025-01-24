@@ -730,7 +730,7 @@ class Project(FromDictMixin):
 
         if TYPE_CHECKING:
             assert isinstance(self.weather, pd.DataFrame)  # mypy helper
-        weather: pd.DataFrame = self.weather.loc[
+        weather = self.weather.loc[
             self.operations_start : self.operations_end,
             [self.floris_windspeed, self.floris_wind_direction],
         ].rename(
@@ -739,7 +739,7 @@ class Project(FromDictMixin):
                 self.floris_wind_direction: "wind_direction",
             }
         )
-        zero_power_filter: np.ndarray = np.full((weather.shape[0]), True)
+        zero_power_filter = np.full((weather.shape[0]), True)
         if cut_out_wind_speed is not None:
             zero_power_filter = weather.windspeed.to_numpy() < cut_out_wind_speed
         if cut_in_wind_speed is not None:
