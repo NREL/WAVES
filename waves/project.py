@@ -25,7 +25,6 @@ import numpy_financial as npf
 import matplotlib.pyplot as plt
 from attrs import field, define
 from ORBIT import ProjectManager, load_config
-from scipy import stats
 from wombat.core import Simulation
 from floris.tools import FlorisInterface
 from floris.tools.wind_rose import WindRose
@@ -39,6 +38,7 @@ from waves.utilities import (
     run_parallel_time_series_floris,
     calculate_monthly_wind_rose_results,
 )
+from waves.utilities.met_data import compute_shear, fit_weibull_distribution
 from waves.utilities.validators import validate_common_inputs
 
 
@@ -2985,7 +2985,7 @@ class Project(FromDictMixin):
                     self.orbit.config["turbine"]["hub_height"]
                 ),  # Average annual wind speed at hub height
                 np.mean(
-                    self.compute_shear(
+                    compute_shear(
                         self.wombat.env.weather.to_pandas(),
                         self.identify_windspeed_columns_and_heights(
                             self.wombat.env.weather.to_pandas()
@@ -2993,9 +2993,7 @@ class Project(FromDictMixin):
                         False,
                     )
                 ),  # Shear exponent
-                self.fit_weibull_distribution(
-                    self.orbit.config["turbine"]["hub_height"]
-                ),  # Weibull k
+                self.compute_weibull(self.orbit.config["turbine"]["hub_height"]),  # Weibull k
                 100 * self.loss_ratio(),  # Total system losses
                 100
                 * self.availability(
@@ -3210,92 +3208,6 @@ class Project(FromDictMixin):
             return f"wind speed at {height}m not provided"
         return weather[column_name].mean()
 
-    def compute_shear(
-        self,
-        data: pd.DataFrame,
-        ws_heights: dict[str, float],
-        return_reference_values: bool = False,
-    ) -> pd.Series | tuple[pd.Series, float, pd.Series]:
-        """Computes the shear coefficient between wind speed measurements using the power law.
-
-        The shear coefficient is calculated by evaluating the expression for an Ordinary Least
-        Squares (OLS) regression coefficient. The power law is used to model the relationship
-        between wind speed and sensor height. This function is based on the implementation 
-        provided by OpenOA (https://github.com/NREL/OpenOA)
-
-        Parameters
-        ----------
-        data : pandas.DataFrame
-            A DataFrame containing wind speed columns that correspond to the keys of `ws_heights`.
-            Each column should represent wind speed measurements at a specific height.
-
-        ws_heights : dict[str, float]
-            A dictionary where the keys are the names of the wind speed columns in `data`, and the
-            values are the respective sensor heights (in meters) for those columns.
-
-        return_reference_values : bool, optional
-            If True, the function will return a tuple containing the shear exponents, the reference
-            height (m), and the reference wind speed (m/s). Defaults to False.
-
-        Returns
-        -------
-        pd.Series | tuple[pd.Series, float, pd.Series]
-            If `return_reference_values` is False, the function returns the shear coefficient
-            (unitless) as a pandas Series.
-            If `return_reference_values` is True, the function returns a tuple:
-                - The shear coefficient (unitless) as a pandas Series,
-                - The reference height (float) in meters,
-                - The reference wind speed (pandas Series) in meters per second.
-        """
-        # Extract the wind speed columns from `data` and create "u" 2-D array; where element
-        # [i,j] is the wind speed measurement at the ith timestep and jth sensor height
-
-        u: np.ndarray = np.column_stack(
-            tuple(data.loc[:, col].copy() if col is not None else col for col in ws_heights)
-        )
-
-        # create "z" 2_D array; columns are filled with the sensor height
-        z: np.ndarray = np.repeat([[*ws_heights.values()]], len(data), axis=0)
-
-        # take log of z & u
-        with warnings.catch_warnings():  # suppress log division by zero warning.
-            warnings.filterwarnings("ignore", r"divide by zero encountered in log")
-            u = np.log(u)
-            z = np.log(z)
-
-        # correct -inf or NaN if any.
-        nan_or_ninf = np.logical_or(np.isneginf(u), np.isnan(u))
-        if np.any(nan_or_ninf):
-            # replace -inf or NaN with zero or NaN in u and corresponding location in
-            # z such that these
-            # elements are excluded from the regression.
-            u[nan_or_ninf] = 0
-            z[nan_or_ninf] = np.nan
-
-        # shift rows of z by the mean of z to simplify shear calculation
-        z = z - (np.nanmean(z, axis=1))[:, None]
-
-        # finally, replace NaN's in z by zero so those points are effectively excluded
-        # from the regression
-        z[np.isnan(z)] = 0
-
-        # compute shear based on simple linear regression
-        alpha = (z * u).sum(axis=1) / (z * z).sum(axis=1)
-
-        if not return_reference_values:
-            return alpha
-
-        # compute reference height
-        z_ref: float = np.exp(np.mean(np.log(np.array(list(ws_heights.values())))))
-
-        # replace zeros in u (if any) with NaN
-        u[u == 0] = np.nan
-
-        # compute reference wind speed
-        u_ref = np.exp(np.nanmean(u, axis=1))
-
-        return alpha, z_ref, u_ref
-
     def identify_windspeed_columns_and_heights(self, df):
         """Identifies columns containing wind speed measurements and their respective sensor
         heights.
@@ -3332,7 +3244,7 @@ class Project(FromDictMixin):
 
         return dict(list(windspeed_columns.items())[:2])
 
-    def fit_weibull_distribution(self, height, random_seed=1):
+    def compute_weibull(self, height, random_seed=1):
         """Fits a Weibull distribution to wind speed data at a specified height.
 
         This function fits a Weibull distribution to the wind speed data at the specified height
@@ -3380,10 +3292,4 @@ class Project(FromDictMixin):
         # Extract windspeed data
         wind_speed_data = weather[column_name]
 
-        # Fit a Weibull distribution to the wind speed data
-        shape, loc, scale = stats.weibull_min.fit(
-            wind_speed_data, floc=0
-        )  # fixing location to 0 (assuming windspeed is non-negative)
-
-        # Return the fitted parameters
-        return shape
+        return fit_weibull_distribution(wind_speed_data, random_seed)
