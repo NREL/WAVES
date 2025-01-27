@@ -7,7 +7,6 @@ from __future__ import annotations
 import re
 import json
 import math
-import warnings
 from copy import deepcopy
 from typing import TYPE_CHECKING
 from pathlib import Path
@@ -2964,26 +2963,24 @@ class Project(FromDictMixin):
                 "%",
             ],
             "Value": [
-                self.capacity("mw"),  # Wind plant capacity
-                self.orbit.num_turbines,  # Number of turbines
-                self.orbit.turbine_rating,  # Turbine rating
-                self.orbit.config["turbine"]["rotor_diameter"],  # Rotor diameter
-                self.orbit.config["turbine"]["hub_height"],  # Hub height
+                self.capacity("mw"),
+                self.orbit.num_turbines,
+                self.orbit.turbine_rating,
+                self.orbit.config["turbine"]["rotor_diameter"],
+                self.orbit.config["turbine"]["hub_height"],
                 self.orbit.config["turbine"]["turbine_rating"]
                 * 1000000
                 / (
                     math.pi * (self.orbit.config["turbine"]["rotor_diameter"] / 2) ** 2
                 ),  # Specific power
-                self.orbit.config["site"]["depth"],  # Water depth
-                self.determine_substructure_type(),  # Substructure type
+                self.orbit.config["site"]["depth"],
+                self.determine_substructure_type(),
                 self.orbit.config["site"]["distance"],  # Distance to port
-                self.orbit.config["site"]["distance_to_landfall"],  # Distance to landfall
-                self.cut_in_windspeed(),  # Cut-in wind speed
-                self.cut_out_windspeed(),  # Cut-out wind speed
-                self.average_wind_speed(50),  # Average annual wind speed at 50 m
-                self.average_wind_speed(
-                    self.orbit.config["turbine"]["hub_height"]
-                ),  # Average annual wind speed at hub height
+                self.orbit.config["site"]["distance_to_landfall"],
+                self.cut_in_windspeed(),
+                self.cut_out_windspeed(),
+                self.average_wind_speed(50),
+                self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),
                 np.mean(
                     compute_shear(
                         self.wombat.env.weather.to_pandas(),
@@ -2992,27 +2989,14 @@ class Project(FromDictMixin):
                         ),
                         False,
                     )
-                ),  # Shear exponent
-                self.compute_weibull(self.orbit.config["turbine"]["hub_height"]),  # Weibull k
-                100 * self.loss_ratio(),  # Total system losses
-                100
-                * self.availability(
-                    which="energy", frequency="project", by="windfarm"
-                ),  # Availability
-                self.energy_potential(
-                    units="mw", per_capacity="mw", aep=True
-                ),  # Gross energy capture
-                self.energy_production(
-                    units="mw", per_capacity="mw", aep=True
-                ),  # Net energy capture
-                100
-                * self.capacity_factor(
-                    which="gross", frequency="project", by="windfarm"
-                ),  # Gross capacity factor
-                100
-                * self.capacity_factor(
-                    which="net", frequency="project", by="windfarm"
-                ),  # Net capacity factor
+                ),
+                self.compute_weibull(self.orbit.config["turbine"]["hub_height"]),
+                100 * self.loss_ratio(),
+                100 * self.availability(which="energy", frequency="project", by="windfarm"),
+                self.energy_potential(units="mw", per_capacity="mw", aep=True),
+                self.energy_production(units="mw", per_capacity="mw", aep=True),
+                100 * self.capacity_factor(which="gross", frequency="project", by="windfarm"),
+                100 * self.capacity_factor(which="net", frequency="project", by="windfarm"),
             ],
         }
 
@@ -3051,14 +3035,13 @@ class Project(FromDictMixin):
         # Iterate over the design_phases to check for the substructure type
         if "MonopileDesign" in project_data:
             return "Monopile"
-        elif "SemiSubmersibleDesign" in project_data:
+        if "SemiSubmersibleDesign" in project_data:
             return "Semi-Submersible"
-        elif "JacketDesign" in project_data:
+        if "JacketDesign" in project_data:
             return "Jacket"
-        elif "SparDesign" in project_data:
+        if "SparDesign" in project_data:
             return "Spar"
-        else:
-            return "Unknown"
+        return None
 
     def cut_in_windspeed(self):
         """Determine the cut-in wind speed for the turbine based on the power-thrust table.
@@ -3087,11 +3070,10 @@ class Project(FromDictMixin):
 
         # Extract power and wind_speed lists from the floris turbine dictionary
         power = turbine_data["power"]
-        wind_speed = turbine_data["wind_speed"]
+        wind_speed = np.array(turbine_data["wind_speed"])
 
         # Find the index of the maximum power
-        max_power = max(power)
-        max_power_index = power.index(max_power)
+        max_power_index = np.argmax(power)
 
         # Identify the wind speed at the max power
         max_power_wind_speed = wind_speed[max_power_index]
@@ -3099,20 +3081,14 @@ class Project(FromDictMixin):
         # Identify the wind speeds with 0 power
         zero_power_indices = [i for i, p in enumerate(power) if p == 0]
 
-        # Filter the zero power indices to find those where wind speed is lower than the max
-        # power wind speed
-        valid_zero_power_indices = [
-            i for i in zero_power_indices if wind_speed[i] < max_power_wind_speed
-        ]
+        # Find the first wind speed before the start of the power curve - latest zero before max ws
+        latest_zero_power_ix = min(
+            set(zero_power_indices).intersection(np.where(wind_speed < max_power_wind_speed)[0])
+        )
+        if latest_zero_power_ix == set():
+            return None
 
-        if not valid_zero_power_indices:
-            return None  # No valid zero power wind speeds below max power wind speed
-
-        # Get the latest index of the zero power wind speeds
-        latest_zero_power_index = valid_zero_power_indices[-1]
-
-        # Return the wind speed at the next index (index + 1)
-        return wind_speed[latest_zero_power_index + 1]
+        return wind_speed[latest_zero_power_ix + 1]
 
     def cut_out_windspeed(self):
         """Determine the cut-out wind speed for the turbine based on the power-thrust table.
@@ -3140,11 +3116,10 @@ class Project(FromDictMixin):
 
         # Extract power and wind_speed lists from the floris turbine dictionary
         power = turbine_data["power"]
-        wind_speed = turbine_data["wind_speed"]
+        wind_speed = np.array(turbine_data["wind_speed"])
 
         # Find the index of the maximum power
-        max_power = max(power)
-        max_power_index = power.index(max_power)
+        max_power_index = np.argmax(power)
 
         # Identify the wind speed at the max power
         max_power_wind_speed = wind_speed[max_power_index]
@@ -3152,20 +3127,14 @@ class Project(FromDictMixin):
         # Identify the wind speeds with 0 power
         zero_power_indices = [i for i, p in enumerate(power) if p == 0]
 
-        # Filter the zero power indices to find those where wind speed is greater than the max
-        # power wind speed
-        valid_zero_power_indices = [
-            i for i in zero_power_indices if wind_speed[i] > max_power_wind_speed
-        ]
+        # Find the first wind speed past the end of the power curve - earliest zero after max ws
+        earliest_zero_power_ix = min(
+            set(zero_power_indices).intersection(np.where(wind_speed > max_power_wind_speed)[0])
+        )
+        if earliest_zero_power_ix == set():
+            return None
 
-        if not valid_zero_power_indices:
-            return None  # No valid zero power wind speeds below max power wind speed
-
-        # Get the earliest index of the zero power wind speeds
-        earliest_zero_power_index = valid_zero_power_indices[0]
-
-        # Return the wind speed at the previous index (index - 1)
-        return wind_speed[earliest_zero_power_index - 1]
+        return wind_speed[earliest_zero_power_ix - 1]
 
     def average_wind_speed(self, height):
         """Calculates the average wind speed at a specified height.
@@ -3204,8 +3173,7 @@ class Project(FromDictMixin):
                 f"Please, add a column to the weather .csv file with the name 'windspeed_"
                 f"{height}m, and the respective wind speed data"
             )
-            warnings.warn(msg)
-            return f"wind speed at {height}m not provided"
+            raise KeyError(msg)
         return weather[column_name].mean()
 
     def identify_windspeed_columns_and_heights(self, df):
@@ -3285,9 +3253,7 @@ class Project(FromDictMixin):
                 f"Please, add a column to the weather .csv file with the name 'windspeed_"
                 f"{height}m, and the respective wind speed data"
             )
-            # raise KeyError(msg)
-            warnings.warn(msg)
-            return f"wind speed at {height}m not provided"
+            raise KeyError(msg)
 
         # Extract windspeed data
         wind_speed_data = weather[column_name]

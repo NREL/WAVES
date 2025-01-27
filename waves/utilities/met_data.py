@@ -32,10 +32,9 @@ def fit_weibull_distribution(wind_speed_data, random_seed=1):
         valid.
         If the data is missing or invalid, it returns an error message indicating the issue.
     """
-    # Set random seed for reproducibility
+    # Set random seed for reproducibility, fit a Weibull distribution to the wind speed data
     np.random.seed(random_seed)
 
-    # Fit a Weibull distribution to the wind speed data
     shape, loc, scale = stats.weibull_min.fit(
         wind_speed_data, floc=0
     )  # fixing location to 0 (assuming windspeed is non-negative)
