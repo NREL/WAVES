@@ -181,6 +181,9 @@ For the following set of methods, users only need to create a ``Project`` object
 .. automethod:: Project.plot_farm
    :noindex:
 
+.. automethod:: Project.determine_substructure_type
+   :noindex:
+
 .. automethod:: Project.n_turbines
    :noindex:
 
@@ -191,6 +194,24 @@ For the following set of methods, users only need to create a ``Project`` object
    :noindex:
 
 .. automethod:: Project.turbine_rating
+   :noindex:
+
+.. automethod:: Project.cut_in_windspeed
+   :noindex:
+
+.. automethod:: Project.cut_out_windspeed
+   :noindex:
+
+.. automethod:: Project.identify_windspeed_columns_and_heights
+   :noindex:
+
+.. automethod:: Project.calculate_wind_speed
+   :noindex:
+
+.. automethod:: Project.average_wind_speed
+   :noindex:
+
+.. automethod:: Project.compute_weibull
    :noindex:
 ```
 
@@ -287,6 +308,15 @@ any interdependencies between model outputs.
 
 .. automethod:: Project.energy_losses
    :noindex:
+
+.. automethod:: Project.loss_ratio
+   :noindex:
+
+.. automethod:: Project.wake_losses
+   :noindex:
+
+.. automethod:: Project.technical_loss_ratio
+   :noindex:
 ```
 
 ### Project Financials
@@ -316,6 +346,21 @@ any interdependencies between model outputs.
    :noindex:
 
 .. automethod:: Project.lcoe
+   :noindex:
+```
+
+### Report Generation
+
+```{eval-rst}
+.. currentmodule:: waves.project
+
+.. automethod:: Project.generate_report_project_details
+   :noindex:
+
+.. automethod:: Project.generate_report
+   :noindex:
+
+.. automethod:: Project.generate_report_lcoe_breakdown
    :noindex:
 ```
 
