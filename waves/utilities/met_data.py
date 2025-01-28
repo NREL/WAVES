@@ -127,3 +127,30 @@ def compute_shear(
     u_ref = np.exp(np.nanmean(u, axis=1))
 
     return alpha, z_ref, u_ref
+
+
+def extrapolate_windspeed(
+    v1: pd.Series | np.ndarray | float, z1: float, z2: float, shear: pd.Series | np.ndarray | float
+) -> pd.Series | np.ndarray | float:
+    """
+    Extrapolates wind speed vertically using the Power Law. This function is based on the
+    implementation provided by OpenOA (https://github.com/NREL/OpenOA).
+
+    Parameters
+    ----------
+    v1 : :obj: `pandas.Series` | :obj:`np.ndarray` | :obj:`float`
+        A pandas ``Series`` of the wind speed measurements at the reference height, or the name of
+        the column in :py:attr:`data`.
+    z1 : :obj:`float`
+        Height of reference wind speed measurements; units in meters.
+    z2 : :obj:`float`
+        Target extrapolation height; units in meters.
+    shear : :obj: `pandas.Series` | :obj:`np.ndarray` | `float`
+        A pandas ``Series`` of the shear values, or a single shear value.
+
+    Returns
+    -------
+    :obj: `pandas.Series` | :obj:`np.ndarray` | :obj:`float`
+        Wind speed extrapolated to target height, :py:arg:`z2`.
+    """
+    return v1 * (z2 / z1) ** shear

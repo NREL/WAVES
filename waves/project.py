@@ -35,7 +35,7 @@ from waves.utilities import (
     create_monthly_wind_rose,
     calculate_monthly_wind_rose_results,
 )
-from waves.utilities.met_data import compute_shear, fit_weibull_distribution
+from waves.utilities.met_data import compute_shear, extrapolate_windspeed, fit_weibull_distribution
 from waves.utilities.validators import validate_common_inputs
 
 
@@ -2716,10 +2716,10 @@ class Project(FromDictMixin):
                 "Distance to landfall",
                 "Cut-in wind speed",
                 "Cut-out wind speed",
-                # "Average annual wind speed at 50 m",
-                # "Average annual wind speed at hub height",
+                "Average annual wind speed at 50 m",
+                "Average annual wind speed at hub height",
                 "Shear exponent",
-                # "Weibull k",
+                "Weibull k",
                 "Total system losses",
                 "Availability",
                 "Gross energy capture",
@@ -2740,10 +2740,10 @@ class Project(FromDictMixin):
                 "km",
                 "m/s",
                 "m/s",
-                # "m/s",
-                # "m/s",
+                "m/s",
+                "m/s",
                 "-",
-                # "-",
+                "-",
                 "%",
                 "%",
                 "MWh/MW/year",
@@ -2768,8 +2768,8 @@ class Project(FromDictMixin):
                 self.orbit.config["site"]["distance_to_landfall"],
                 self.cut_in_windspeed(),
                 self.cut_out_windspeed(),
-                # self.average_wind_speed(50),
-                # self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),
+                self.average_wind_speed(50),
+                self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),
                 np.mean(
                     compute_shear(
                         self.wombat.env.weather.to_pandas(),
@@ -2779,7 +2779,7 @@ class Project(FromDictMixin):
                         False,
                     )
                 ),
-                # self.compute_weibull(self.orbit.config["turbine"]["hub_height"]),
+                self.compute_weibull(self.orbit.config["turbine"]["hub_height"]),
                 100 * self.loss_ratio(),
                 100 * self.availability(which="energy", frequency="project", by="windfarm"),
                 self.energy_potential(units="mw", per_capacity="mw", aep=True),
@@ -2925,12 +2925,33 @@ class Project(FromDictMixin):
 
         return wind_speed[earliest_zero_power_ix - 1]
 
-    def average_wind_speed(self, height):
+    def calculate_wind_speed(self, height: int | float) -> pd.Series:
+        """Calculates a new array, series, or value of wind speed at a given height.
+
+        Parameters
+        ----------
+        height : int | float
+            The new height to calculate the wind speed.
+
+        Returns
+        -------
+        pd.Series
+            The wind speed data at :py:arg:`height`.
+        """
+        weather = self.wombat.env.weather.to_pandas()
+        ws_heights = self.identify_windspeed_columns_and_heights(weather)
+        shear = compute_shear(weather, ws_heights)
+        h1, *_ = ws_heights
+        shear = compute_shear(weather, ws_heights)
+        ws = extrapolate_windspeed(weather[h1], ws_heights[h1], height, shear)
+        return ws
+
+    def average_wind_speed(self, height: int | float):
         """Calculates the average wind speed at a specified height.
 
         This method computes the mean wind speed from the weather data at the given height.
-        If the wind speed data for the specified height is not found, it provides an error
-        message.
+        If the wind speed data for the specified height is not found, and there are not
+        at least two columns of wind speed data, an error is raised.
 
         Parameters
         ----------
@@ -2952,18 +2973,24 @@ class Project(FromDictMixin):
             If the column corresponding to the specified height is not present in the weather
             data.
         """
-        column_name = "windspeed_" + str(height) + "m"
+        column_name = f"windspeed_{height}m"
 
-        weather = self.wombat.env.weather
-        if column_name not in weather.columns:
+        weather = self.wombat.env.weather.to_pandas()
+        ws_heights = self.identify_windspeed_columns_and_heights(weather)
+
+        # Check if the column exists or if there is enough data to compute it
+        if height_exists := column_name in weather.columns:
+            return weather[column_name].mean()
+        if (not height_exists) and len(ws_heights) < 2:
             msg = (
-                f"Wind speed at {height}m not provided at {str(self.library_path)}/weather/"
-                f"{str(self.weather_profile)}\n"
-                f"Please, add a column to the weather .csv file with the name 'windspeed_"
-                f"{height}m, and the respective wind speed data"
+                f"Wind speed at {height} m not provided at {str(self.library_path)}/weather/"
+                f"{str(self.weather_profile)}, nor are there at least two heights to extrapolate"
+                f"the wind speed.\nPlease, add a column to the weather .csv file with the name"
+                f"'windspeed_{height}m', and the respective wind speed data"
             )
             raise KeyError(msg)
-        return weather[column_name].mean()
+
+        return self.calculate_wind_speed(height).mean()
 
     def identify_windspeed_columns_and_heights(self, df):
         """Identifies columns containing wind speed measurements and their respective sensor
@@ -3031,20 +3058,22 @@ class Project(FromDictMixin):
         np.random.seed(random_seed)
 
         column_name = "windspeed_" + str(height) + "m"
+        weather = self.wombat.env.weather.to_pandas()
+        ws_heights = self.identify_windspeed_columns_and_heights(weather)
 
-        weather = self.wombat.env.weather
-
-        # Check if the necessary columns are in the dataframe
-        if column_name not in weather.columns:
+        # Check if the column exists or if there is enough data to compute it
+        if height_exists := column_name in weather.columns:
+            wind_speed_data = weather[column_name]
+            return fit_weibull_distribution(wind_speed_data, random_seed)
+        if (not height_exists) and len(ws_heights) < 2:
             msg = (
-                f"Wind speed at {height}m not provided at {str(self.library_path)}\\weather\\"
-                f"{str(self.weather_profile)}\n"
-                f"Please, add a column to the weather .csv file with the name 'windspeed_"
-                f"{height}m, and the respective wind speed data"
+                f"Wind speed at {height} m not provided at {str(self.library_path)}/weather/"
+                f"{str(self.weather_profile)}, nor are there at least two heights to extrapolate"
+                f"the wind speed.\nPlease, add a column to the weather .csv file with the name"
+                f"'windspeed_{height}m', and the respective wind speed data"
             )
             raise KeyError(msg)
 
         # Extract windspeed data
-        wind_speed_data = weather[column_name]
-
+        wind_speed_data = self.calculate_wind_speed(height)
         return fit_weibull_distribution(wind_speed_data, random_seed)
