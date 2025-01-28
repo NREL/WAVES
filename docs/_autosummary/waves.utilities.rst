@@ -12,4 +12,5 @@
 
    floris_runners
    library
+   met_data
    validators

@@ -2,6 +2,19 @@
 
 ## Unreleased (TBD)
 
+- Site and project detail reporting functionality has been added:
+  - `Project.generate_report_lcoe_breakdown()`
+  - `Project.generate_report_project_details()`
+  - `Project.determine_substructure_type()`
+  - `Project.identify_windspeed_columns_and_heights()`
+  - `Project.cut_in_windspeed()`
+  - `Project.cut_out_windspeed()`
+  - `Project.calculate_wind_speed()`
+  - `Project.average_wind_speed()`
+  - `Project.compute_weibull()`
+  - `utilities.met_data.fit_weibull_distribution()`
+  - `utilities.met_data.compute_shear()`
+  - `utilities.met_data.extrapolate_windspeed()`
 - WAVES will now set the FLORIS `turbine_library_path` setting in the FLORIS `farm` configuration
   to use "`Project.library_path`/turbines", ensuring that all analysis data will be co-located.
 - Updated dependency stack:
