@@ -4,7 +4,9 @@ FLORIS (AEP) simulation libraries for a simplified modeling workflow.
 
 from __future__ import annotations
 
+import re
 import json
+import math
 from copy import deepcopy
 from typing import TYPE_CHECKING
 from pathlib import Path
@@ -33,6 +35,7 @@ from waves.utilities import (
     create_monthly_wind_rose,
     calculate_monthly_wind_rose_results,
 )
+from waves.utilities.met_data import compute_shear, fit_weibull_distribution
 from waves.utilities.validators import validate_common_inputs
 
 
@@ -326,6 +329,7 @@ class Project(FromDictMixin):
         if isinstance(self.weather_profile, str | Path):
             weather_path = self.library_path / "weather" / self.weather_profile
             self.weather = load_weather(weather_path)
+
         self.setup_orbit()
         self.setup_wombat()
         self.setup_floris()
@@ -1247,12 +1251,18 @@ class Project(FromDictMixin):
         pd.DataFrame | float
             The wind farm-level energy prodcution, in GWh, for the desired ``frequency``.
         """
+        if aep and frequency != "project":
+            raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
+
         energy = self._get_floris_energy(
             which="potential",
             frequency=frequency,
             by=by,
             units=units,
         )
+
+        if aep:
+            energy /= self.operations_years
 
         if per_capacity is None:
             return energy
@@ -1308,7 +1318,7 @@ class Project(FromDictMixin):
             The wind farm-level energy prodcution, in GWh, for the desired ``frequency``.
         """
         if aep and frequency != "project":
-            raise ValueError("When `aep=True`, `frequency` must be 'project'.")
+            raise ValueError("`aep` can only be set to True, if `frequency`='project'.")
 
         energy = self.energy_potential(
             frequency=frequency,
@@ -1612,15 +1622,15 @@ class Project(FromDictMixin):
             ]
             loss_breakdown = pd.DataFrame(
                 [
-                    environmental_loss_ratio,
-                    availability,
-                    wake_loss_ratio,
-                    technical_loss_ratio,
-                    electrical_loss_ratio,
-                    total_loss_ratio,
+                    100 * environmental_loss_ratio,
+                    100 * availability,
+                    100 * wake_loss_ratio,
+                    100 * technical_loss_ratio,
+                    100 * electrical_loss_ratio,
+                    100 * total_loss_ratio,
                 ],
                 index=loss_types,
-                columns=["Loss Ratio"],
+                columns=["Loss Ratio (%)"],
             )
             return loss_breakdown
 
@@ -2537,10 +2547,41 @@ class Project(FromDictMixin):
         return results_df
 
     def generate_report_lcoe_breakdown(self) -> pd.DataFrame:
-        """Generates a single dataframe containing all the necessary LCOE metrics from the project,
-        which are required to produce LCOE waterfall charts and CapEx donut charts for the Cost of
-        Wind Energy Review. The dataframe provides a detailed breakdown, showing the contribution
-        of each CapEx and OpEx component (from ORBIT and WOMBAT) to the LCOE in $/MWh.
+        """Generates a dataframe containing the detailed breakdown of LCOE (Levelized Cost of
+        Energy) metrics for the project, which is used to produce LCOE waterfall charts and
+        CapEx donut charts in the Cost of Wind Energy Review. The breakdown includes the
+        contributions of each CapEx and OpEx component (from ORBIT and WOMBAT) to the LCOE in
+        $/MWh.
+
+        This function calculates the LCOE by considering both CapEx (from ORBIT) and OpEx (from
+        WOMBAT),and incorporates the fixed charge rate (FCR) and net annual energy production
+        (net AEP) into the computation for each component.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame containing the detailed LCOE breakdown with the following columns:
+                - "Component": The name of the project component (e.g., "Turbine", "Balance
+                  of System CapEx", "OpEx").
+                - "Category": The category of the component (e.g., "Turbine", "Balance of System
+                  CapEx", "Financial CapEx", "OpEx").
+                - "Value ($/kW)": The value of the component in $/kW.
+                - "Fixed charge rate (FCR) (real)": The real fixed charge rate (FCR) applied to the
+                  component.
+                - "Value ($/kW-yr)": The value of the component in $/kW-yr, after applying the FCR.
+                - "Net AEP (MWh/kW/yr)": The net annual energy production (AEP) in MWh/kW/yr.
+                - "Value ($/MWh)": The value of the component in $/MWh, calculated by dividing the
+                  $/kW-yr value by the net AEP.
+
+        Notes
+        -----
+        - CapEx components are categorized into "Turbine", "Balance of System CapEx", and "Financial
+            CapEx".
+        - OpEx components are derived from WOMBAT's OpEx metrics, categorized as "OpEx".
+        - The LCOE is calculated by considering both CapEx and OpEx components, and adjusting for
+          net AEP and FCR.
+        - Rows with a value of 0 in the "Value ($/MWh)" column are removed to avoid clutter in
+          annual reporting charts.
         """
         # Static values
         fcr = self.fixed_charge_rate
@@ -2639,3 +2680,371 @@ class Project(FromDictMixin):
         # Reset index and return the dataframe
         df = df.reset_index(drop=True)
         return df
+
+    def generate_report_project_details(self) -> pd.DataFrame:
+        """Generates a DataFrame containing detailed project information, following the format
+        from the table at slide 64 in the Cost of Wind Energy Review: 2024 Edition
+        (https://www.nrel.gov/docs/fy25osti/91775.pdf).
+
+        This function collects various project parameters such as turbine specifications, wind speed
+        data,energy capture, and efficiency metrics, and formats them into a comprehensive report.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame containing the project details, where each row corresponds to a specific
+            assumption and its associated unit and value. The columns include:
+                - "Assumption": Describes the specific project assumption (e.g.,
+                  "Wind plant capacity","Turbine rating").
+                - "Units": The unit of measurement for each assumption (e.g., "MW", "Number",
+                  "m/s").
+                - "Value": The actual value for each assumption, computed based on the project's
+                    configurations and available data.
+        """
+        # Define the project details template
+        project_details = {
+            "Assumption": [
+                "Wind plant capacity",
+                "Number of turbines",
+                "Turbine rating",
+                "Rotor diameter",
+                "Hub height",
+                "Specific power",
+                "Water depth",
+                "Substructure type",
+                "Distance to port",
+                "Distance to landfall",
+                "Cut-in wind speed",
+                "Cut-out wind speed",
+                # "Average annual wind speed at 50 m",
+                # "Average annual wind speed at hub height",
+                "Shear exponent",
+                # "Weibull k",
+                "Total system losses",
+                "Availability",
+                "Gross energy capture",
+                "Net energy capture",
+                "Gross capacity factor",
+                "Net capacity factor",
+            ],
+            "Units": [
+                "MW",
+                "Number",
+                "MW",
+                "m",
+                "m",
+                "W/m2",
+                "m",
+                "-",
+                "km",
+                "km",
+                "m/s",
+                "m/s",
+                # "m/s",
+                # "m/s",
+                "-",
+                # "-",
+                "%",
+                "%",
+                "MWh/MW/year",
+                "MWh/MW/year",
+                "%",
+                "%",
+            ],
+            "Value": [
+                self.capacity("mw"),
+                self.orbit.num_turbines,
+                self.orbit.turbine_rating,
+                self.orbit.config["turbine"]["rotor_diameter"],
+                self.orbit.config["turbine"]["hub_height"],
+                self.orbit.config["turbine"]["turbine_rating"]
+                * 1000000
+                / (
+                    math.pi * (self.orbit.config["turbine"]["rotor_diameter"] / 2) ** 2
+                ),  # Specific power
+                self.orbit.config["site"]["depth"],
+                self.determine_substructure_type(),
+                self.orbit.config["site"]["distance"],  # Distance to port
+                self.orbit.config["site"]["distance_to_landfall"],
+                self.cut_in_windspeed(),
+                self.cut_out_windspeed(),
+                # self.average_wind_speed(50),
+                # self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),
+                np.mean(
+                    compute_shear(
+                        self.wombat.env.weather.to_pandas(),
+                        self.identify_windspeed_columns_and_heights(
+                            self.wombat.env.weather.to_pandas()
+                        ),
+                        False,
+                    )
+                ),
+                # self.compute_weibull(self.orbit.config["turbine"]["hub_height"]),
+                100 * self.loss_ratio(),
+                100 * self.availability(which="energy", frequency="project", by="windfarm"),
+                self.energy_potential(units="mw", per_capacity="mw", aep=True),
+                self.energy_production(units="mw", per_capacity="mw", aep=True),
+                100 * self.capacity_factor(which="gross", frequency="project", by="windfarm"),
+                100 * self.capacity_factor(which="net", frequency="project", by="windfarm"),
+            ],
+        }
+
+        # Create a DataFrame from the template
+        df = pd.DataFrame(project_details)
+
+        return df
+
+    def determine_substructure_type(self):
+        """Determine the substructure type based on the ORBIT configuration file.
+
+        This function scans the "design_phases" section of the ORBIT configuration file to identify
+        the substructure type used in the project. The substructure types considered are
+        "Monopile", "SemiSubmersible", "Jacket", and "Spar". The function returns the substructure
+        type as a string if found in the design phases, or "Unknown" if no substructure type is
+        identified.
+
+        Returns
+        -------
+        str
+            The substructure type as one of the following: "Monopile", "SemiSubmersible",
+            "Jacket", "Spar", or "Unknown" if no match is found.
+
+        Notes
+        -----
+        - The search is case-insensitive and looks for the substructure types as substrings within
+          the design phase names.
+        - If no substructure type is found after checking all phases, the function will return
+          "Unknown".
+        """
+        if self.turbine_type == "land":
+            raise NotImplementedError("Land-based analyses are not yet supported.")
+
+        project_data = self.orbit.config["design_phases"]
+
+        # Iterate over the design_phases to check for the substructure type
+        if "MonopileDesign" in project_data:
+            return "Monopile"
+        if "SemiSubmersibleDesign" in project_data:
+            return "Semi-Submersible"
+        if "JacketDesign" in project_data:
+            return "Jacket"
+        if "SparDesign" in project_data:
+            return "Spar"
+        return None
+
+    def cut_in_windspeed(self):
+        """Determine the cut-in wind speed for the turbine based on the power-thrust table.
+
+        This function extracts the power and wind speed data from the turbine definitions in the
+        FLORIS model and identifies the cut-in wind speed. The cut-in wind speed is the wind speed
+        at which the turbine begins to produce power after zero power is achieved. The function
+        returns the cut-in wind speed or `None` if no valid value can be determined.
+
+        Returns
+        -------
+        float | None
+            The wind speed (in m/s) at which the turbine starts producing power, or `None` if no
+            valid cut-in wind speed can be found.
+
+        Notes
+        -----
+        - The cut-in wind speed is identified as the wind speed immediately following the last wind
+          speed with zero power that is lower than the wind speed at which the turbine produces
+          maximum power.
+        - If no valid zero power wind speeds are found below the maximum power wind speed, `None`
+          is returned.
+
+        """
+        turbine_data = self.floris.core.farm.turbine_definitions[0]["power_thrust_table"]
+
+        # Extract power and wind_speed lists from the floris turbine dictionary
+        power = turbine_data["power"]
+        wind_speed = np.array(turbine_data["wind_speed"])
+
+        # Find the index of the maximum power
+        max_power_index = np.argmax(power)
+
+        # Identify the wind speed at the max power
+        max_power_wind_speed = wind_speed[max_power_index]
+
+        # Identify the wind speeds with 0 power
+        zero_power_indices = [i for i, p in enumerate(power) if p == 0]
+
+        # Find the first wind speed before the start of the power curve - latest zero before max ws
+        latest_zero_power_ix = min(
+            set(zero_power_indices).intersection(np.where(wind_speed < max_power_wind_speed)[0])
+        )
+        if latest_zero_power_ix == set():
+            return None
+
+        return wind_speed[latest_zero_power_ix + 1]
+
+    def cut_out_windspeed(self):
+        """Determine the cut-out wind speed for the turbine based on the power-thrust table.
+
+        This function extracts the power and wind speed data from the turbine definitions in the
+        FLORIS model and identifies the cut-out wind speed. The cut-out wind speed is the wind speed
+        at which the turbine stops producing power, which occurs when the power drops to zero.
+        The function returns the cut-out wind speed or `None` if no valid value can be determined.
+
+        Returns
+        -------
+        float | None
+            The wind speed (in m/s) at which the turbine stops producing power, or `None` if no
+            valid cut-out wind speed can be found.
+
+        Notes
+        -----
+        - The cut-out wind speed is identified as the wind speed immediately preceding the first
+          wind speed where the turbine generates zero power and the wind speed is greater than
+          the wind speed at which maximum power is produced.
+        - If no valid zero power wind speeds are found above the maximum power wind speed, `None` is
+          returned.
+        """
+        turbine_data = self.floris.core.farm.turbine_definitions[0]["power_thrust_table"]
+
+        # Extract power and wind_speed lists from the floris turbine dictionary
+        power = turbine_data["power"]
+        wind_speed = np.array(turbine_data["wind_speed"])
+
+        # Find the index of the maximum power
+        max_power_index = np.argmax(power)
+
+        # Identify the wind speed at the max power
+        max_power_wind_speed = wind_speed[max_power_index]
+
+        # Identify the wind speeds with 0 power
+        zero_power_indices = [i for i, p in enumerate(power) if p == 0]
+
+        # Find the first wind speed past the end of the power curve - earliest zero after max ws
+        earliest_zero_power_ix = min(
+            set(zero_power_indices).intersection(np.where(wind_speed > max_power_wind_speed)[0])
+        )
+        if earliest_zero_power_ix == set():
+            return None
+
+        return wind_speed[earliest_zero_power_ix - 1]
+
+    def average_wind_speed(self, height):
+        """Calculates the average wind speed at a specified height.
+
+        This method computes the mean wind speed from the weather data at the given height.
+        If the wind speed data for the specified height is not found, it provides an error
+        message.
+
+        Parameters
+        ----------
+        height : int
+            The height (in meters) at which the average wind speed is to be calculated.
+            The method expects the column in the weather data to be named in the format
+            'windspeed_{height}m'.
+
+        Returns
+        -------
+        float | str
+            If the wind speed data for the specified height exists, the method returns the mean
+            wind speed as a float (in meters per second). If the data is not found, it returns
+            a string indicating that the wind speed data is missing.
+
+        Raises
+        ------
+        KeyError
+            If the column corresponding to the specified height is not present in the weather
+            data.
+        """
+        column_name = "windspeed_" + str(height) + "m"
+
+        weather = self.wombat.env.weather
+        if column_name not in weather.columns:
+            msg = (
+                f"Wind speed at {height}m not provided at {str(self.library_path)}/weather/"
+                f"{str(self.weather_profile)}\n"
+                f"Please, add a column to the weather .csv file with the name 'windspeed_"
+                f"{height}m, and the respective wind speed data"
+            )
+            raise KeyError(msg)
+        return weather[column_name].mean()
+
+    def identify_windspeed_columns_and_heights(self, df):
+        """Identifies columns containing wind speed measurements and their respective sensor
+        heights.
+
+        Scans the DataFrame to find columns that match the pattern "windspeed_{number}m", where
+        `{number}`corresponds to the sensor height in meters. The function returns a dictionary
+        with the first two matches, where the keys are the column names and the values are the
+        heights in meters.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            A DataFrame containing wind speed columns. The columns should follow the naming
+            convention"windspeed_{number}m", where `{number}` represents the sensor height in
+            meters.
+
+        Returns
+        -------
+        dict[str, int]
+            A dictionary containing the first two columns that match the "windspeed_{number}m"
+            pattern. The keys are the column names (e.g., "windspeed_10m"), and the values are the
+            corresponding sensor heights (e.g., 10).
+        """
+        windspeed_columns = {}
+
+        # Regex pattern to match "windspeed_{number}m" where the name ends with 'm'
+        pattern = r"windspeed_(\d+)m$"
+
+        for col in df.columns:
+            match = re.match(pattern, col)
+            if match:
+                number = match.group(1)
+                windspeed_columns[col] = int(number)
+
+        return dict(list(windspeed_columns.items())[:2])
+
+    def compute_weibull(self, height, random_seed=1):
+        """Fits a Weibull distribution to wind speed data at a specified height.
+
+        This function fits a Weibull distribution to the wind speed data at the specified height
+        from the weather data. It assumes that wind speeds are non-negative, so it fixes the
+        location parameter of the Weibull distribution to 0. If the required column for the given
+        height is not present in the weather data, an error message is printed and the function
+        returns a string indicating the missing data.
+
+        Parameters
+        ----------
+        height : int
+            The height (in meters) at which the wind speed data is collected. The function looks
+            for a column named "windspeed_{height}m" in the weather data.
+        random_seed : int, optional
+            A random seed for reproducibility. Defaults to 1. This seed is used to initialize
+            the random number generator for the Weibull fitting procedure.
+
+        Returns
+        -------
+        float | str
+            If the wind speed data is available for the specified height, the function returns
+            the shape parameter of the fitted Weibull distribution. If the necessary column is
+            missing from the weather data, it returns a string indicating the error
+            (e.g., "wind speed at {height}m not provided").
+        """
+        # Set random seed for reproducibility
+        np.random.seed(random_seed)
+
+        column_name = "windspeed_" + str(height) + "m"
+
+        weather = self.wombat.env.weather
+
+        # Check if the necessary columns are in the dataframe
+        if column_name not in weather.columns:
+            msg = (
+                f"Wind speed at {height}m not provided at {str(self.library_path)}\\weather\\"
+                f"{str(self.weather_profile)}\n"
+                f"Please, add a column to the weather .csv file with the name 'windspeed_"
+                f"{height}m, and the respective wind speed data"
+            )
+            raise KeyError(msg)
+
+        # Extract windspeed data
+        wind_speed_data = weather[column_name]
+
+        return fit_weibull_distribution(wind_speed_data, random_seed)
