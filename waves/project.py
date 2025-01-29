@@ -118,7 +118,7 @@ def load_weather(value: str | Path | pd.DataFrame) -> pd.DataFrame:
         .to_pandas()
         .set_index("datetime")
         .fillna(0.0)
-        .resample("H")
+        .resample("h")
         .interpolate(limit_direction="both", limit=5)
     )
     return weather
