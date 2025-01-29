@@ -1807,7 +1807,7 @@ class Project(FromDictMixin):
         if environmental_loss_ratio is None:
             if (environmental_loss_ratio := self.environmental_loss_ratio) is None:
                 raise ValueError(
-                    "`environmental_loss_ratio` wasn neither defined in the Project settings nor"
+                    "`environmental_loss_ratio` was neither defined in the Project settings nor"
                     " provided in the keyword arguments."
                 )
 
