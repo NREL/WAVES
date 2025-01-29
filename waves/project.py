@@ -831,15 +831,14 @@ class Project(FromDictMixin):
         if set_kwargs is None:
             set_kwargs = {}
 
+        if TYPE_CHECKING:
+            assert isinstance(self.weather, pd.DataFrame)  # mypy helper
+
         weather = self.weather.copy()
 
-        if full_wind_rose:
-            if TYPE_CHECKING:
-                assert isinstance(self.weather, pd.DataFrame)  # mypy helper
-        else:
-            if TYPE_CHECKING:
-                assert isinstance(self.weather, pd.DataFrame)  # mypy helper
-            weather = self.weather.loc[self.operations_start : self.operations_end]
+        if not full_wind_rose:
+            weather = weather.loc[self.operations_start : self.operations_end]
+
         if self.floris_turbulence_intensity is None:
             ti, *_ = self.floris_config_dict["flow_field"]["turbulence_intensities"]
             ti_col = "floris_turbulence_intensities"
