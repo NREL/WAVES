@@ -830,10 +830,12 @@ class Project(FromDictMixin):
         """
         if set_kwargs is None:
             set_kwargs = {}
+
+        weather = self.weather.copy()
+
         if full_wind_rose:
             if TYPE_CHECKING:
                 assert isinstance(self.weather, pd.DataFrame)  # mypy helper
-            weather = self.weather.copy()
         else:
             if TYPE_CHECKING:
                 assert isinstance(self.weather, pd.DataFrame)  # mypy helper
