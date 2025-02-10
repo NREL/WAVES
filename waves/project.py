@@ -1754,7 +1754,8 @@ class Project(FromDictMixin):
                 + 0.0000000000029271 * distance_to_landfall**5
             ) / 100
         else:
-            electrical_loss_ratio = 0.0
+            # https://www.nrel.gov/docs/fy22osti/78715.pdf Fig30
+            electrical_loss_ratio = 0.028
 
         return electrical_loss_ratio
 
