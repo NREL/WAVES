@@ -946,23 +946,16 @@ class Project(FromDictMixin):
             A list of models to be skipped. This is intended to be used after a model is
             reinitialized with a new or modified configuration. Defaults to None.
 
-        Raises
-        ------
-        ValueError
-            Raised if neither ORBIT nor LandBOSSE are used to calculated CapEx.
         """
         if floris_kwargs is None:
             floris_kwargs = {}
         if skip is None:
             skip = []
 
-        if hasattr(self, "orbit") and "orbit" not in skip:
+        if self.orbit_config is not None and "orbit" not in skip:
             self.orbit.run()
-        elif hasattr(self, "landbosse") and "landbosse" not in skip:
+        elif self.landbosse_config is not None and "landbosse" not in skip:
             self.landbosse.run()
-        else:
-            raise ValueError("Must use either ORBIT or LandBOSSE to calculate CAPEX")
-
         if "wombat" not in skip:
             self.wombat.run()
         if "floris" not in skip:
@@ -1000,9 +993,6 @@ class Project(FromDictMixin):
         elif landbosse_config is not None:
             self.landbosse_config = landbosse_config
             self.setup_landbosse()
-        else:
-            raise RuntimeError("Must use ORBIT or LandBOSSE to calculate CapEx")
-
         if wombat_config is not None:
             self.wombat_config = wombat_config
             self.setup_wombat()
@@ -1010,6 +1000,8 @@ class Project(FromDictMixin):
         if floris_config is not None:
             self.floris_config = floris_config
             self.setup_floris()
+
+        self.check_consistent_config()
 
         return
 
@@ -1084,21 +1076,21 @@ class Project(FromDictMixin):
         -------
         int
             The number of turbines in the project.
-        """
-        n_turbines_all = {}
-        if hasattr(self, "orbit"):
-            n_turbines_all["orbit"] = self.orbit.num_turbines
-        if hasattr(self, "landbosse"):
-            n_turbines_all["landbosse"] = self.landbosse.result.project_parameters[
-                "Number of turbines"
-            ]
-        if hasattr(self, "wombat"):
-            n_turbines_all["wombat"] = len(self.wombat.windfarm.turbine_id)
-        if hasattr(self, "floris"):
-            n_turbines_all["floris"] = self.floris.n_turbines
 
-        check_dict_consistency(n_turbines_all, "num_turbines")
-        return set(n_turbines_all.values()).pop()
+        Raises
+        ------
+        RuntimeError
+            Raised if no model configurations were provided on initialization.
+        """
+        if self.orbit_config is not None:
+            return self.orbit.num_turbines
+        elif self.landbosse_config is not None:
+            return self.landbosse.result.project_parameters["Number of turbines"]
+        if self.wombat_config is not None:
+            return len(self.wombat.windfarm.turbine_id)
+        if self.floris_config is not None:
+            return self.floris.n_turbines
+        raise RuntimeError("No models were provided, cannot calculate value.")
 
     def turbine_rating(self) -> float:
         """Calculates the average turbine rating, in MW, of all the turbines in the project.
@@ -1107,38 +1099,35 @@ class Project(FromDictMixin):
         -------
         float
             The average rating of the turbines, in MW.
-        """
-        turbine_rating_all = {}
-        if hasattr(self, "orbit"):
-            turbine_rating_all["orbit"] = self.orbit.turbine_rating
-        if hasattr(self, "landbosse"):
-            turbine_rating_all["landbosse"] = self.landbosse.result.project_parameters[
-                "Turbine rating MW"
-            ]
-        if hasattr(self, "wombat"):
-            turbine_rating_all["wombat"] = self.wombat.windfarm.capacity / 1000 / self.n_turbines()
 
-        check_dict_consistency(turbine_rating_all, "turbine_rating")
-        return set(turbine_rating_all.values()).pop()
+        Raises
+        ------
+        RuntimeError
+            Raised if no model configurations were provided on initialization.
+        """
+        if self.orbit_config is not None:
+            return self.orbit.turbine_rating
+        elif self.landbosse_config is not None:
+            return self.landbosse.result.project_parameters["Turbine rating MW"]
+        if self.wombat_config is not None:
+            return self.wombat.windfarm.capacity / 1000 / self.n_turbines()
+        raise RuntimeError("No models were provided, cannot calculate value.")
 
     def n_substations(self) -> int:
-        """Calculates the number of subsations in the project.
+        """Calculates the number of substations in the project.
 
         Returns
         -------
         int
             The number of substations in the project.
         """
-        n_substations_all = {}
-        if hasattr(self, "orbit") and "OffshoreSubstationDesign" not in self.orbit._phases:
-            n_substations_all["orbit"] = self.orbit_config_dict["oss_design"]["num_substations"]
-        if hasattr(self, "landbosse"):
-            n_substations_all["landbosse"] = 1
-        if hasattr(self, "wombat"):
-            n_substations_all["wombat"] = len(self.wombat.windfarm.substation_id)
-
-        check_dict_consistency(n_substations_all, "n_substations")
-        return set(n_substations_all.values()).pop()
+        if self.orbit_config is not None and "OffshoreSubstationDesign" not in self.orbit._phases:
+            return self.orbit_config_dict["oss_design"]["num_substations"]
+        elif self.landbosse_config is not None:
+            return 1
+        if self.wombat_config is not None:
+            return len(self.wombat.windfarm.substation_id)
+        raise RuntimeError("No models were provided, cannot calculate value.")
 
     @validate_common_inputs(which=["units"])
     def capacity(self, units: str = "mw") -> float:
@@ -1158,24 +1147,18 @@ class Project(FromDictMixin):
         ------
         RuntimeError
             Raised if no model configurations were provided on initialization.
-        ValueError
-            Raised if an invalid units input was provided.
         """
-        capacity_all = {}
-        if hasattr(self, "orbit"):
-            capacity_all["orbit"] = self.orbit.capacity
-        if hasattr(self, "landbosse"):
-            capacity_all["landbosse"] = (
+        if self.orbit_config is not None:
+            capacity = self.orbit.capacity
+        elif self.landbosse_config is not None:
+            capacity = (
                 self.landbosse.result.project_parameters["Turbine rating MW"]
                 * self.landbosse.result.project_parameters["Number of turbines"]
             )
-        if hasattr(self, "wombat"):
-            capacity_all["wombat"] = (
-                self.wombat.windfarm.capacity / 1000 if hasattr(self, "wombat") else None
-            )
-
-        check_dict_consistency(capacity_all, "n_substations")
-        capacity = set(capacity_all.values()).pop()
+        elif self.wombat_config is not None:
+            capacity = self.wombat.windfarm.capacity / 1000
+        else:
+            raise RuntimeError("No models were provided, cannot calculate value.")
 
         units = units.lower()
         if units == "kw":
@@ -1305,7 +1288,7 @@ class Project(FromDictMixin):
         RuntimeError
             Raised if neither ORBIT nor LandBOSSE have been run.
         """
-        if hasattr(self, "orbit"):
+        if self.orbit_config is not None:
             if "ArraySystemDesign" in self.orbit._phases:
                 array = self.orbit._phases["ArraySystemDesign"]
             elif "CustomArraySystemDesign" in self.orbit._phases:
@@ -1316,7 +1299,7 @@ class Project(FromDictMixin):
             # TODO: Fix ORBIT bug for nansum
             return np.nansum(array.sections_cable_lengths)
 
-        elif hasattr(self, "landbosse"):
+        elif self.landbosse_config is not None:
             landbosse_vars = self.landbosse.result.model_variables
             return landbosse_vars.loc[
                 landbosse_vars["variable_df_key_col_name"] == "Total cable length",
@@ -1341,7 +1324,7 @@ class Project(FromDictMixin):
         RuntimeError
             Raised if neither ORBIT nor LandBOSSE have been run.
         """
-        if hasattr(self, "orbit"):
+        if self.orbit_config is not None:
             try:
                 return self.orbit._phases["ExportSystemDesign"].total_length
             except KeyError:
@@ -1352,7 +1335,7 @@ class Project(FromDictMixin):
                     " able to calculate this metric."
                 )
 
-        elif hasattr(self, "landbosse"):
+        elif self.landbosse_config is not None:
             landbosse_vars = self.landbosse.result.model_variables
             return landbosse_vars.loc[
                 landbosse_vars["variable_df_key_col_name"] == "Cable Length to Substation (km)",
@@ -1757,7 +1740,7 @@ class Project(FromDictMixin):
             The electrical loss ratio.
 
         """
-        if hasattr(self, "orbit"):
+        if self.orbit_config is not None:
             depth = self.orbit_config_dict["site"]["depth"]
             distance_to_landfall = self.orbit_config_dict["site"]["distance_to_landfall"]
             # ORCA formula
