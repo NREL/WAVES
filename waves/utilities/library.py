@@ -99,7 +99,7 @@ def load_yaml(path: str | Path, fname: str | Path) -> Any:
     """
     path = Path(path).resolve()
 
-    with Path(path / fname).open("r") as f:
+    with (path / fname).open() as f:
         return yaml.load(f, Loader=custom_loader)
 
 
@@ -121,5 +121,5 @@ def write_yaml(path: str | Path, fname: str | Path, data: dict):
     """
     path = Path(path).resolve()
 
-    with Path(path / fname).open("w") as f:
+    with (path / fname).open() as f:
         yaml.dump(data, f, sort_keys=False, default_flow_style=False)
