@@ -29,7 +29,7 @@ oss_install_vessel: demand_adjusted_heavy_lift_vessel
 wtiv: demand_adjusted_wtiv
 
 # Module Specific
-MonopileDesign:
+monopile_design:
   monopile_steel_cost: 3487.5 # 2250 # COE Review 2021 + applied % increase from 2020 to 2022 in steel costs according to 55 % Steel and Iron Price index increase
   tp_steel_cost: 5006.5 # 3230 # COE Review 2021 + applied % increase from 2020 to 2022 in steel costs according to 55 % Steel and Iron Price index increase
 scour_protection_design:
@@ -50,10 +50,9 @@ OffshoreSubstationInstallation:
 # Configured Phases
 design_phases:
 - CustomArraySystemDesign
-- ExportSystemDesign
+- ElectricalDesign
 - MonopileDesign
 - ScourProtectionDesign
-- OffshoreSubstationDesign
 install_phases:
   ArrayCableInstallation: 0
   ExportCableInstallation: 0
