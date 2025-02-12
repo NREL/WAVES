@@ -51,9 +51,8 @@ export_system_design:
 # Configured Phases
 design_phases:
 - CustomArraySystemDesign
-- ExportSystemDesign
+- ElectricalDesign
 - MooringSystemDesign
-- OffshoreSubstationDesign
 - SemiSubmersibleDesign
 install_phases:
   ArrayCableInstallation: 0
