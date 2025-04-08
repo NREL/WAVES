@@ -44,6 +44,7 @@ OffshoreSubstationInstallation:
   feeder: demand_adjusted_floating_barge
 array_system_design:
   free_cable_length: 0.5
+  floating_cable_depth: 200
   cables:
   - _XLPE_630mm_66kV
   location_data: base_floating_shallow_layout

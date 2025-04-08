@@ -179,7 +179,9 @@ generator:
     time: 24
     materials: 1500
     service_equipment: CTV
-    frequency: 365
+    frequency: 1
+    frequency_basis: date-years
+    start_date: "04/01/1999" 
   failures:
   - scale: 1.832
     shape: 1
@@ -213,12 +215,16 @@ supporting_structure:
     time: 24
     materials: 600
     service_equipment: CTV
-    frequency: 365
+    frequency: 1
+    frequency_basis: date-years
+    start_date: "04/01/1999" 
   - description: structural subsea inspection
     time: 6
     materials: 500
     service_equipment: DSV
-    frequency: 730
+    frequency: 2
+    frequency_basis: date-years
+    start_date: "04/01/1999" 
   failures:
   - scale: 8.33
     shape: 1
