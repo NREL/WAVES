@@ -1,8 +1,8 @@
 name: Anchor Handling Tug
-charter_days: 3  # needs to be here, but doesn't do anything
+charter_days: 1  
 equipment_rate: 42000
 strategy: requests
-strategy_threshold: 1  # needs to be here, but doesn't do anything
+strategy_threshold: 1   
 onsite: false
 capability: AHV
 speed: 24.08 # 24 kph = 13 knots
