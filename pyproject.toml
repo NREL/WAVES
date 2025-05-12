@@ -8,7 +8,7 @@ dynamic = ["version"]
 authors = [{name = "Rob Hammond", email = "rob.hammond@nrel.gov"}]
 readme = "README.md"
 description = "Wind Asset Value Estimation System"
-requires-python = ">=3.9, <3.11"
+requires-python = ">=3.11, <3.14"
 license = {file = "LICENSE"}
 dependencies = [
     "tqdm",
@@ -16,9 +16,9 @@ dependencies = [
     "pyyaml",
     "matplotlib>=3.6",
     "numpy-financial>=1.0.0",
-    "floris==3.6",  # TODO: upgrade to FLORIS v4
+    "floris>=4.2.2",
     "wombat>=0.9.3",
-    "orbit-nrel @ git+https://github.com/WISDEM/ORBIT.git@486ec2329f8a2dd4c6cb884f6393529ee5490c1c",
+    "orbit-nrel>=1.0.8",
     "typer>=0.12.3",
 ]
 keywords = [
@@ -44,8 +44,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",

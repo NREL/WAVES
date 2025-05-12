@@ -98,4 +98,28 @@ def load_yaml(path: str | Path, fname: str | Path) -> Any:
         Whatever content is in the YAML file.
     """
     path = Path(path).resolve()
-    return yaml.load(open(path / fname), Loader=custom_loader)
+
+    with (path / fname).open() as f:
+        return yaml.load(f, Loader=custom_loader)
+
+
+def write_yaml(path: str | Path, fname: str | Path, data: dict):
+    """Writes a yaml file based on a dictionary input.
+
+    Parameters
+    ----------
+    path : str | Path
+        Path to the write the new file
+    fname: str | Path
+        Name of the file (ending in .yaml) to be written.
+    data: dict
+        Dictionary of data to become a .yaml file.
+
+    Returns
+    -------
+    None
+    """
+    path = Path(path).resolve()
+
+    with (path / fname).open() as f:
+        yaml.dump(data, f, sort_keys=False, default_flow_style=False)
