@@ -68,8 +68,6 @@ farm:
   - 1659.55
   - 2241.53
   - 2823.51
-
-
   layout_y:
   - 1677.22
   - 3276.2
@@ -138,8 +136,6 @@ farm:
   - 11172.7
   - 12771.7
   - 14370.7
-
-
   turbine_library_path: ../../turbines
   turbine_type:
   - iea_15MW_240m
@@ -209,18 +205,18 @@ farm:
   - iea_15MW_240m
   - iea_15MW_240m
   - iea_15MW_240m
-
 floris_version: v3.0.0
 flow_field:
   air_density: 1.225
   reference_wind_height: -1
-  turbulence_intensity: 0.06
   wind_directions:
   - 270.0
   wind_shear: 0.12
   wind_speeds:
-  - 8.41  # avg from weather profile in the Humboldt site
+  - 8.41
   wind_veer: 0.0
+  turbulence_intensities:
+  - 0.06
 logging:
   console:
     enable: true
@@ -277,3 +273,4 @@ wake:
       kb: 0.004
     jensen:
       we: 0.05
+  enable_active_wake_mixing: false
