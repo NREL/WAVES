@@ -1,5 +1,5 @@
 #end_year: 2020
-end_year: 2003
+end_year: 2018
 fixed_costs: fixed_costs_FAD.yaml
 inflation_rate: 0
 layout: base_floating_deep_layout.csv

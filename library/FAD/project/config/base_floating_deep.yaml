@@ -1,3 +1,4 @@
+turbine_type: "floating"
 # Primary model configurations
 orbit_config: base_floating_deep_install.yaml
 wombat_config: base_floating_deep_operations.yaml

@@ -11,7 +11,7 @@ max_waveheight_repair: 3
 onsite: false
 mobilization_cost: 225000
 mobilization_days: 15
-charter_days: 1
+charter_days: 10
 crew_transfer_time: 0.25
 n_crews: 1
 crew:

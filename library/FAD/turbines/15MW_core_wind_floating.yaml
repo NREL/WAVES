@@ -2,7 +2,7 @@ capacity_kw: 15000
 capex_kw: 1500
 power_curve:
   file: 2020ATB_NREL_Reference_15MW_240.csv
-  bin_width: 0.5
+  bin_width: 0.25
 electrical_system:
   name: electrical_system
   maintenance:
