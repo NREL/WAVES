@@ -1,3 +1,4 @@
+turbine_type: "floating"
 # Primary model configurations
 orbit_config: base_floating_moderate_install.yaml
 wombat_config: base_floating_moderate_operations.yaml
@@ -11,7 +12,7 @@ orbit_weather_cols:
 - windspeed_10m
 - waveheight
 floris_wind_direction: wind_direction_100m
-floris_windspeed: windspeed_100m
+floris_windspeed: windspeed_145m
 floris_x_col: floris_x
 floris_y_col: floris_y
 

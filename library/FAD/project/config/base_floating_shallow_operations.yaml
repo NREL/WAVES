@@ -1,18 +1,20 @@
 name: base_floating_shallow
 weather: gulf_of_mexico_27.0_-97.0.csv
 service_equipment:
-  - ctv1.yaml
-  - ctv2.yaml
-  - ctv3.yaml
-  - clv.yaml
-  - dsv.yaml
-  - jackup.yaml
+- ctv1.yaml
+- ctv2.yaml
+- ctv3.yaml
+- clv.yaml
+- dsv1.yaml
+- dsv2.yaml
+- ahv.yaml
 layout: base_floating_shallow_layout.csv
 inflation_rate: 0
 fixed_costs: fixed_costs_FAD.yaml
-workday_start: 7
-workday_end: 19
-start_year: 1999
-end_year: 2019
+workday_start: 6
+workday_end: 22
+start_year: 1989
+end_year: 2008
 project_capacity: 1005
 port_distance: 120
+port: port_120km.yaml

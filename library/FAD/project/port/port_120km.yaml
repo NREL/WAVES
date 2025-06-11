@@ -1,13 +1,10 @@
-name: base_port_120km
+name: Freeport
 tugboats: [tugboat1.yaml, tugboat2.yaml]
-max_operations: 2  # max number of turbines at the port at one time
-workday_start: 6
-workday_end: 18
-site_distance: 120  # will set the tugboats to this distance if not individually defined
+n_crews: 3
 crew:
-  day_rate: 0
-  n_day_rate: 0
+  day_rate: 0  # 80K/yr annual salary for 30 workers added as a fixed cost
+  n_day_rate: 5  # Most tasks are 3 or 4, but some larger ones are 8, 10, and 21
   hourly_rate: 0
   n_hourly_rate: 0
-n_crews: 2  # maximum number of simultaneously operating crews to repair individual failures on a turbine
-annual_fee: 8100000 # https://www.nrel.gov/docs/fy22osti/83502.pdf
+max_operations: 2
+annual_fee: 25e6  # 24 million annually from ORBIT + assummed annual cost for 2 tugboats ($10m each divided by 20 years of operation, $1m per year on tugboats)

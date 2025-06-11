@@ -1,4 +1,4 @@
-name: Eurkea Port
+name: Eureka Port
 tugboats: [tugboat1.yaml, tugboat2.yaml]
 n_crews: 3
 crew:

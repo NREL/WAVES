@@ -17,8 +17,8 @@ dependencies = [
     "matplotlib>=3.6",
     "numpy-financial>=1.0.0",
     "floris>=4.2.2",
-    "wombat @ git+https://github.com/WISDEM/WOMBAT.git@develop",
-    "orbit-nrel>=1.0.8",
+    "wombat @ git+https://github.com/WISDEM/WOMBAT.git@enhancement/corewind-update",
+    "orbit-nrel>=1.2.1",
     "typer>=0.12.3",
 ]
 keywords = [
