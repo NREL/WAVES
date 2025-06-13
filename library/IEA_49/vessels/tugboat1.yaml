@@ -4,10 +4,10 @@ equipment_rate: 0 # assume 0 and add total investment cost as fixed cost on port
 capability: [TOW]
 speed: 37.04 # 20 knots
 strategy: requests
-max_windspeed_transport: 20
-max_windspeed_repair: 20
-max_waveheight_transport: 3
-max_waveheight_repair: 3
+max_windspeed_transport: 14 # TNO suggestion
+max_windspeed_repair: 14 # TNO suggestion
+max_waveheight_transport: 1.5 # TNO suggestion
+max_waveheight_repair: 1.5 # TNO suggestion
 onsite: True
 #mobilization_cost: 325000 
 mobilization_cost: 0 # assume 0 and add total investment cost as fixed cost on port costs
