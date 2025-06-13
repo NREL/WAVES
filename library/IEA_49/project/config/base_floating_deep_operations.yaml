@@ -8,12 +8,9 @@ port: port_53km.yaml
 port_distance: 53
 project_capacity: 1005
 service_equipment:
-- ctv1.yaml
-- ctv2.yaml
-- ctv3.yaml
+- [ctv.yaml, 3]
 - clv.yaml
-- dsv1.yaml
-- dsv2.yaml
+- [dsv.yaml, 2]
 - ahv.yaml
 start_year: 1999
 weather: era5_41.0N_125.0W_1989_2019.csv

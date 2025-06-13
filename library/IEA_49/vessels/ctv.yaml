@@ -1,4 +1,4 @@
-name: Crew Transfer Vessel 7
+name: Crew Transfer Vessel
 equipment_rate: 3805.31  # 3500 EUR -> USD 3/31/23
 capability: CTV
 speed: 37.04 # 37 kph = 20 knots
