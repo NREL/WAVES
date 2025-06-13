@@ -4,6 +4,7 @@ orbit_config: base_floating_deep_install.yaml
 wombat_config: base_floating_deep_operations.yaml
 floris_config: base_floating_deep_floris_jensen.yaml
 weather_profile: era5_41.0N_125.0W_1989_2019.csv
+turbine_type: floating
 
 # Shared input connections
 orbit_start_date: 1/1/1998
