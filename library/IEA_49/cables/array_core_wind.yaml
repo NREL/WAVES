@@ -20,7 +20,7 @@ failures:
   shape: 1
   time: 360
   materials: 220000
-  operation_reduction: 0
+  operation_reduction: 1
   service_equipment:
   - CAB
   replacement: true

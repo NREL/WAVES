@@ -33,7 +33,7 @@ power_converter:
     time: 170
     materials: 55000
     service_equipment: TOW
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 3
     description: power converter replacement
@@ -67,7 +67,7 @@ electrical_system:
     time: 54
     materials: 50000
     service_equipment: TOW
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 3
     description: power electrical system major replacement
@@ -101,7 +101,7 @@ hydraulic_pitch_system:
     time: 75
     materials: 14000
     service_equipment: TOW
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 3
     description: major pitch system replacement
@@ -152,7 +152,7 @@ yaw_system:
     time: 147
     materials: 12500
     service_equipment: TOW
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 3
     description: yaw system major replacement
@@ -186,7 +186,7 @@ rotor_blades:
     time: 864
     materials: 534000
     service_equipment: TOW
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 3
     description: blades major replacement
@@ -220,7 +220,7 @@ generator:
     time: 244
     materials: 236500
     service_equipment: TOW
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 3
     description: direct drive generator major replacement
@@ -268,7 +268,7 @@ anchor:
     time: 360
     materials: 512000
     service_equipment: AHV
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 2
     description: anchor replacement
@@ -302,7 +302,7 @@ mooring_lines:
     time: 360
     materials: 135000
     service_equipment: AHV
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 3
     description: mooring line replacement
@@ -311,7 +311,7 @@ mooring_lines:
     time: 40
     materials: 100000
     service_equipment: CTV
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: false
     level: 3
     description: buoyancy module replacement
@@ -345,7 +345,7 @@ drive_train:
     time: 144
     materials: 232000
     service_equipment: TOW
-    operation_reduction: 0
+    operation_reduction: 1
     replacement: true
     level: 3
     description: main shaft replacement
