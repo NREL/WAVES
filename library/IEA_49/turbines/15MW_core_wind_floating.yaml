@@ -207,7 +207,7 @@ generator:
     operation_reduction: 0.0
     level: 1
     description: direct drive generator minor repair
-  - scale: 33.333
+  - scale: 33.33
     shape: 1
     time: 49
     materials: 14340
