@@ -1,13 +1,9 @@
 name: base_floating_moderate
 weather: gulf_of_maine_43.5_-69.0.csv
 service_equipment:
-- ctv1.yaml
-- ctv2.yaml
-- ctv3.yaml
-- clv.yaml
-- dsv1.yaml
-- dsv2.yaml
-- ahv.yaml
+  - [ctv.yaml, 3]
+  - [dsv.yaml, 2]
+  - ahv.yaml
 layout: base_floating_moderate_layout.csv
 inflation_rate: 0
 fixed_costs: fixed_costs_FAD.yaml
