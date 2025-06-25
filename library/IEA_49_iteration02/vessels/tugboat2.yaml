@@ -4,10 +4,10 @@ equipment_rate: 0 # assume 0 and add total investment cost as fixed cost on port
 capability: [TOW]
 speed: 37.04 # 20 knots
 strategy: requests
-max_windspeed_transport: 14 # TNO suggestion
-max_windspeed_repair: 14 # TNO suggestion
-max_waveheight_transport: 1.5 # TNO suggestion
-max_waveheight_repair: 1.5 # TNO suggestion
+max_windspeed_transport: 20 # NREL original input
+max_windspeed_repair: 20 # NREL original input
+max_waveheight_transport: 3 # NREL original input
+max_waveheight_repair: 3 # NREL original input
 onsite: True
 #mobilization_cost: 325000 
 mobilization_cost: 0 # assume 0 and add total investment cost as fixed cost on port costs
@@ -18,8 +18,8 @@ workday_end: 18
 strategy_threshold: 1  # needs to be here, but doesn't do anything
 charter_days: 3  # needs to be here, but doesn't do anything
 tow_speed: 9.26 # 9.26 kph = 5 knots
-unmoor_hours: 60 # suggestion from TNO
-reconnection_hours: 60 # suggestion from TNO
+unmoor_hours: 2 # NREL original input
+reconnection_hours: 4 # NREL original input
 crew_transfer_time: 0.25
 n_crews: 1
 crew:
