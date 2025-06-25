@@ -1,0 +1,88 @@
+# floating deep base case
+site:
+  depth: 800 # deep site
+  distance: 53 # deep site
+  distance_to_landfall: 40 # deep site
+  mean_windspeed: 8.41  # avg from weather profile in the Humboldt site
+plant:
+  layout: grid
+  num_turbines: 67
+  row_spacing: 6.63 
+  substation_distance: 1
+  turbine_spacing: 7.09 
+landfall:
+  interconnection_distance: 4 # deep site
+  trench_length: 6  # COE Review 2022
+turbine: 15MW_generic
+oss_design:
+  num_substations: 1
+port:
+  monthly_rate: 2498449
+  sub_assembly_lines: 1
+  turbine_assembly_cranes: 1
+  num_cranes : 1
+  sub_storage: 5
+
+# Vessels
+array_cable_install_vessel: example_cable_lay_vessel
+export_cable_install_vessel: example_cable_lay_vessel
+mooring_install_vessel: example_support_vessel
+oss_install_vessel: floating_heavy_lift_vessel
+support_vessel: example_support_vessel
+towing_vessel: example_towing_vessel
+ahts_vessel: example_support_vessel
+towing_vessel_groups:
+  num_groups : 1 # note these numbers are different than the default for ORBIT- I believe ORCA assumes only one installation group of 3 vessels total for floating
+  station_keeping_vessels: 1
+  towing_vessels: 2
+
+# Module Specific
+substructure:
+  takt_time: 336
+  ahts_vessel: example_support_vessel
+OffshoreSubstationInstallation:
+  feeder: floating_barge
+array_system_design:
+  free_cable_length: 0
+  floating_cable_depth: 200
+  cables:
+  - _XLPE_630mm_66kV
+  location_data: base_floating_deep_layout
+ArrayCableInstallation:
+  array_system:
+    system_cost: 151138771
+export_system_design:
+  cables: XLPE_1000m_220kV
+  percent_added_length: 0.0
+mooring_system_design:
+  anchor_type: Suction Pile
+mooring_system:
+  num_lines: 3 #int
+  line_mass: 122.29 #t
+  line_cost: 964522 #USD
+  anchor_mass: 69.218 #t
+  anchor_cost: 416760  #USD
+  anchor_type: Suction Pile 
+
+# Configured Phases
+design_phases:
+- CustomArraySystemDesign
+- ElectricalDesign
+- MooringSystemDesign
+- SemiSubmersibleDesign
+install_phases:
+  ArrayCableInstallation: 0
+  ExportCableInstallation: 0
+  MooredSubInstallation: 0
+  MooringSystemInstallation: 0
+  OffshoreSubstationInstallation: 0
+
+project_parameters:
+  turbine_capex: 1770  # new assumed turbine price COE Review 2023
+  interest_during_construction: 0.073
+  decommissioning_factor: 0.2
+  construction_insurance_factor: 0.023
+  site_auction_price: 162290000 # average of CA auction sales in 2022 USD is 151.42 -> 2024 USD 162.29
+  site_assessment_cost: 63000000   # modified so that total Project Development without lease area is 350m
+  construction_plan_cost: 87000000 # modified so that total Project Development without lease area is 350m
+  installation_plan_cost: 200000000 # modified so that total Project Development without lease area is 350m

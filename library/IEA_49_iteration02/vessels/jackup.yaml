@@ -1,0 +1,23 @@
+name: Jack-up Vessel
+equipment_rate: 315297.11  # 290000 EUR -> USD 3/31/23
+capability: LCN
+speed: 20.37 # 20 kph = 11 knots
+strategy: requests
+strategy_threshold: 2
+max_windspeed_transport: 10
+max_windspeed_repair: 10
+max_waveheight_transport: 2
+max_waveheight_repair: 2
+onsite: false
+mobilization_cost: 353350.21  # 325000 EUR -> USD 3/31/23
+mobilization_days: 21
+workday_start: 0
+workday_end: 24
+charter_days: 20
+crew_transfer_time: 0.25
+n_crews: 1
+crew:
+  day_rate: 0
+  n_day_rate: 0  # crew comes with the vessel
+  hourly_rate: 0
+  n_hourly_rate: 0
