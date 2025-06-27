@@ -17,7 +17,7 @@ dependencies = [
     "matplotlib>=3.6",
     "numpy-financial>=1.0.0",
     "floris>=4.2.2",
-    "wombat @ git+https://github.com/WISDEM/WOMBAT.git@develop",
+    "wombat>=0.11",
     "orbit-nrel>=1.2.1",
     "typer>=0.12.3",
 ]
