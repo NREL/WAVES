@@ -13,8 +13,8 @@ onsite: True
 mobilization_cost: 0 # assume 0 and add total investment cost as fixed cost on port costs
 mobilization_days: 0
 port_distance: 0  # will get automatically set from the port configuration if not provided
-workday_start: 6
-workday_end: 18
+workday_start: 0  #6 TNO's suggested change
+workday_end: 24 #18 TNO's suggested change
 strategy_threshold: 1  # needs to be here, but doesn't do anything
 charter_days: 3  # needs to be here, but doesn't do anything
 tow_speed: 9.26 # 9.26 kph = 5 knots
