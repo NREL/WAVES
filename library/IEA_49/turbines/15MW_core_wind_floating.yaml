@@ -228,6 +228,7 @@ generator:
     description: direct drive generator major replacement
 supporting_structure:
   name: supporting_structure
+  maintenance:
   - description: structural annual inspection
     time: 24
     materials: 600
