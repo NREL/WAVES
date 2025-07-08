@@ -3,6 +3,39 @@ capex_kw: 1300
 power_curve:
   file: 2020ATB_NREL_Reference_15MW_240.csv
   bin_width: 0.5
+scheduled_maintenance:
+  name: scheduled maintenance
+  maintenance:
+  - description: annual turbine inspection
+    time: 24
+    materials: 1500
+    service_equipment: CTV
+    frequency: 1
+    frequency_basis: date-years
+    start_date: "04/01/1999"
+  - description: structural annual inspection
+    time: 24
+    materials: 600
+    service_equipment: CTV
+    frequency: 1
+    frequency_basis: date-years
+    start_date: "04/01/1999"
+  - description: structural subsea inspection
+    time: 6
+    materials: 500
+    service_equipment: DSV
+    frequency: 2
+    frequency_basis: date-years
+    start_date: "04/01/1999"
+  failures:
+  - scale: 0
+    shape: 0
+    time: 0
+    materials: 0
+    service_equipment: CTV
+    operation_reduction: 0.0
+    level: 1
+    description: na
 power_converter:
   name: power converter
   maintenance:
@@ -193,13 +226,11 @@ rotor_blades:
 generator:
   name: generator
   maintenance:
-  - description: annual turbine inspection
-    time: 24
-    materials: 1500
+  - description: n/a
+    time: 0
+    materials: 0
     service_equipment: CTV
-    frequency: 1
-    frequency_basis: date-years
-    start_date: "04/01/1999" 
+    frequency: 0
   failures:
   - scale: 1.832
     shape: 1
@@ -229,20 +260,11 @@ generator:
 supporting_structure:
   name: supporting_structure
   maintenance:
-  - description: structural annual inspection
-    time: 24
-    materials: 600
+  - description: n/a
+    time: 0
+    materials: 0
     service_equipment: CTV
-    frequency: 1
-    frequency_basis: date-years
-    start_date: "04/01/1999"
-  - description: structural subsea inspection
-    time: 6
-    materials: 500
-    service_equipment: DSV
-    frequency: 2
-    frequency_basis: date-years
-    start_date: "04/01/1999" 
+    frequency: 0
   failures:
   - description: na
     scale: 0

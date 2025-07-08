@@ -1,7 +1,7 @@
 capacity_kw: 600
 capex_kw: 120
-transformer:
-  name: transformer
+scheduled_maintenance:
+  name: scheduled maintenance
   maintenance:
   - description: oss annual inspection
     time: 24
@@ -11,6 +11,23 @@ transformer:
     frequency_basis: date-years
     start_date: "04/01/1999"
     level: 1
+  failures:
+  - scale: 0
+    shape: 0
+    time: 0
+    materials: 0
+    service_equipment: CTV
+    operation_reduction: 0.0
+    level: 1
+    description: na
+transformer:
+  name: transformer
+  maintenance:
+  - description: n/a
+    time: 0
+    materials: 0
+    service_equipment: CTV
+    frequency: 0
   failures:
   - scale: 5
     shape: 1
