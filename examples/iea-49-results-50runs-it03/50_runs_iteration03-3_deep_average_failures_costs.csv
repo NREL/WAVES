@@ -1,0 +1,39 @@
+subassembly,task,annual_materials_cost,annual_occurrences
+anchor,anchor replacement,299008.0,0.633
+anchor,major anchor repair,52275.0,0.7509999999999999
+array cable,array cable major repair,37530.0,1.317
+array cable,array cable replacement,180620.0,0.846
+ballast pump,minor ballast pump repair,562.0,0.562
+drive_train,main shaft major repair,19502.0,1.3969999999999998
+drive_train,main shaft minor repair,11685.0,11.722000000000001
+drive_train,main shaft replacement,111128.0,0.479
+electrical system,power electrical system major repair,4260.0,0.852
+electrical system,power electrical system major replacement,5611.111111111111,0.11333333333333334
+electrical system,power electrical system minor repair,19266.0,19.36
+export cable,export cable major repair,1800.0,0.06000000000000001
+export cable,export cable subsea inspection,250.0,0.5
+generator,direct drive generator major repair,22657.2,1.5830000000000002
+generator,direct drive generator major replacement,111864.5,0.47700000000000004
+generator,direct drive generator minor repair,27661.0,27.776
+hydraulic pitch system,major pitch system repair,18570.6,9.829
+hydraulic pitch system,major pitch system replacement,1081.8181818181818,0.07727272727272728
+hydraulic pitch system,minor pitch system repair,22602.0,45.431999999999995
+mooring lines,buoyancy module replacement,166200.0,1.675
+mooring lines,marine growth removal,8692.5,5.822
+mooring lines,mooring line major repair,14060.0,0.7609999999999999
+mooring lines,mooring line replacement,79515.0,0.625
+power converter,power converter major repair,73087.0,10.468
+power converter,power converter minor repair,16444.0,16.474
+power converter,power converter replacement,125675.0,2.289
+rotor_blades,blades major repair,27159.3,0.528
+rotor_blades,blades major replacement,39308.333333333336,0.07361111111111111
+rotor_blades,blades minor repair,149526.0,25.057
+scheduled maintenance,annual turbine inspection,75297.0,67.0
+scheduled maintenance,oss annual inspection,500.0,1.0
+scheduled maintenance,structural annual inspection,30074.4,67.0
+scheduled maintenance,structural subsea inspection,14491.0,33.504
+transformer,oss major repair,6666.666666666667,0.06666666666666667
+transformer,oss minor repair,372.0,0.188
+yaw_system,yaw system major repair,936.0,0.314
+yaw_system,yaw system major replacement,839.2857142857143,0.06714285714285714
+yaw_system,yaw system minor repair,4483.0,9.014

@@ -1,21 +1,21 @@
 Metrics,IEA Task 49 Deep Case - Floating
 # OSS,1.0
 # Turbines,67.0
-AEP (MWh),3839914.7828097222
-AEP per kW (MWh/kW),3.8208107291639024
-Annual OpEx per kW ($/kW),46.36949754574804
+AEP (MWh),3819812.2378074336
+AEP per kW (MWh/kW),3.8008081968233167
+Annual OpEx per kW ($/kW),46.57744386000032
 CapEx ($),6257436644.718304
 CapEx per kW ($/kW),6226.3051191226905
-Energy Availability (%),80.11914276068418
-FCR (%),6.4799999999999995
+Energy Availability (%),79.6997067148371
+FCR (%),6.48
 Gross Capacity Factor (%),61.318711467574246
-LCOE ($/MWh),118.00048310669531
-Net Capacity Factor With All Losses (%),43.5867069263507
+LCOE ($/MWh),118.8613563103413
+Net Capacity Factor With All Losses (%),43.35852380587858
 Offtake Price ($/MWh),83.3
-OpEx ($),932026900.6695356
-OpEx per kW ($/kW),927.3899509149608
+OpEx ($),936206621.5860063
+OpEx per kW ($/kW),931.5488772000064
 Potential AEP from WOMBAT (kWh),5005505624.725
-Production AEP from WOMBAT (kWh),4010368197.3675003
+Production AEP from WOMBAT (kWh),3989373302.5004997
 Project Capacity (MW),1005.0
 Total Array Cable Length (km),133.2406333689631
 Total Export Cable Length (km),178.533251254

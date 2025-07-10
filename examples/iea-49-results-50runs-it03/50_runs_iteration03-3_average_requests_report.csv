@@ -1,0 +1,39 @@
+subassembly,task,total_requests,canceled_requests,incomplete_requests,completed_requests
+anchor,anchor replacement,12.66,0.0,0.98,11.68
+anchor,major anchor repair,15.02,0.0,1.08,13.94
+array cable,array cable major repair,26.34,0.0,1.32,25.02
+array cable,array cable replacement,16.92,0.0,0.5,16.42
+ballast pump,minor ballast pump repair,11.24,0.0,0.0,11.24
+drive_train,main shaft major repair,27.98,0.04,0.08,27.86
+drive_train,main shaft minor repair,234.88,0.44,0.74,233.7
+drive_train,main shaft replacement,9.58,0.0,0.0,9.58
+electrical system,power electrical system major repair,17.04,0.0,0.0,17.04
+electrical system,power electrical system major replacement,2.2666666666666666,0.0,0.022222222222222223,2.2444444444444445
+electrical system,power electrical system minor repair,387.32,0.12,1.88,385.32
+export cable,export cable major repair,1.2,0.0,0.0,1.2
+export cable,export cable subsea inspection,10.0,0.0,0.0,10.0
+generator,direct drive generator major repair,31.68,0.02,0.06,31.6
+generator,direct drive generator major replacement,9.54,0.0,0.08,9.46
+generator,direct drive generator minor repair,556.78,1.26,2.3,553.22
+hydraulic pitch system,major pitch system repair,196.58,0.0,1.1,195.48
+hydraulic pitch system,major pitch system replacement,1.5454545454545454,0.0,0.0,1.5454545454545454
+hydraulic pitch system,minor pitch system repair,908.88,0.24,4.56,904.08
+mooring lines,buoyancy module replacement,33.5,0.0,0.26,33.24
+mooring lines,marine growth removal,116.98,0.54,0.54,115.9
+mooring lines,mooring line major repair,15.22,0.0,1.16,14.06
+mooring lines,mooring line replacement,12.5,0.0,0.72,11.78
+power converter,power converter major repair,209.98,0.62,0.54,208.82
+power converter,power converter minor repair,335.82,6.34,0.6,328.88
+power converter,power converter replacement,45.78,0.0,0.08,45.7
+rotor_blades,blades major repair,10.56,0.0,0.06,10.5
+rotor_blades,blades major replacement,1.4722222222222223,0.0,0.0,1.4722222222222223
+rotor_blades,blades minor repair,501.26,0.12,2.72,498.42
+scheduled maintenance,annual turbine inspection,1340.0,0.0,336.04,1003.96
+scheduled maintenance,oss annual inspection,20.0,0.0,0.0,20.0
+scheduled maintenance,structural annual inspection,1340.0,0.0,337.52,1002.48
+scheduled maintenance,structural subsea inspection,670.08,0.0,90.44,579.64
+transformer,oss major repair,1.3333333333333333,0.0,0.0,1.3333333333333333
+transformer,oss minor repair,3.76,0.0,0.04,3.72
+yaw_system,yaw system major repair,6.28,0.0,0.04,6.24
+yaw_system,yaw system major replacement,1.3428571428571427,0.0,0.0,1.3428571428571427
+yaw_system,yaw system minor repair,180.28,0.0,0.96,179.32
