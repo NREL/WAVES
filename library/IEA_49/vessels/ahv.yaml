@@ -6,7 +6,6 @@ strategy_threshold: 1
 onsite: false
 capability: AHV
 speed: 24.08 # 24 kph = 13 knots
-tow_speed: 9.26
 unmoor_hours: 1
 reconnection_hours: 1
 mobilization_cost: 325000

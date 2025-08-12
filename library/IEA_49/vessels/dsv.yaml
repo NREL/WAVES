@@ -19,3 +19,5 @@ crew:
   n_day_rate: 0
   hourly_rate: 0
   n_hourly_rate: 0
+workday_start: 0
+workday_end: 24
