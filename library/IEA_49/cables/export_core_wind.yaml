@@ -1,6 +1,6 @@
 name: Export Cable
 maintenance:
-- description: Export Cable Subsea Inspection
+- description: Subsea Inspection
   time: 12
   materials: 500
   service_equipment: DSV
@@ -18,4 +18,4 @@ failures:
   - CAB
   replacement: false
   level: 2
-  description: Export Cable Major Repair
+  description: Major Repair

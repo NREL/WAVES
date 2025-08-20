@@ -1,9 +1,9 @@
 capacity_kw: 600
 capex_kw: 120
-scheduled_maintenance:
-  name: Scheduled Maintenance
+oss:
+  name: OSS
   maintenance:
-  - description: Oss Annual Inspection
+  - description: Annual Inspection
     time: 24
     materials: 500
     service_equipment: CTV
@@ -20,8 +20,8 @@ scheduled_maintenance:
     operation_reduction: 0.0
     level: 1
     description: Na
-transformer:
-  name: Transformer
+offshore_substation:
+  name: Offshore Substation
   maintenance:
   - description: N/A
     time: 0
@@ -36,7 +36,7 @@ transformer:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: Oss Minor Repair
+    description: Minor Repair
   - scale: 100
     shape: 1
     time: 60
@@ -44,4 +44,4 @@ transformer:
     service_equipment: CTV
     operation_reduction: 0
     level: 2
-    description: Oss Major Repair
+    description: Major Repair

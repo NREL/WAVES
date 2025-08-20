@@ -3,8 +3,8 @@ capex_kw: 1300
 power_curve:
   file: 2020ATB_NREL_Reference_15MW_240.csv
   bin_width: 0.5
-scheduled_maintenance:
-  name: Scheduled Maintenance
+wind_turbine:
+  name: Wind Turbine
   maintenance:
   - description: Annual Turbine Inspection
     time: 24
@@ -334,6 +334,15 @@ mooring_lines:
     replacement: true
     level: 3
     description: Mooring Line Replacement
+buoyancy_module:
+  name: Buoyancy Module
+  maintenance:
+  - description: N/A
+    time: 0
+    materials: 0
+    service_equipment: CTV
+    frequency: 0
+  failures:
   - scale: 30.3
     shape: 1
     time: 40
@@ -342,9 +351,9 @@ mooring_lines:
     operation_reduction: 1
     replacement: false
     level: 3
-    description: Buoyancy Module Replacement
+    description: Replacement
 drive_train:
-  name: Drive_Train
+  name: Drive Train
   maintenance:
   - description: N/A
     time: 0

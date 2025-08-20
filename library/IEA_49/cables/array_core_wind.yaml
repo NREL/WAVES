@@ -15,7 +15,7 @@ failures:
   - CAB
   replacement: false
   level: 2
-  description: Array Cable Major Repair
+  description: Major Repair
 - scale: 62.5
   shape: 1
   time: 360
@@ -25,4 +25,4 @@ failures:
   - CAB
   replacement: true
   level: 3
-  description: Array Cable Replacement
+  description: Replacement
