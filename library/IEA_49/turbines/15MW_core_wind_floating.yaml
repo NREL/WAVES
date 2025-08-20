@@ -4,29 +4,29 @@ power_curve:
   file: 2020ATB_NREL_Reference_15MW_240.csv
   bin_width: 0.5
 scheduled_maintenance:
-  name: scheduled maintenance
+  name: Scheduled Maintenance
   maintenance:
-  - description: annual turbine inspection
+  - description: Annual Turbine Inspection
     time: 24
     materials: 1500
     service_equipment: CTV
     frequency: 1
     frequency_basis: date-years
-    start_date: "04/01/1999"
-  - description: structural annual inspection
+    start_date: 04/01/1999
+  - description: Structural Annual Inspection
     time: 24
     materials: 600
     service_equipment: CTV
     frequency: 1
     frequency_basis: date-years
-    start_date: "04/01/1999"
-  - description: structural subsea inspection
+    start_date: 04/01/1999
+  - description: Structural Subsea Inspection
     time: 6
     materials: 500
     service_equipment: DSV
     frequency: 2
     frequency_basis: date-years
-    start_date: "04/01/1999"
+    start_date: 04/01/1999
   failures:
   - scale: 0
     shape: 0
@@ -35,11 +35,11 @@ scheduled_maintenance:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 1
-    description: na
+    description: Na
 power_converter:
-  name: power converter
+  name: Power Converter
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
@@ -52,7 +52,7 @@ power_converter:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 1
-    description: power converter minor repair
+    description: Power Converter Minor Repair
   - scale: 2.959
     shape: 1
     time: 28
@@ -60,7 +60,7 @@ power_converter:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: power converter major repair
+    description: Power Converter Major Repair
   - scale: 12.99
     shape: 1
     time: 170
@@ -69,11 +69,11 @@ power_converter:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: power converter replacement
+    description: Power Converter Replacement
 electrical_system:
-  name: electrical system
+  name: Electrical System
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
@@ -86,7 +86,7 @@ electrical_system:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 1
-    description: power electrical system minor repair
+    description: Power Electrical System Minor Repair
   - scale: 62.5
     shape: 1
     time: 28
@@ -94,7 +94,7 @@ electrical_system:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: power electrical system major repair
+    description: Power Electrical System Major Repair
   - scale: 500
     shape: 1
     time: 54
@@ -103,11 +103,11 @@ electrical_system:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: power electrical system major replacement
+    description: Power Electrical System Major Replacement
 hydraulic_pitch_system:
-  name: hydraulic pitch system
+  name: Hydraulic Pitch System
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
@@ -120,7 +120,7 @@ hydraulic_pitch_system:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: minor pitch system repair
+    description: Minor Pitch System Repair
   - scale: 5.587
     shape: 1
     time: 38
@@ -128,7 +128,7 @@ hydraulic_pitch_system:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 2
-    description: major pitch system repair
+    description: Major Pitch System Repair
   - scale: 1000
     shape: 1
     time: 75
@@ -137,11 +137,11 @@ hydraulic_pitch_system:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: major pitch system replacement
+    description: Major Pitch System Replacement
 ballast_pump:
-  name: ballast pump
+  name: Ballast Pump
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
@@ -154,11 +154,11 @@ ballast_pump:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: minor ballast pump repair
+    description: Minor Ballast Pump Repair
 yaw_system:
-  name: yaw_system
+  name: Yaw_System
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
@@ -171,7 +171,7 @@ yaw_system:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: yaw system minor repair
+    description: Yaw System Minor Repair
   - scale: 166.7
     shape: 1
     time: 40
@@ -179,7 +179,7 @@ yaw_system:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: yaw system major repair
+    description: Yaw System Major Repair
   - scale: 1000
     shape: 1
     time: 147
@@ -188,11 +188,11 @@ yaw_system:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: yaw system major replacement
+    description: Yaw System Major Replacement
 rotor_blades:
-  name: rotor_blades
+  name: Rotor_Blades
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
@@ -205,7 +205,7 @@ rotor_blades:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: blades minor repair
+    description: Blades Minor Repair
   - scale: 100
     shape: 1
     time: 42
@@ -213,7 +213,7 @@ rotor_blades:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: blades major repair
+    description: Blades Major Repair
   - scale: 1000
     shape: 1
     time: 864
@@ -222,11 +222,11 @@ rotor_blades:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: blades major replacement
+    description: Blades Major Replacement
 generator:
-  name: generator
+  name: Generator
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
@@ -239,7 +239,7 @@ generator:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 1
-    description: direct drive generator minor repair
+    description: Direct Drive Generator Minor Repair
   - scale: 33.33
     shape: 1
     time: 49
@@ -247,7 +247,7 @@ generator:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: direct drive generator major repair
+    description: Direct Drive Generator Major Repair
   - scale: 111.1111
     shape: 1
     time: 244
@@ -256,17 +256,17 @@ generator:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: direct drive generator major replacement
+    description: Direct Drive Generator Major Replacement
 supporting_structure:
-  name: supporting_structure
+  name: Supporting_Structure
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
     frequency: 0
   failures:
-  - description: na
+  - description: Na
     scale: 0
     shape: 0
     time: 0
@@ -275,9 +275,9 @@ supporting_structure:
     level: 0
     operation_reduction: 0
 anchor:
-  name: anchor
+  name: Anchor
   maintenance:
-  - description: na
+  - description: Na
     time: 0
     materials: 0
     service_equipment: DSV
@@ -290,7 +290,7 @@ anchor:
     service_equipment: AHV
     operation_reduction: 0
     level: 1
-    description: major anchor repair
+    description: Major Anchor Repair
   - scale: 80
     shape: 1
     time: 360
@@ -299,11 +299,11 @@ anchor:
     operation_reduction: 1
     replacement: true
     level: 2
-    description: anchor replacement
+    description: Anchor Replacement
 mooring_lines:
-  name: mooring lines
+  name: Mooring Lines
   maintenance:
-  - description: na
+  - description: Na
     time: 0
     materials: 0
     service_equipment: DSV
@@ -316,7 +316,7 @@ mooring_lines:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: marine growth removal
+    description: Marine Growth Removal
   - scale: 66.67
     shape: 1
     time: 240
@@ -324,7 +324,7 @@ mooring_lines:
     service_equipment: AHV
     operation_reduction: 0
     level: 2
-    description: mooring line major repair
+    description: Mooring Line Major Repair
   - scale: 80
     shape: 1
     time: 360
@@ -333,7 +333,7 @@ mooring_lines:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: mooring line replacement
+    description: Mooring Line Replacement
   - scale: 30.3
     shape: 1
     time: 40
@@ -342,11 +342,11 @@ mooring_lines:
     operation_reduction: 1
     replacement: false
     level: 3
-    description: buoyancy module replacement
+    description: Buoyancy Module Replacement
 drive_train:
-  name: drive_train
+  name: Drive_Train
   maintenance:
-  - description: n/a
+  - description: N/A
     time: 0
     materials: 0
     service_equipment: CTV
@@ -359,7 +359,7 @@ drive_train:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: main shaft minor repair
+    description: Main Shaft Minor Repair
   - scale: 38.462
     shape: 1
     time: 36
@@ -367,7 +367,7 @@ drive_train:
     service_equipment: TOW
     operation_reduction: 0
     level: 2
-    description: main shaft major repair
+    description: Main Shaft Major Repair
   - scale: 111.111
     shape: 1
     time: 144
@@ -376,4 +376,4 @@ drive_train:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: main shaft replacement
+    description: Main Shaft Replacement

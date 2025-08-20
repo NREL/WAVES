@@ -1,12 +1,12 @@
-name: export cable
+name: Export Cable
 maintenance:
-- description: export cable subsea inspection
+- description: Export Cable Subsea Inspection
   time: 12
   materials: 500
   service_equipment: DSV
   frequency: 2
   frequency_basis: date-years
-  start_date: "04/01/1999"
+  start_date: 04/01/1999
   level: 1
 failures:
 - scale: 50
@@ -18,4 +18,4 @@ failures:
   - CAB
   replacement: false
   level: 2
-  description: export cable major repair
+  description: Export Cable Major Repair

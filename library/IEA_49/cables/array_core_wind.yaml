@@ -1,6 +1,6 @@
-name: array cable
+name: Array Cable
 maintenance:
-- description: n/a
+- description: N/A
   time: 0
   materials: 0
   service_equipment: CTV
@@ -15,7 +15,7 @@ failures:
   - CAB
   replacement: false
   level: 2
-  description: array cable major repair
+  description: Array Cable Major Repair
 - scale: 62.5
   shape: 1
   time: 360
@@ -25,4 +25,4 @@ failures:
   - CAB
   replacement: true
   level: 3
-  description: array cable replacement
+  description: Array Cable Replacement
