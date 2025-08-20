@@ -1,5 +1,5 @@
 name: Eurkea Port
-tugboats: [tugboat1.yaml, tugboat2.yaml]
+tugboats: [[tugboat.yaml, 2]]
 n_crews: 3
 crew:
   day_rate: 0  # 80K/yr annual salary for 30 workers added as a fixed cost
