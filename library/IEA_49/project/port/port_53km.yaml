@@ -7,7 +7,7 @@ crew:
   hourly_rate: 0
   n_hourly_rate: 0
 max_operations: 2
-annual_fee: 25e6  # 24 million annually from ORBIT + assummed annual cost for 2 tugboats ($10m each divided by 20 years of operation, $1m per year on tugboats)
+annual_fee: 10000  # Heavy lift crane ownership as 25k/day access fee (remaining cost is in fixed costs)
 workday_start: 0
 workday_end: 24
 site_distance: 53

@@ -1,1 +1,9 @@
-labor: 5.97 # $80K/year * 60 workers / Capacity (kW)
+# Technical Personnel
+labor: 5.97 # €100K/year * 60 workers / 1,005,000 (kW); 6M/yr
+
+# O&M Base
+port_management: 0.497512  # 500k/yr
+operating_facilities: 1.492537  # 1.5M/yr
+project_management_administration: 7.960199  # 8M/yr
+
+# NOTE: Heavy Lift Crane (10M/yr) is the port's annual_fee
