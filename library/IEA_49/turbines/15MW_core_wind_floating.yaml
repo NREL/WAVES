@@ -52,7 +52,7 @@ power_converter:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 1
-    description: Power Converter Minor Repair
+    description: Minor Repair
   - scale: 2.959
     shape: 1
     time: 28
@@ -60,7 +60,7 @@ power_converter:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: Power Converter Major Repair
+    description: Major Repair
   - scale: 12.99
     shape: 1
     time: 170
@@ -69,7 +69,7 @@ power_converter:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: Power Converter Replacement
+    description: Replacement
 electrical_system:
   name: Electrical System
   maintenance:
@@ -86,7 +86,7 @@ electrical_system:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 1
-    description: Power Electrical System Minor Repair
+    description: Minor Repair
   - scale: 62.5
     shape: 1
     time: 28
@@ -94,7 +94,7 @@ electrical_system:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: Power Electrical System Major Repair
+    description: Major Repair
   - scale: 500
     shape: 1
     time: 54
@@ -103,7 +103,7 @@ electrical_system:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: Power Electrical System Major Replacement
+    description: Replacement
 hydraulic_pitch_system:
   name: Hydraulic Pitch System
   maintenance:
@@ -120,7 +120,7 @@ hydraulic_pitch_system:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: Minor Pitch System Repair
+    description: Minor Repair
   - scale: 5.587
     shape: 1
     time: 38
@@ -128,7 +128,7 @@ hydraulic_pitch_system:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 2
-    description: Major Pitch System Repair
+    description: Major Repair
   - scale: 1000
     shape: 1
     time: 75
@@ -137,7 +137,7 @@ hydraulic_pitch_system:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: Major Pitch System Replacement
+    description: Replacement
 ballast_pump:
   name: Ballast Pump
   maintenance:
@@ -154,7 +154,7 @@ ballast_pump:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: Minor Ballast Pump Repair
+    description: Minor Repair
 yaw_system:
   name: Yaw_System
   maintenance:
@@ -171,7 +171,7 @@ yaw_system:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: Yaw System Minor Repair
+    description: Minor Repair
   - scale: 166.7
     shape: 1
     time: 40
@@ -179,7 +179,7 @@ yaw_system:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: Yaw System Major Repair
+    description: Major Repair
   - scale: 1000
     shape: 1
     time: 147
@@ -188,9 +188,9 @@ yaw_system:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: Yaw System Major Replacement
+    description: Replacement
 rotor_blades:
-  name: Rotor_Blades
+  name: Rotor Blades
   maintenance:
   - description: N/A
     time: 0
@@ -205,7 +205,7 @@ rotor_blades:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: Blades Minor Repair
+    description: Minor Repair
   - scale: 100
     shape: 1
     time: 42
@@ -213,7 +213,7 @@ rotor_blades:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: Blades Major Repair
+    description: Major Repair
   - scale: 1000
     shape: 1
     time: 864
@@ -222,7 +222,7 @@ rotor_blades:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: Blades Major Replacement
+    description: Replacement
 generator:
   name: Generator
   maintenance:
@@ -239,7 +239,7 @@ generator:
     service_equipment: CTV
     operation_reduction: 0.0
     level: 1
-    description: Direct Drive Generator Minor Repair
+    description: Minor Repair
   - scale: 33.33
     shape: 1
     time: 49
@@ -247,7 +247,7 @@ generator:
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
-    description: Direct Drive Generator Major Repair
+    description: Major Repair
   - scale: 111.1111
     shape: 1
     time: 244
@@ -256,9 +256,9 @@ generator:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: Direct Drive Generator Major Replacement
+    description: Replacement
 supporting_structure:
-  name: Supporting_Structure
+  name: Supporting Structure
   maintenance:
   - description: N/A
     time: 0
@@ -290,7 +290,7 @@ anchor:
     service_equipment: AHV
     operation_reduction: 0
     level: 1
-    description: Major Anchor Repair
+    description: Major Repair
   - scale: 80
     shape: 1
     time: 360
@@ -299,7 +299,7 @@ anchor:
     operation_reduction: 1
     replacement: true
     level: 2
-    description: Anchor Replacement
+    description: Replacement
 mooring_lines:
   name: Mooring Lines
   maintenance:
@@ -316,7 +316,7 @@ mooring_lines:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: Marine Growth Removal
+    description: Minor Repair
   - scale: 66.67
     shape: 1
     time: 240
@@ -324,7 +324,7 @@ mooring_lines:
     service_equipment: AHV
     operation_reduction: 0
     level: 2
-    description: Mooring Line Major Repair
+    description: Major Repair
   - scale: 80
     shape: 1
     time: 360
@@ -333,7 +333,7 @@ mooring_lines:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: Mooring Line Replacement
+    description: Replacement
 buoyancy_module:
   name: Buoyancy Module
   maintenance:
@@ -368,7 +368,7 @@ drive_train:
     service_equipment: CTV
     operation_reduction: 0
     level: 1
-    description: Main Shaft Minor Repair
+    description: Minor Repair
   - scale: 38.462
     shape: 1
     time: 36
@@ -376,7 +376,7 @@ drive_train:
     service_equipment: TOW
     operation_reduction: 0
     level: 2
-    description: Main Shaft Major Repair
+    description: Major Repair
   - scale: 111.111
     shape: 1
     time: 144
@@ -385,4 +385,4 @@ drive_train:
     operation_reduction: 1
     replacement: true
     level: 3
-    description: Main Shaft Replacement
+    description: Replacement
