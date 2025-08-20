@@ -25,7 +25,7 @@ conenct_orbit_array_design: true
 fixed_charge_rate: 0.0648 # real FCR from national LCOE study, 25 year lifetime instead of 30
 discount_rate: 0.025
 loss_ratio: 0.1
-offtake_price: 83.30
+offtake_price: 80
 
 # Cash flow settings
 project_capex_date:
