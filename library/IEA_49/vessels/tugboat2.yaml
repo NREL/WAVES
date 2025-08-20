@@ -1,14 +1,16 @@
-name: Tugboat
+name: Tugboat 2
 #equipment_rate: 160000
 equipment_rate: 0 # assume 0 and add total investment cost as fixed cost on port costs
 capability: [TOW]
 speed: 22.224 # 12 knots
 strategy: requests
+strategy_threshold: 1
+charter_days: 1
 max_windspeed_transport: 14
 max_windspeed_repair: 14
 max_waveheight_transport: 3
 max_waveheight_repair: 1.5 #
-mobilization_cost: 0 # assume 0 and add total investment cost as fixed cost on port costs
+mobilization_cost: 0  # assume 0 and add total investment cost as fixed cost on port costs
 mobilization_days: 0
 workday_start: 0
 workday_end: 24
