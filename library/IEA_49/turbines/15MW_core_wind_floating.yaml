@@ -201,7 +201,7 @@ rotor_blades:
   - scale: 2.193
     shape: 1
     time: 18
-    materials: 6000
+    materials: 5000
     service_equipment: CTV
     operation_reduction: 0
     level: 1
@@ -209,7 +209,7 @@ rotor_blades:
   - scale: 100
     shape: 1
     time: 42
-    materials: 51732
+    materials: 43110
     service_equipment: TOW
     operation_reduction: 0.0
     level: 2
@@ -217,7 +217,7 @@ rotor_blades:
   - scale: 1000
     shape: 1
     time: 864
-    materials: 534000
+    materials: 445000
     service_equipment: TOW
     operation_reduction: 1
     replacement: true
