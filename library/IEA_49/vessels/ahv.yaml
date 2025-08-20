@@ -1,14 +1,15 @@
 name: Anchor Handling Tug
-charter_days: 1  
-equipment_rate: 42000
+charter_days: 1
+equipment_rate: 55000
 strategy: requests
-strategy_threshold: 1   
+strategy_threshold: 1
 onsite: false
 capability: AHV
-speed: 24.08 # 24 kph = 13 knots
+speed: 22.224 # 12 knots
+tow_speed: 9.26 # 5 knots
 unmoor_hours: 1
 reconnection_hours: 1
-mobilization_cost: 325000
+mobilization_cost: 770000
 mobilization_days: 14
 max_windspeed_transport: 20
 max_windspeed_repair: 20

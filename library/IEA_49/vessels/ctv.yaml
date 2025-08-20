@@ -1,12 +1,12 @@
 name: Crew Transfer Vessel
-equipment_rate: 3805.31  # 3500 EUR -> USD 3/31/23
+equipment_rate: 4380
 capability: CTV
-speed: 37.04 # 37 kph = 20 knots
+speed: 44.448 # 24 knots
 strategy: scheduled
-max_windspeed_transport: 12 # TNO suggestion
-max_windspeed_repair: 12 # TNO suggestion
-max_waveheight_transport: 1.5 # TNO suggestion
-max_waveheight_repair: 1.5 # TNO suggestion
+max_windspeed_transport: 12
+max_windspeed_repair: 12
+max_waveheight_transport: 1.5
+max_waveheight_repair: 1.5
 onsite: True
 mobilization_cost: 0
 mobilization_days: 0
@@ -14,7 +14,6 @@ start_month: 1
 start_day: 1
 end_month: 12
 end_day: 31
-#start_year: 2000
 start_year: 1999
 end_year: 2022
 crew_transfer_time: 0.25
