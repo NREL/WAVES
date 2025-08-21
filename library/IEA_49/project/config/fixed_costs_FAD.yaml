@@ -6,4 +6,7 @@ port_management: 0.497512  # 500k/yr
 operating_facilities: 1.492537  # 1.5M/yr
 project_management_administration: 7.960199  # 8M/yr
 
+# Ownership of 2 sets of 2 tugboats (1 pair needed for a single tow)
+onshore_electrical_maintenance: 43.58209  # 43.8M/yr
+
 # NOTE: Heavy Lift Crane (10M/yr) is the port's annual_fee

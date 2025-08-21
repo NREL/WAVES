@@ -1,6 +1,6 @@
 name: Export Cable
 maintenance:
-- description: Subsea Inspection
+- description: Export Cable Subsea Inspection
   time: 12
   materials: 500
   service_equipment: DSV

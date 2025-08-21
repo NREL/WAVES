@@ -71,7 +71,7 @@ power_converter:
     level: 3
     description: Replacement
 electrical_system:
-  name: Electrical System
+  name: Power Electrical System
   maintenance:
   - description: N/A
     time: 0
@@ -156,7 +156,7 @@ ballast_pump:
     level: 1
     description: Minor Repair
 yaw_system:
-  name: Yaw_System
+  name: Yaw System
   maintenance:
   - description: N/A
     time: 0
@@ -300,8 +300,8 @@ anchor:
     replacement: true
     level: 2
     description: Replacement
-mooring_lines:
-  name: Mooring Lines
+mooring_line:
+  name: Mooring Line
   maintenance:
   - description: Na
     time: 0

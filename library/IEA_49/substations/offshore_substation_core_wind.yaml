@@ -3,7 +3,7 @@ capex_kw: 120
 oss:
   name: OSS
   maintenance:
-  - description: Annual Inspection
+  - description: OSS Annual Inspection
     time: 24
     materials: 500
     service_equipment: CTV
