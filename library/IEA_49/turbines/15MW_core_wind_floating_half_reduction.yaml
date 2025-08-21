@@ -288,7 +288,7 @@ anchor:
     time: 240
     materials: 75000
     service_equipment: AHV
-    operation_reduction: 1.0
+    operation_reduction: 0.5
     level: 1
     description: Major Repair
   - scale: 80
@@ -322,7 +322,7 @@ mooring_line:
     time: 240
     materials: 20000
     service_equipment: AHV
-    operation_reduction: 1.0
+    operation_reduction: 0.5
     level: 2
     description: Major Repair
   - scale: 80
@@ -374,7 +374,7 @@ main_shaft:
     time: 36
     materials: 14000
     service_equipment: CTV
-    operation_reduction: 1.0
+    operation_reduction: 0.5
     level: 2
     description: Major Repair
   - scale: 111.111
