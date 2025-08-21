@@ -8,6 +8,7 @@ model (with WAVES supplement for additonal results calculation) and TNO's UWISE 
 #   "waves>=0.5.3",
 #   "wombat>=0.11.3",
 #   "rich",
+#   "openpyxl",
 # ]
 # ///
 
