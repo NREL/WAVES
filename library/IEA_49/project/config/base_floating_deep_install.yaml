@@ -7,12 +7,9 @@ site:
 plant:
   layout: grid
   num_turbines: 67
-  row_spacing: 6.63 
+  row_spacing: 6.63
   substation_distance: 1
-  turbine_spacing: 7.09 
-landfall:
-  interconnection_distance: 4 # deep site
-  trench_length: 6  # COE Review 2022
+  turbine_spacing: 7.09
 turbine: 15MW_generic
 oss_design:
   num_substations: 1
@@ -28,12 +25,11 @@ array_cable_install_vessel: example_cable_lay_vessel
 export_cable_install_vessel: example_cable_lay_vessel
 mooring_install_vessel: example_support_vessel
 oss_install_vessel: floating_heavy_lift_vessel
-support_vessel: example_support_vessel
 towing_vessel: example_towing_vessel
 ahts_vessel: example_support_vessel
 towing_vessel_groups:
   num_groups : 1 # note these numbers are different than the default for ORBIT- I believe ORCA assumes only one installation group of 3 vessels total for floating
-  station_keeping_vessels: 1
+  ahts_vessels: 1
   towing_vessels: 2
 
 # Module Specific
@@ -54,6 +50,9 @@ ArrayCableInstallation:
 export_system_design:
   cables: XLPE_1000m_220kV
   percent_added_length: 0.0
+  landfall:
+    interconnection_distance: 4 # deep site
+    trench_length: 6  # COE Review 2022
 mooring_system_design:
   anchor_type: Suction Pile
 mooring_system:
@@ -62,7 +61,7 @@ mooring_system:
   line_cost: 964522 #USD
   anchor_mass: 69.218 #t
   anchor_cost: 416760  #USD
-  anchor_type: Suction Pile 
+  anchor_type: Suction Pile
 
 # Configured Phases
 design_phases:
