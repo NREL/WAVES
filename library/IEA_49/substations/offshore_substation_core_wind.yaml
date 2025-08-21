@@ -42,6 +42,6 @@ offshore_substation:
     time: 60
     materials: 100000
     service_equipment: CTV
-    operation_reduction: 1
+    operation_reduction: 0.5
     level: 2
     description: Major Repair
