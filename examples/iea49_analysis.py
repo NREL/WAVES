@@ -158,6 +158,134 @@ def run_analysis(
     return project, run_time
 
 
+def calculate_monthly_work_orders(seed: int, project: Project) -> pd.DataFrame:
+    """Calculate the cumulative remaining work orders, and the number of submitted, canceled,
+    and completed worker orders by simulation month.
+
+    Parameters
+    ----------
+    seed : int
+        The iteration number for the a scenario.
+    project : waves.Project
+        The simulation object.
+
+    Returns
+    -------
+    pd.DataFrame : A monthly data frame of work order statuses.
+    """
+    repair_order = ["Minor Repair", "Major Repair", "Replacement"]
+    total_order = repair_order + ["Scheduled"]
+    ev = project.wombat.metrics.events
+    request_map = dict(ev.loc[ev.action.eq("repair request"), ["request_id", "reason"]].values)
+    base_df = ev[["year", "month", "duration"]].groupby(["year", "month"]).count()
+    base_df[total_order] = 0
+    base_df = base_df[total_order]
+
+    repair_requests = (
+        ev.loc[
+            ev.action.eq("repair request"),
+            ["year", "month", "request_id", "reason"],
+        ]
+        .drop_duplicates()
+        .groupby(["year", "month", "reason"])
+        .count()
+        .unstack()
+        .fillna(0)
+    )
+    repair_requests.columns = repair_requests.columns.droplevel(level=0)
+
+    maintenance_requests = (
+        ev.loc[
+            ev.action.eq("maintenance request"),
+            ["year", "month", "request_id"],
+        ]
+        .drop_duplicates()
+        .groupby(["year", "month"])
+        .count()
+        .rename(columns={"request_id": "Scheduled"})
+    )
+
+    canceled_repairs = (
+        ev.loc[
+            ev.action.eq("repair canceled"),
+            ["year", "month", "request_id", "duration"],
+        ]
+        .drop_duplicates()
+        .replace(request_map)
+        .groupby(["year", "month", "request_id"])
+        .count()
+        .unstack()
+        .fillna(0)
+    )
+    canceled_repairs.columns = canceled_repairs.columns.droplevel(level=0)
+
+    canceled_maintenance = (
+        ev.loc[
+            ev.action.eq("maintenance canceled"),
+            ["year", "month", "request_id"],
+        ]
+        .drop_duplicates()
+        .groupby(["year", "month"])
+        .count()
+        .rename(columns={"request_id": "Scheduled"})
+    )
+
+    complete_maintenance = (
+        ev.loc[
+            ev.action.eq("maintenance complete"),
+            ["year", "month", "request_id"],
+        ]
+        .drop_duplicates()
+        .groupby(["year", "month"])
+        .count()
+        .rename(columns={"request_id": "Scheduled"})
+    )
+
+    complete_repairs = (
+        ev.loc[
+            ev.action.eq("repair complete"),
+            ["year", "month", "request_id", "duration"],
+        ]
+        .drop_duplicates()
+        .replace(request_map)
+        .groupby(["year", "month", "request_id"])
+        .count()
+        .unstack()
+        .fillna(0)
+    )
+    complete_repairs.columns = complete_repairs.columns.droplevel(level=0)
+
+    requests = (
+        repair_requests.join(maintenance_requests).reindex_like(base_df).fillna(0).astype(int)
+    )
+    canceled = (
+        canceled_repairs.join(canceled_maintenance).reindex_like(base_df).fillna(0).astype(int)
+    )
+    complete = (
+        complete_repairs.join(complete_maintenance).reindex_like(base_df).fillna(0).astype(int)
+    )
+    total = requests.cumsum() - canceled.cumsum() - complete.cumsum()
+    work_orders = (
+        total.rename(columns={c: f"NumberOfWO_{c.replace(' ', '')}" for c in total_order})
+        .join(
+            requests.rename(
+                columns={c: f"NumberOfSubmittedWO_{c.replace(' ', '')}" for c in total_order}
+            )
+        )
+        .join(
+            canceled.rename(
+                columns={c: f"NumberOfCanceledWO_{c.replace(' ', '')}" for c in total_order}
+            )
+        )
+        .join(
+            complete.rename(
+                columns={c: f"NumberOfCompletedWO_{c.replace(' ', '')}" for c in total_order}
+            )
+        )
+    )
+    return work_orders
+
+
 def gather_project_results(seed: int, project: Project) -> pd.DataFrame:
     """Calculate the availability, revenue, O&M cost breakdown, failure rate, vessel hours at sea,
     utilization rate, and dispatch summaries; and combine them as a single row for concatenation.
@@ -178,9 +306,11 @@ def gather_project_results(seed: int, project: Project) -> pd.DataFrame:
     metrics = project.wombat.metrics
     vessels = [*project.wombat.service_equipment]
 
-    results = project.generate_report(metrics_configuration, simulation_name=str(seed))
+    results = project.generate_report(metrics_configuration, simulation_name=seed)  # type: ignore
     fixed_costs = metrics.project_fixed_costs(frequency="project", resolution="medium")
-    vessel_costs = metrics.equipment_costs(frequency="project", by_equipment=True)
+    vessel_costs = metrics.equipment_costs(
+        frequency="project", by_equipment=True
+    )  # TODO: This value is far too high, is there double/triple counting?
 
     # Fixed cost breakdown
     base_cols = ["operations_management_administration", "operating_facilities"]
@@ -200,6 +330,7 @@ def gather_project_results(seed: int, project: Project) -> pd.DataFrame:
     cost_cols = [c for c in results if c.startswith("OM_")]
     cost_cols.extend(["Revenue", "Downtime_Loss"])
     results[cost_cols] = results[cost_cols] / years / 1000 / project.capacity(units="mw")
+    results.index.name = "seed"
 
     # Corrective and scheduled maintenance summary
     failures = metrics.request_summary()
@@ -219,6 +350,7 @@ def gather_project_results(seed: int, project: Project) -> pd.DataFrame:
         .set_index("name")[["total_requests"]]
         .T.rename({"total_requests": seed})
     )
+    corrective.index.name = "seed"
 
     scheduled = _failures.loc[~is_corrective].sort_values(["subassembly", "task"])
     scheduled["name"] = (
@@ -230,18 +362,21 @@ def gather_project_results(seed: int, project: Project) -> pd.DataFrame:
         .T.rename({"total_requests": seed})
     )
     scheduled.columns = scheduled.T.index.str.split("_").str[1]
+    scheduled.index.name = "seed"
 
     # Vessel hours at sea
     vessel_hours = metrics.vessel_crew_hours_at_sea(
         frequency="project", by_equipment=True, vessel_crew_assumption={}
     )[vessels].rename({0: seed})
     vessel_hours.columns = [f"SeaHours_{col.replace(' ', '')}" for col in vessel_hours.columns]
+    vessel_hours.index.name = "seed"
 
     # Unscheduled, scheduled, and combined utilization rates
     utilization = metrics.service_equipment_utilization(frequency="project")[vessels].rename(
         {0: seed}
     )  # noqa: E501
     utilization.columns = [f"UtilizationRate_{col.replace(' ', '')}" for col in utilization.columns]
+    utilization.index.name = "seed"
 
     # Mobilization and chartering time summary
     mobilization_summary = metrics.dispatch_summary(frequency="project")
@@ -250,25 +385,31 @@ def gather_project_results(seed: int, project: Project) -> pd.DataFrame:
     mobilizations = mobilization_summary[["N Mobilizations"]].T.rename({"N Mobilizations": seed})[
         [v for v in vessels if v in mobilization_summary.index]
     ]
-    mobilizations.columns = [f"NumMob_{col.replace(' ', '')}" for col in mobilizations.columns]
-
     charter_period = mobilization_summary[["Average Charter Days"]].T.rename(
         {"Average Charter Days": seed}
     )[[v for v in vessels if v in mobilization_summary.index]]
+    charter_period = mobilizations
+
+    mobilizations.columns = [f"NumMob_{col.replace(' ', '')}" for col in mobilizations.columns]
     charter_period.columns = [
         f"CharterDay_{col.replace(' ', '')}" for col in charter_period.columns
     ]
+    mobilizations.index.name = "seed"
+    charter_period.index.name = "seed"
 
     # Combine all seed results
-    results = (
-        results.join(corrective / years)
-        .join(scheduled / years)
-        .join(vessel_hours / years)
-        .join(utilization)
-        .join(mobilizations / years)
-        .join(charter_period / years)
+    results = pd.concat(
+        (
+            results,
+            corrective / years,
+            scheduled / years,
+            vessel_hours / years,
+            utilization,
+            mobilizations / years,
+            charter_period / years,
+        ),
+        axis=1,
     )
-    results.index.name = "seed"
     return results
 
 
@@ -303,6 +444,7 @@ def gather_timeline_results(seed: int, project: Project) -> pd.DataFrame:
         metrics.task_completion_rate("both", "month-year").rename(
             columns={"Completion Rate": "CompletionRate_Both"}
         ),
+        calculate_monthly_work_orders(seed, project),
     ]
     results = pd.concat(results, axis=1)
     assert isinstance(results, pd.DataFrame)
