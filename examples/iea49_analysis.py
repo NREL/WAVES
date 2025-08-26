@@ -456,7 +456,7 @@ def gather_timeline_results(seed: int, project: Project) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    N = 2
+    N = 20
     scenarios = [
         "base",
     ]
