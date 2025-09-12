@@ -1,0 +1,215 @@
+#project type, can be "fixed", "floating" or "land"
+turbine_type: fixed
+
+# Primary model configurations
+orbit_config: base_fixed_bottom_2022_install.yaml
+wombat_config: base_fixed_bottom_2022_operations.yaml
+floris_config: base_fixed_bottom_2022_floris_jensen.yaml
+weather_profile: era5_40.0N_72.5W_1990_2020.csv
+
+# Shared input connections
+orbit_start_date: 1/1/1998
+orbit_weather_cols:
+- windspeed_100m
+- windspeed_10m
+- waveheight
+floris_wind_direction: wind_direction_100m
+floris_windspeed: windspeed_100m
+floris_x_col: floris_x
+floris_y_col: floris_y
+
+# Create the necessary connections
+# NOTE: these are default values, but worth highlighting for an example
+connect_floris_to_layout: true
+conenct_orbit_array_design: true
+
+# High-level project financials
+discount_rate: 0.025
+fixed_charge_rate: 0.0648 # real FCR from national LCOE study, 25 year lifetime instead of 30
+loss_ratio: 0.1
+offtake_price: 83.30
+
+# Cash flow settings
+project_capex_date:
+- !!python/tuple
+  - 1996
+  - 1
+- !!python/tuple
+  - 1996
+  - 7
+- !!python/tuple
+  - 1997
+  - 1
+- !!python/tuple
+  - 1997
+  - 7
+soft_capex_date: !!python/tuple
+- 1995
+- 1
+system_capex_date:
+- !!python/tuple
+  - 1996
+  - 1
+- !!python/tuple
+  - 1996
+  - 4
+- !!python/tuple
+  - 1996
+  - 7
+- !!python/tuple
+  - 1996
+  - 10
+- !!python/tuple
+  - 1997
+  - 1
+- !!python/tuple
+  - 1997
+  - 4
+- !!python/tuple
+  - 1997
+  - 7
+- !!python/tuple
+  - 1997
+  - 10
+- !!python/tuple
+  - 1998
+  - 1
+- !!python/tuple
+  - 1998
+  - 4
+- !!python/tuple
+  - 1998
+  - 7
+- !!python/tuple
+  - 1998
+  - 10
+- !!python/tuple
+  - 1999
+  - 1
+- !!python/tuple
+  - 1999
+  - 4
+- !!python/tuple
+  - 1999
+  - 7
+- !!python/tuple
+  - 1999
+  - 10
+turbine_capex_date:
+- !!python/tuple
+  - 1996
+  - 1
+- !!python/tuple
+  - 1996
+  - 4
+- !!python/tuple
+  - 1996
+  - 7
+- !!python/tuple
+  - 1996
+  - 10
+- !!python/tuple
+  - 1997
+  - 1
+- !!python/tuple
+  - 1997
+  - 4
+- !!python/tuple
+  - 1997
+  - 7
+- !!python/tuple
+  - 1997
+  - 10
+- !!python/tuple
+  - 1998
+  - 1
+- !!python/tuple
+  - 1998
+  - 4
+- !!python/tuple
+  - 1998
+  - 7
+- !!python/tuple
+  - 1998
+  - 10
+- !!python/tuple
+  - 1999
+  - 1
+- !!python/tuple
+  - 1999
+  - 4
+- !!python/tuple
+  - 1999
+  - 7
+- !!python/tuple
+  - 1999
+  - 10
+
+
+# CLI Arguments
+run:
+  which_floris: wind_rose  # month-based wind rose wake analysis
+  full_wind_rose: False  # use the WOMBAT date range
+  floris_reinitialize_kwargs:
+      cut_in_wind_speed: 3.0
+      cut_out_wind_speed: 25.0  # standard ws range
+report_config:
+  name: Base Fixed Bottom 2022
+  "# Turbines":
+    metric: n_turbines
+  Turbine Rating (MW):
+    metric: turbine_rating
+  Project Capacity (MW):
+    metric: capacity
+    kwargs:
+      units: mw
+  "# OSS":
+    metric: n_substations
+  Total Export Cable Length (km):
+    metric: export_system_total_cable_length
+  Total Array Cable Length (km):
+    metric: array_system_total_cable_length
+  CapEx ($):
+    metric: capex
+  CapEx per kW ($/kW):
+    metric: capex
+    kwargs:
+      per_capacity: kw
+  OpEx ($):
+    metric: opex
+  OpEx per kW ($/kW):
+    metric: opex
+    kwargs:
+      per_capacity: kw
+  AEP (MWh):
+    metric: energy_production
+    kwargs:
+      units: mw
+      aep: True
+      with_losses: True
+  AEP per kW (MWh/kW):
+    metric: energy_production
+    kwargs:
+      units: mw
+      per_capacity: kw
+      aep: True
+      with_losses: True
+  Net Capacity Factor With Wake Losses (%):
+    metric: capacity_factor
+    kwargs:
+      which: net
+  Net Capacity Factor With All Losses (%):
+    metric: capacity_factor
+    kwargs:
+      which: net
+      with_losses: True
+  Gross Capacity Factor (%):
+    metric: capacity_factor
+    kwargs:
+      which: gross
+  Energy Availability (%):
+    metric: availability
+    kwargs:
+      which: energy
+  LCOE ($/MWh):
+    metric: lcoe

@@ -1,0 +1,21 @@
+name: Cable Lay Vessel
+equipment_rate: 59797.73  # 55000 EUR -> USD 3/31/23
+capability: CAB
+speed: 25.93 # 25 kph = 14 knots
+strategy: requests
+strategy_threshold: 1
+max_windspeed_transport: 99
+max_windspeed_repair: 99
+max_waveheight_transport: 4.2
+max_waveheight_repair: 3.5
+onsite: false
+mobilization_cost: 543615.71  # 500000 EUR -> USD 3/31/23
+mobilization_days: 14
+charter_days: 10
+crew_transfer_time: 0.25
+n_crews: 1
+crew:
+  day_rate: 0  # cabling vessels include the technicians
+  n_day_rate: 0
+  hourly_rate: 0
+  n_hourly_rate: 0
