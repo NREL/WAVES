@@ -24,7 +24,7 @@ are expected to know how to work with each of these models to work with WAVES.
 
 ### Installation
 
-Requires Python 3.9 or 3.10.
+Requires Python 3.10+.
 
 For basic usage, users can install WAVES directly from PyPI, or from source for more advanced usage.
 
