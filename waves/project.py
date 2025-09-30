@@ -25,13 +25,9 @@ import matplotlib.pyplot as plt
 from attrs import field, define
 from ORBIT import ProjectManager, load_config
 from floris import WindRose, TimeSeries, FlorisModel
+from landbosse import landbosse_runner  # noqa: E402
 from wombat.core import Simulation
 from wombat.core.data_classes import FromDictMixin
-
-# TODO TEMP
-import sys
-sys.path.append(str(Path("./../LandBOSSE").resolve()))
-from landbosse import landbosse_runner  # noqa: E402
 
 from waves.utilities import (
     load_yaml,
@@ -1331,8 +1327,8 @@ class Project(FromDictMixin):
                 return self.orbit._phases["ElectricalDesign"].total_length
             except KeyError:
                 raise ValueError(
-                    "Neither an `ElectricalDesign` nor an `ExportSystemDesign` phase were defined to be"
-                    " able to calculate this metric."
+                    "Neither an `ElectricalDesign` nor an `ExportSystemDesign` phase were defined"
+                    " to be able to calculate this metric."
                 )
 
         elif self.landbosse_config is not None:
