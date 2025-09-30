@@ -11,14 +11,15 @@ description = "Wind Asset Value Estimation System"
 requires-python = ">=3.9, <3.11"
 license = {file = "LICENSE"}
 dependencies = [
+    "wombat>=0.9.3",
+    "orbit-nrel>=1.0.8",
+    "floris>=4.2.2",
+    "NREL-landbosse",
     "tqdm",
     "attrs",
     "pyyaml",
     "matplotlib>=3.6",
     "numpy-financial>=1.0.0",
-    "floris>=4.2.2",
-    "wombat>=0.9.3",
-    "orbit-nrel>=1.0.8",
     "typer>=0.12.3",
 ]
 keywords = [
