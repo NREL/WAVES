@@ -28,6 +28,7 @@ export_cable_install_vessel: demand_adjusted_cable_lay_vessel
 mooring_install_vessel: demand_adjusted_support_vessel
 oss_install_vessel: demand_adjusted_floating_heavy_lift_vessel
 support_vessel: demand_adjusted_support_vessel
+ahts_vessel: example_ahts_vessel
 towing_vessel: demand_adjusted_towing_vessel
 towing_vessel_groups:
   num_groups : 1 # note these numbers are different than the default for ORBIT- I believe ORCA assumes only one installation group of 3 vessels total for floating
@@ -45,14 +46,13 @@ array_system_design:
   - XLPE_630mm_66kV
   location_data: base_floating_2022_layout
 export_system_design:
-  cables: XLPE_1000m_220kV
+  cables: XLPE_1000mm_220kV
   percent_added_length: 0.0
 # Configured Phases
 design_phases:
 - CustomArraySystemDesign
-- ExportSystemDesign
+- ElectricalDesign
 - MooringSystemDesign
-- OffshoreSubstationDesign
 - SemiSubmersibleDesign
 install_phases:
   ArrayCableInstallation: 0

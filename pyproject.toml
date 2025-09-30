@@ -8,17 +8,18 @@ dynamic = ["version"]
 authors = [{name = "Rob Hammond", email = "rob.hammond@nrel.gov"}]
 readme = "README.md"
 description = "Wind Asset Value Estimation System"
-requires-python = ">=3.9, <3.11"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 dependencies = [
+    "wombat>=0.11",
+    "orbit-nrel>=1.2.1",
+    "floris>=4.2.2",
+    "NREL-landbosse",
     "tqdm",
     "attrs",
     "pyyaml",
     "matplotlib>=3.6",
     "numpy-financial>=1.0.0",
-    "floris==3.6",  # TODO: upgrade to FLORIS v4
-    "wombat>=0.9.3",
-    "orbit-nrel>=1.0.8",
     "typer>=0.12.3",
 ]
 keywords = [

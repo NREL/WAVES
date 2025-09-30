@@ -51,7 +51,6 @@ farm:
   - 4545.45
   - 3030.3
   - 1515.15
-
   layout_y:
   - 9090.9
   - 9090.9
@@ -103,8 +102,6 @@ farm:
   - 0
   - 0
   - 0
-
-  turbine_library_path: ../../turbines
   turbine_type:
   - 12MW_216m
   - 12MW_216m
@@ -156,18 +153,18 @@ farm:
   - 12MW_216m
   - 12MW_216m
   - 12MW_216m
-
 floris_version: v3.0.0
 flow_field:
   air_density: 1.225
   reference_wind_height: -1
-  turbulence_intensity: 0.06
   wind_directions:
   - 270.0
   wind_shear: 0.12
   wind_speeds:
-  - 8.98   # avg from weather profile in the Vineyard Wind 1 site
+  - 8.98
   wind_veer: 0.0
+  turbulence_intensities:
+  - 0.06
 logging:
   console:
     enable: true
@@ -224,3 +221,4 @@ wake:
       kb: 0.004
     jensen:
       we: 0.05
+  enable_active_wake_mixing: false

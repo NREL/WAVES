@@ -1,3 +1,6 @@
+#project type, can be "fixed", "floating" or "land" 
+turbine_type: fixed
+
 # Primary model configurations
 orbit_config: base_fixed_bottom_2022_install.yaml
 wombat_config: base_fixed_bottom_2022_operations.yaml
