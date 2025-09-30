@@ -4,9 +4,9 @@ Provides a series of validation functions for commonly used keyword arguments in
 """
 
 import inspect
-from collections.abc import Callable
-from functools import wraps
 from typing import Any
+from functools import wraps
+from collections.abc import Callable
 
 
 def check_dict_consistency(dict_values: dict, output_name: str):
