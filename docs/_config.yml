@@ -61,17 +61,17 @@ sphinx:
       use_repository_button: true
       use_edit_page_button: true
       show_toc_level: 2
-      repository_url: https://github.com/NREL/WAVES
+      repository_url: "https://github.com/NREL/WAVES"
       repository_branch: main
       icon_links: [
         {
             name: GitHub,
-            url: https://github.com/NREL/WAVES,
+            url: "https://github.com/NREL/WAVES",
             icon: fa-brands fa-github,
         },
         {
             name: PyPI version,
-            url: https://pypi.org/project/WAVES/,
+            url: "https://pypi.org/project/WAVES/",
             icon: "https://img.shields.io/pypi/v/WAVES?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F",
             type: url,
         },
