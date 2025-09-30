@@ -1,7 +1,8 @@
 # CHANGELOG
 
-## Unreleased (TBD)
+## v0.6 - 30 September 2025
 
+- Land-based wind analyses are now supported through the inclusion of LandBOSSE.
 - Site and project detail reporting functionality has been added:
   - `Project.generate_report_lcoe_breakdown()`
   - `Project.generate_report_project_details()`
