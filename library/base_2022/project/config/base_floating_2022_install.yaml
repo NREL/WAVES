@@ -1,0 +1,67 @@
+# floating base case
+site:
+  depth: 739 # COE Review 2021
+  distance: 189 # COE Review 2021
+  distance_to_landfall: 36 # COE Review 2021
+  mean_windspeed: 8.41  # avg from weather profile in the Humboldt site
+plant:
+  layout: grid
+  num_turbines: 50
+  row_spacing: 7  # COE Review 2021
+  substation_distance: 1
+  turbine_spacing: 7  # COE Review 2021
+landfall:
+  interconnection_distance: 8 # COE Review 2021
+  trench_length: 6  # COE Review 2021
+turbine: 12MW_generic
+oss_design:
+  num_substations: 1
+port:
+  monthly_rate: 2261495.841    # 2000000.0 # COE Review 2021 multiplied by % increase from 2020 to 2022 from U.S Bureau Labor Statistics
+  sub_assembly_lines: 3
+  turbine_assembly_cranes: 3
+  num_cranes : 3
+
+# Vessels
+array_cable_install_vessel: demand_adjusted_cable_lay_vessel
+export_cable_install_vessel: demand_adjusted_cable_lay_vessel
+mooring_install_vessel: demand_adjusted_support_vessel
+oss_install_vessel: demand_adjusted_floating_heavy_lift_vessel
+support_vessel: demand_adjusted_support_vessel
+ahts_vessel: example_ahts_vessel
+towing_vessel: demand_adjusted_towing_vessel
+towing_vessel_groups:
+  num_groups : 1 # note these numbers are different than the default for ORBIT- I believe ORCA assumes only one installation group of 3 vessels total for floating
+  station_keeping_vessels: 1
+  towing_vessels: 2
+
+# Module Specific
+substructure:
+  takt_time: 168
+OffshoreSubstationInstallation:
+  feeder: demand_adjusted_floating_barge
+array_system_design:
+  free_cable_length: 0.5
+  cables:
+  - XLPE_630mm_66kV
+  location_data: base_floating_2022_layout
+export_system_design:
+  cables: XLPE_1000mm_220kV
+  percent_added_length: 0.0
+# Configured Phases
+design_phases:
+- CustomArraySystemDesign
+- ElectricalDesign
+- MooringSystemDesign
+- SemiSubmersibleDesign
+install_phases:
+  ArrayCableInstallation: 0
+  ExportCableInstallation: 0
+  MooredSubInstallation: 0
+  MooringSystemInstallation: 0
+  OffshoreSubstationInstallation: 0
+
+project_parameters:
+  turbine_capex: 1700  # new assumed turbine price COE Review 2022
+  commissioning: 0.01
+  decommissioning: 0.15
