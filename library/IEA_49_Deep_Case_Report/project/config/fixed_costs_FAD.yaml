@@ -1,0 +1,5 @@
+labor: 5.97 # $80K/year * 60 workers / Capacity (kW)
+insurance: 11.2   # Added fixed O&M costs of $31/kW (excluding labor, labor in Wombat is also considered a fixed cost in this modeling setup) in line with IEA Task 49 Reference Basis suggestion
+marine_management: 3.9 # Added fixed O&M costs of $31/kW (excluding labor, labor in Wombat is also considered a fixed cost in this modeling setup) in line with IEA Task 49 Reference Basis suggestion
+weather_forecasting: 6.6 # Added fixed O&M costs of $31/kW (excluding labor, labor in Wombat is also considered a fixed cost in this modeling setup) in line with IEA Task 49 Reference Basis suggestion
+project_management_administration: 9.3 # Added fixed O&M costs of $31/kW (excluding labor, labor in Wombat is also considered a fixed cost in this modeling setup) in line with IEA Task 49 Reference Basis suggestion

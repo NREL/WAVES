@@ -1,0 +1,16 @@
+name: base_floating_deep
+weather: era5_41.0N_125.0W_1989_2019.csv
+service_equipment:
+  - [ctv.yaml, 3]
+  - [dsv.yaml, 2]
+  - ahv.yaml
+layout: base_floating_deep_layout.csv
+inflation_rate: 0
+fixed_costs: fixed_costs_FAD.yaml
+workday_start: 6
+workday_end: 22
+start_year: 1999
+end_year: 2018
+project_capacity: 1005
+port_distance: 53
+port: port_53km.yaml

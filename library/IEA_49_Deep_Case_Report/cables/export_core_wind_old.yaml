@@ -1,0 +1,19 @@
+name: export cable
+maintenance:
+  -
+    description: inspection
+    time: 12
+    materials: 600
+    service_equipment: DSV
+    frequency: 730
+failures:
+  6:
+    scale: 150
+    shape: 1
+    time: 360
+    materials: 400000
+    operation_reduction: 0
+    service_equipment: [CAB]
+    replacement: false
+    level: 4
+    description: cable major repair
