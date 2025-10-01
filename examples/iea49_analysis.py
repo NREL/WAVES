@@ -509,7 +509,6 @@ if __name__ == "__main__":
                     project, timing = run_analysis(
                         seed, rng, config, config_wombat, project=project
                     )
-                    print(f"{scenario:>30}, {seed:>2} run time: {timing:3.1f} seconds", flush=True)
                     scenario_project_results.append(gather_project_results(seed, project))
                     scenario_timeline_results.append(gather_timeline_results(seed, project))
 
