@@ -97,7 +97,6 @@ def check_monthly_wind_rose(
         # Find the missing combinations, add them to the wind rose DataFrame, and resort
         missing_wd = list(set(project_wd).difference(wind_rose.wind_directions))
         missing_ws = list(set(project_ws).difference(wind_rose.wind_speeds))
-    
         wr_df.loc[missing_wd] = 0
         wr_df.loc[:, missing_ws] = 0
         wr_df = wr_df.sort_index().T.sort_index().T

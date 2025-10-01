@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 from attrs import field, define
 from ORBIT import ProjectManager, load_config
 from floris import WindRose, TimeSeries, FlorisModel
+from landbosse import landbosse_runner  # noqa: E402
 from wombat.core import Simulation
 from wombat.core.data_classes import FromDictMixin
 
@@ -36,7 +37,7 @@ from waves.utilities import (
     calculate_monthly_wind_rose_results,
 )
 from waves.utilities.met_data import compute_shear, extrapolate_windspeed, fit_weibull_distribution
-from waves.utilities.validators import validate_common_inputs
+from waves.utilities.validators import check_dict_consistency, validate_common_inputs
 
 
 def convert_to_multi_index(
@@ -160,6 +161,9 @@ class Project(FromDictMixin):
     orbit_config : str | pathlib.Path | dict | None
         The ORBIT configuration file name or dictionary. If None, will not set up
         the ORBIT simulation component.
+    landbosse_config : str | pathlib.Path | dict | None
+        The LandBOSSE configuration file name or dictionary. If None, will not set up
+        the LandBOSSE simulation component.
     wombat_config : str | pathlib.Path | dict | None
         The WOMBAT configuration file name or dictionary. If None, will not set up
         the WOMBAT simulation component.
@@ -251,6 +255,9 @@ class Project(FromDictMixin):
     floris_config: str | Path | dict | None = field(
         default=None, validator=attrs.validators.instance_of((str, Path, dict, type(None)))
     )
+    landbosse_config: str | Path | dict | None = field(
+        default=None, validator=attrs.validators.instance_of((str, Path, dict, type(None)))
+    )
     orbit_start_date: str | None = field(default=None)
     orbit_weather_cols: list[str] = field(
         default=["windspeed", "wave_height"],
@@ -307,10 +314,12 @@ class Project(FromDictMixin):
     # Internally created attributes, aka, no user inputs to these
     weather: pd.DataFrame = field(init=False)
     orbit_config_dict: dict = field(factory=dict, init=False)
+    landbosse_config_dict: dict = field(factory=dict, init=False)
     wombat_config_dict: dict = field(factory=dict, init=False)
     floris_config_dict: dict = field(factory=dict, init=False)
     wombat: Simulation = field(init=False)
     orbit: ProjectManager = field(init=False)
+    landbosse: landbosse_runner.LandBOSSERunner = field(init=False)
     floris: FlorisModel = field(init=False)
     project_wind_rose: WindRose = field(init=False)
     monthly_wind_rose: WindRose = field(init=False)
@@ -331,11 +340,15 @@ class Project(FromDictMixin):
             self.weather = load_weather(weather_path)
 
         self.setup_orbit()
+        self.setup_landbosse()
         self.setup_wombat()
         self.setup_floris()
+
+        self.check_consistent_config()
+
         if self.connect_floris_to_layout:
             self.connect_floris_to_turbines()
-        if self.connect_orbit_array_design:
+        if self.connect_orbit_array_design and self.orbit_config is not None:
             self.connect_orbit_cable_lengths()
 
     # **********************************************************************************************
@@ -470,6 +483,7 @@ class Project(FromDictMixin):
         config_dict = {
             "library_path": str(self.library_path),
             "orbit_config": self.orbit_config_dict,
+            "landbosse_config": self.landbosse_config_dict,
             "wombat_config": wombat_config_dict,
             "floris_config": self.floris_config_dict,
             "weather_profile": self.weather_profile,
@@ -480,6 +494,42 @@ class Project(FromDictMixin):
             "floris_y_col": self.floris_y_col,
         }
         return config_dict
+
+    def check_consistent_config(self) -> None:
+        """Check the configurations of the models after they have been set up
+        but before running the model to ensure the basicinputs to each model are
+        consistent.
+        """
+        num_turbines = {}
+        project_capacity = {}
+        num_substations = {}
+
+        if bool(self.orbit_config_dict):
+            num_turbines["orbit"] = self.orbit_config_dict["plant"]["num_turbines"]
+            orbit_num_substation = self.orbit_config_dict.get("oss_design", {}).get(
+                "num_substations"
+            )
+            if orbit_num_substation is not None:
+                num_substations["orbit"] = orbit_num_substation
+
+        if bool(self.landbosse_config_dict):
+            num_turbines["landbosse"] = self.landbosse_config_dict["num_turbines"]
+            project_capacity["landbosse"] = (
+                self.landbosse_config_dict["turbine_rating_MW"] * num_turbines["landbosse"]
+            )
+            num_substations["landbosse"] = 1
+
+        if bool(self.wombat_config_dict):
+            num_turbines["wombat"] = len(self.wombat.windfarm.turbine_id)
+            project_capacity["wombat"] = self.wombat.windfarm.capacity / 1000.0
+            num_substations["wombat"] = len(self.wombat.windfarm.substation_id)
+
+        if bool(self.floris_config_dict):
+            num_turbines["floris"] = self.floris.n_turbines
+
+        check_dict_consistency(num_turbines, "num_turbines")
+        check_dict_consistency(project_capacity, "project_capacity")
+        check_dict_consistency(num_substations, "num_substations")
 
     def save_config(self, config_file: str | Path) -> None:
         """Saves a copy of the Project configuration settings to recreate the results of
@@ -521,6 +571,37 @@ class Project(FromDictMixin):
             self.orbit_config_dict,
             library_path=str(self.library_path),
             weather=self.weather.loc[:, self.orbit_weather_cols],
+        )
+
+    def setup_landbosse(self) -> None:
+        """Creates the LandBOSSE runner object and readies it for running an analysis."""
+        if self.landbosse_config is None:
+            print("No LandBOSSE configuration provided, skipping model setup.")
+            return
+
+        if isinstance(self.landbosse_config, str | Path):
+            landbosse_config = self.library_path / "project/config" / self.landbosse_config
+            self.landbosse_config_dict = load_config(landbosse_config)
+        else:
+            self.landbosse_config_dict = self.landbosse_config
+
+        if self.report_config is not None:
+            self.landbosse_config_dict["id"] = self.report_config["name"]
+        else:
+            self.landbosse_config_dict["id"] = ""
+
+        landbosse_table_path = (
+            self.library_path / "project/config" / self.landbosse_config_dict["data_tables"]
+        )
+        landbosse_table_dict = pd.read_excel(landbosse_table_path, sheet_name=None)
+        self.landbosse_config_dict["data_table"] = landbosse_table_dict
+
+        if TYPE_CHECKING:
+            assert isinstance(self.weather, pd.DataFrame)  # mypy helper
+
+        self.landbosse = landbosse_runner.LandBOSSERunner(
+            input_config=self.landbosse_config_dict,
+            weather=self.weather,
         )
 
     def setup_wombat(self) -> None:
@@ -745,14 +826,15 @@ class Project(FromDictMixin):
         """
         if set_kwargs is None:
             set_kwargs = {}
-        if full_wind_rose:
-            if TYPE_CHECKING:
-                assert isinstance(self.weather, pd.DataFrame)  # mypy helper
-            weather = self.weather.copy()
-        else:
-            if TYPE_CHECKING:
-                assert isinstance(self.weather, pd.DataFrame)  # mypy helper
-            weather = self.weather.loc[self.operations_start : self.operations_end]
+
+        if TYPE_CHECKING:
+            assert isinstance(self.weather, pd.DataFrame)  # mypy helper
+
+        weather = self.weather.copy()
+
+        if not full_wind_rose:
+            weather = weather.loc[self.operations_start : self.operations_end]
+
         if self.floris_turbulence_intensity is None:
             ti, *_ = self.floris_config_dict["flow_field"]["turbulence_intensities"]
             ti_col = "floris_turbulence_intensities"
@@ -860,18 +942,16 @@ class Project(FromDictMixin):
             A list of models to be skipped. This is intended to be used after a model is
             reinitialized with a new or modified configuration. Defaults to None.
 
-        Raises
-        ------
-        ValueError
-            Raised if ``which_floris`` is not one of "wind_rose" or "time_series".
         """
         if floris_kwargs is None:
             floris_kwargs = {}
         if skip is None:
             skip = []
 
-        if "orbit" not in skip:
+        if self.orbit_config is not None and "orbit" not in skip:
             self.orbit.run()
+        elif self.landbosse_config is not None and "landbosse" not in skip:
+            self.landbosse.run()
         if "wombat" not in skip:
             self.wombat.run()
         if "floris" not in skip:
@@ -880,6 +960,7 @@ class Project(FromDictMixin):
     def reinitialize(
         self,
         orbit_config: str | Path | dict | None = None,
+        landbosse_config: str | Path | dict | None = None,
         wombat_config: str | Path | dict | None = None,
         floris_config: str | Path | dict | None = None,
     ) -> None:
@@ -890,15 +971,24 @@ class Project(FromDictMixin):
         ----------
         orbit_config : str | Path | dict | None, optional
             ORBIT configuration file or dictionary. Defaults to None.
+        landbosse_config : (str | Path | dict | None, optional
+            LandBOSSE configuration file or dictionary. Defaults to None.
         wombat_config : str | Path | dict | None, optional
             WOMBAT configuation file or dictionary. Defaults to None.
         floris_config : (str | Path | dict | None, optional
             FLORIS configuration file or dictionary. Defaults to None.
+
+        Raises
+        ------
+        RuntimeError
+            Raised if neither ORBIT nor LandBOSSE are configured to run.
         """
         if orbit_config is not None:
             self.orbit_config = orbit_config
             self.setup_orbit()
-
+        elif landbosse_config is not None:
+            self.landbosse_config = landbosse_config
+            self.setup_landbosse()
         if wombat_config is not None:
             self.wombat_config = wombat_config
             self.setup_wombat()
@@ -906,6 +996,8 @@ class Project(FromDictMixin):
         if floris_config is not None:
             self.floris_config = floris_config
             self.setup_floris()
+
+        self.check_consistent_config()
 
         return
 
@@ -988,10 +1080,12 @@ class Project(FromDictMixin):
         """
         if self.orbit_config is not None:
             return self.orbit.num_turbines
+        elif self.landbosse_config is not None:
+            return self.landbosse.result.project_parameters["Number of turbines"]
         if self.wombat_config is not None:
             return len(self.wombat.windfarm.turbine_id)
         if self.floris_config is not None:
-            return self.floris.farm.n_turbines
+            return self.floris.n_turbines
         raise RuntimeError("No models were provided, cannot calculate value.")
 
     def turbine_rating(self) -> float:
@@ -1009,23 +1103,27 @@ class Project(FromDictMixin):
         """
         if self.orbit_config is not None:
             return self.orbit.turbine_rating
+        elif self.landbosse_config is not None:
+            return self.landbosse.result.project_parameters["Turbine rating MW"]
         if self.wombat_config is not None:
-            return self.wombat.windfarm.capacity / 1000 / self.n_turbines
+            return self.wombat.windfarm.capacity / 1000 / self.n_turbines()
         raise RuntimeError("No models were provided, cannot calculate value.")
 
     def n_substations(self) -> int:
-        """Calculates the number of subsations in the project.
+        """Calculates the number of substations in the project.
 
         Returns
         -------
         int
             The number of substations in the project.
         """
-        if self.orbit_config is not None or "OffshoreSubstationDesign" not in self.orbit._phases:
+        if self.orbit_config is not None and "OffshoreSubstationDesign" not in self.orbit._phases:
             return self.orbit_config_dict["oss_design"]["num_substations"]
+        elif self.landbosse_config is not None:
+            return 1
         if self.wombat_config is not None:
             return len(self.wombat.windfarm.substation_id)
-        raise RuntimeError("No models wer provided, cannot calculate value.")
+        raise RuntimeError("No models were provided, cannot calculate value.")
 
     @validate_common_inputs(which=["units"])
     def capacity(self, units: str = "mw") -> float:
@@ -1045,15 +1143,18 @@ class Project(FromDictMixin):
         ------
         RuntimeError
             Raised if no model configurations were provided on initialization.
-        ValueError
-            Raised if an invalid units input was provided.
         """
         if self.orbit_config is not None:
             capacity = self.orbit.capacity
+        elif self.landbosse_config is not None:
+            capacity = (
+                self.landbosse.result.project_parameters["Turbine rating MW"]
+                * self.landbosse.result.project_parameters["Number of turbines"]
+            )
         elif self.wombat_config is not None:
             capacity = self.wombat.windfarm.capacity / 1000
         else:
-            raise RuntimeError("No models wer provided, cannot calculate value.")
+            raise RuntimeError("No models were provided, cannot calculate value.")
 
         units = units.lower()
         if units == "kw":
@@ -1066,8 +1167,7 @@ class Project(FromDictMixin):
     def capex(
         self, breakdown: bool = False, per_capacity: str | None = None
     ) -> pd.DataFrame | float:
-        """Provides a thin wrapper to ORBIT's ``ProjectManager`` CapEx calculations that
-        can provide a breakdown of total or normalize it by the project's capacity, in MW.
+        """Calculate capital expenditure (CapEx) using ORBIT or LandBOSSE outputs.
 
         Parameters
         ----------
@@ -1079,21 +1179,23 @@ class Project(FromDictMixin):
             None, then the unnormalized CapEx is returned, otherwise it must be one of "kw",
             "mw", or "gw". Defaults to None.
 
+        Raises
+        ------
+        RuntimeError
+            Raised if neither ORBIT nor LandBOSSE have been run.
+
         Returns
         -------
         pd.DataFrame | float
             Project CapEx, normalized by :py:attr:`per_capacity`, if using, as either a
             pandas DataFrame if :py:attr:`breakdown` is True, otherwise, a float total.
         """
-        if breakdown:
-            capex = pd.DataFrame.from_dict(
-                self.orbit.capex_breakdown, orient="index", columns=["CapEx"]
-            )
-            capex.loc["Total"] = self.orbit.total_capex
+        if self.orbit_config is not None:
+            capex = self.capex_orbit(breakdown=breakdown)
+        elif self.landbosse_config is not None:
+            capex = self.capex_landbosse(breakdown=breakdown)
         else:
-            capex = pd.DataFrame(
-                [self.orbit.total_capex], columns=["CapEx"], index=pd.Index(["Total"])
-            )
+            raise RuntimeError("Must run ORBIT or LandBOSSE to calculate capex.")
 
         if per_capacity is None:
             if breakdown:
@@ -1108,6 +1210,64 @@ class Project(FromDictMixin):
             return capex
         return capex.values[0, 1]
 
+    def capex_orbit(self, *, breakdown: bool = False) -> pd.DataFrame:
+        """Provides a thin wrapper to ORBIT's ``ProjectManager`` CapEx calculations that
+        can provide a breakdown of total or normalize it by the project's capacity, in MW.
+
+        Parameters
+        ----------
+        breakdown : bool, optional
+            Provide a detailed view of the CapEx breakdown, and a total, which is
+            the sum of the BOS, turbine, project, and soft CapEx categories. Defaults to False.
+
+        Returns
+        -------
+        pd.DataFrame
+            Project CapEx, normalized by :py:attr:`per_capacity`, if using, as either a
+            pandas DataFrame if :py:attr:`breakdown` is True, otherwise, a float total.
+        """
+        if breakdown:
+            capex = pd.DataFrame.from_dict(
+                self.orbit.capex_breakdown, orient="index", columns=["CapEx"]
+            )
+            capex.loc["Total"] = self.orbit.total_capex
+        else:
+            capex = pd.DataFrame(
+                [self.orbit.total_capex], columns=["CapEx"], index=pd.Index(["Total"])
+            )
+
+        return capex
+
+    def capex_landbosse(self, *, breakdown: bool = False) -> pd.DataFrame | float:
+        """Calculates project CapEx from LandBOSSE result, in MW.
+
+        Parameters
+        ----------
+        breakdown : bool, optional
+            Provide a detailed view of the CapEx breakdown, and a total, which is
+            the sum of the BOS, turbine, project, and soft CapEx categories. Defaults to False.
+
+        Returns
+        -------
+        pd.DataFrame | float
+            Project CapEx, normalized by :py:attr:`per_capacity`, if using, as either a
+            pandas DataFrame if :py:attr:`breakdown` is True, otherwise, a float total.
+        """
+        capex_breakdown = (
+            self.landbosse.result.operation_cost.groupby("operation_id")["cost_per_project"]
+            .sum()
+            .rename("CapEx")
+        )
+        capex_total = capex_breakdown.sum()
+        if breakdown:
+            capex = capex_breakdown
+            capex.loc["Total"] = capex_total
+            capex = capex.to_frame()
+        else:
+            capex = pd.DataFrame(data=[capex_total], columns=["CapEx"], index=pd.Index(["Total"]))
+
+        return capex
+
     def array_system_total_cable_length(self):
         """Calculates the total length of the cables in the array system, in km.
 
@@ -1121,16 +1281,29 @@ class Project(FromDictMixin):
         ValueError
             Raised if neither ``ArraySystemDesign`` nor ``CustomArraySystem`` design
             were created in ORBIT.
+        RuntimeError
+            Raised if neither ORBIT nor LandBOSSE have been run.
         """
-        if "ArraySystemDesign" in self.orbit._phases:
-            array = self.orbit._phases["ArraySystemDesign"]
-        elif "CustomArraySystemDesign" in self.orbit._phases:
-            array = self.orbit._phases["CustomArraySystemDesign"]
-        else:
-            raise ValueError("No array system design was included in the ORBIT configuration.")
+        if self.orbit_config is not None:
+            if "ArraySystemDesign" in self.orbit._phases:
+                array = self.orbit._phases["ArraySystemDesign"]
+            elif "CustomArraySystemDesign" in self.orbit._phases:
+                array = self.orbit._phases["CustomArraySystemDesign"]
+            else:
+                raise ValueError("No array system design was included in the ORBIT configuration.")
 
-        # TODO: Fix ORBIT bug for nansum
-        return np.nansum(array.sections_cable_lengths)
+            # TODO: Fix ORBIT bug for nansum
+            return np.nansum(array.sections_cable_lengths)
+
+        elif self.landbosse_config is not None:
+            landbosse_vars = self.landbosse.result.model_variables
+            return landbosse_vars.loc[
+                landbosse_vars["variable_df_key_col_name"] == "Total cable length",
+                "value",
+            ].squeeze()
+
+        else:
+            raise RuntimeError("Must use either ORBIT or LandBOSSE to estimate array cable length")
 
     def export_system_total_cable_length(self):
         """Calculates the total length of the cables in the export system, in km.
@@ -1144,16 +1317,29 @@ class Project(FromDictMixin):
         ------
         ValueError
             Raised if ``ExportSystemDesign`` was not created in ORBIT.
+        RuntimeError
+            Raised if neither ORBIT nor LandBOSSE have been run.
         """
-        try:
-            return self.orbit._phases["ExportSystemDesign"].total_length
-        except KeyError:
-            return self.orbit._phases["ElectricalDesign"].total_length
-        except KeyError:
-            raise ValueError(
-                "Neither an `ElectricalDesign` nor an `ExportSystemDesign` phase were defined to be"
-                " able to calculate this metric."
-            )
+        if self.orbit_config is not None:
+            try:
+                return self.orbit._phases["ExportSystemDesign"].total_length
+            except KeyError:
+                return self.orbit._phases["ElectricalDesign"].total_length
+            except KeyError:
+                raise ValueError(
+                    "Neither an `ElectricalDesign` nor an `ExportSystemDesign` phase were defined"
+                    " to be able to calculate this metric."
+                )
+
+        elif self.landbosse_config is not None:
+            landbosse_vars = self.landbosse.result.model_variables
+            return landbosse_vars.loc[
+                landbosse_vars["variable_df_key_col_name"] == "Cable Length to Substation (km)",
+                "value",
+            ].squeeze()
+
+        else:
+            raise RuntimeError("Must use either ORBIT or LandBOSSE to estimate export cable length")
 
     # Operational metrics
 
@@ -1539,7 +1725,7 @@ class Project(FromDictMixin):
         elif self.turbine_type == "fixed":
             return 0.01
         else:
-            raise NotImplementedError("land-based is not currently modeled")
+            return 0.0
 
     def electrical_loss_ratio(self) -> float:
         """Calculate electrical losses based on ORBIT parameters.
@@ -1550,18 +1736,22 @@ class Project(FromDictMixin):
             The electrical loss ratio.
 
         """
-        depth = self.orbit_config_dict["site"]["depth"]
-        distance_to_landfall = self.orbit_config_dict["site"]["distance_to_landfall"]
-        # ORCA formula
-        electrical_loss_ratio = (
-            2.20224112
-            + 0.000604121 * depth
-            + 0.0407303367321603 * distance_to_landfall
-            + -0.0003712532582 * distance_to_landfall**2
-            + 0.0000016525338 * distance_to_landfall**3
-            + -0.000000003547544 * distance_to_landfall**4
-            + 0.0000000000029271 * distance_to_landfall**5
-        ) / 100
+        if self.orbit_config is not None:
+            depth = self.orbit_config_dict["site"]["depth"]
+            distance_to_landfall = self.orbit_config_dict["site"]["distance_to_landfall"]
+            # ORCA formula
+            electrical_loss_ratio = (
+                2.20224112
+                + 0.000604121 * depth
+                + 0.0407303367321603 * distance_to_landfall
+                + -0.0003712532582 * distance_to_landfall**2
+                + 0.0000016525338 * distance_to_landfall**3
+                + -0.000000003547544 * distance_to_landfall**4
+                + 0.0000000000029271 * distance_to_landfall**5
+            ) / 100
+        else:
+            # https://www.nrel.gov/docs/fy22osti/78715.pdf Fig30
+            electrical_loss_ratio = 0.028
 
         return electrical_loss_ratio
 
@@ -1596,7 +1786,7 @@ class Project(FromDictMixin):
         if environmental_loss_ratio is None:
             if (environmental_loss_ratio := self.environmental_loss_ratio) is None:
                 raise ValueError(
-                    "`environmental_loss_ratio` wasn neither defined in the Project settings nor"
+                    "`environmental_loss_ratio` was neither defined in the Project settings nor"
                     " provided in the keyword arguments."
                 )
 
@@ -1860,10 +2050,7 @@ class Project(FromDictMixin):
                     " keyword arguments."
                 )
 
-        if loss:
-            revenue = self.energy_losses(frequency=frequency, units="mw") * offtake_price
-        else:
-            revenue = self.energy_production(frequency=frequency, units="mw") * offtake_price
+        revenue = self.energy_production(frequency=frequency) * 1000 * offtake_price  # MWh
         if frequency != "project":
             if TYPE_CHECKING:
                 assert isinstance(revenue, pd.DataFrame)

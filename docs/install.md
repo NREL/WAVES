@@ -7,7 +7,7 @@
 
 ## Installation
 
-Requires Python 3.10.
+Requires Python 3.10+.
 
 For basic usage, users can install WAVES directly from PyPI, or from source for more advanced usage.
 

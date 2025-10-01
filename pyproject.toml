@@ -8,17 +8,18 @@ dynamic = ["version"]
 authors = [{name = "Rob Hammond", email = "rob.hammond@nrel.gov"}]
 readme = "README.md"
 description = "Wind Asset Value Estimation System"
-requires-python = ">=3.11, <3.14"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 dependencies = [
+    "wombat>=0.11",
+    "orbit-nrel>=1.2.1",
+    "floris>=4.2.2",
+    "NREL-landbosse",
     "tqdm",
     "attrs",
     "pyyaml",
     "matplotlib>=3.6",
     "numpy-financial>=1.0.0",
-    "floris>=4.2.2",
-    "wombat>=0.11.1",
-    "orbit-nrel>=1.2.1",
     "typer>=0.12.3",
 ]
 keywords = [
@@ -192,6 +193,8 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.per-file-ignores]
 "setup.py" = ["D104"]
+"examples/__init__.py" = ["D104"]
+"library/__init__.py" = ["D104"]
 "library/*/__init__.py" = ["D104"]
 "library/*/cables/__init__.py" = ["D104"]
 "library/*/project/__init__.py" = ["D104"]
