@@ -265,20 +265,24 @@ def calculate_monthly_work_orders(seed: int, project: Project) -> pd.DataFrame:
         complete_repairs.join(complete_maintenance).reindex_like(base_df).fillna(0).astype(int)
     )
     total = requests.cumsum() - canceled.cumsum() - complete.cumsum()
+    total.insert(0, "NumberOfWO", total.sum(axis=1))
+    requests.insert(0, "NumberOfSubmittedWO", requests.sum(axis=1))
+    canceled.insert(0, "NumberOfCanceledWO", canceled.sum(axis=1))
+    complete.insert(0, "NumberOfCompletedWO", complete.sum(axis=1))
     work_orders = (
         total.rename(columns={c: f"NumberOfWO_{c.replace(' ', '')}" for c in total_order})
         .join(
-            requests.rename(
+            requests.cumsum().rename(
                 columns={c: f"NumberOfSubmittedWO_{c.replace(' ', '')}" for c in total_order}
             )
         )
         .join(
-            canceled.rename(
+            canceled.cumsum().rename(
                 columns={c: f"NumberOfCanceledWO_{c.replace(' ', '')}" for c in total_order}
             )
         )
         .join(
-            complete.rename(
+            complete.cumsum().rename(
                 columns={c: f"NumberOfCompletedWO_{c.replace(' ', '')}" for c in total_order}
             )
         )
@@ -388,7 +392,6 @@ def gather_project_results(seed: int, project: Project) -> pd.DataFrame:
     charter_period = mobilization_summary[["Average Charter Days"]].T.rename(
         {"Average Charter Days": seed}
     )[[v for v in vessels if v in mobilization_summary.index]]
-    charter_period = mobilizations
 
     mobilizations.columns = [f"NumMob_{col.replace(' ', '')}" for col in mobilizations.columns]
     charter_period.columns = [
