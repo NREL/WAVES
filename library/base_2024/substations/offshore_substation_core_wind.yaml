@@ -1,30 +1,28 @@
-capacity_kw: 510  # ignore
-capex_kw: 140  # 120,000 EUR/MW rounded to 140 USD/kW; https://guidetoanoffshorewindfarm.com/wind-farm-costs
+capacity_kw: 600
+capex_kw: 120
 transformer:
   name: transformer
   maintenance:
-    -
-      description: annual inspection
-      time: 24
-      materials: 600
-      service_equipment: CTV
-      frequency: 365
+  - description: oss annual inspection
+    time: 24
+    materials: 684.8
+    service_equipment: CTV
+    frequency: 365
+    level: 1
   failures:
-    2:
-      scale: 5
-      shape: 1
-      time: 12
-      materials: 2400
-      service_equipment: CTV
-      operation_reduction: 0
-      level: 2
-      description: minor repair
-    4:
-      scale: 100
-      shape: 1
-      time: 60
-      materials: 120000
-      service_equipment: CTV
-      operation_reduction: 0.3
-      level: 4
-      description: major repair
+  - scale: 5
+    shape: 1
+    time: 12
+    materials: 2739.1
+    service_equipment: CTV
+    operation_reduction: 0
+    level: 1
+    description: oss minor repair
+  - scale: 100
+    shape: 1
+    time: 60
+    materials: 136954.7
+    service_equipment: CTV
+    operation_reduction: 0
+    level: 2
+    description: oss major repair

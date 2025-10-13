@@ -5,7 +5,7 @@ site:
   distance_to_landfall: 50  # COE Review 2021
   mean_windspeed: 9.17   # avg from weather profile in the Vineyard Wind 1 site
 plant:
-  layout: grid
+  layout: custom
   num_turbines: 50
   row_spacing: 7  # COE Review 2021
   substation_distance: 1

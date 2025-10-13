@@ -1,5 +1,5 @@
-name: port116
-tugboats: [tugboat1.yaml, tugboat2.yaml, ahv.yaml]
+name: base_port_116km
+tugboats: [tugboat1.yaml, tugboat2.yaml]
 max_operations: 2  # max number of turbines at the port at one time
 workday_start: 6
 workday_end: 18
@@ -10,4 +10,4 @@ crew:
   hourly_rate: 0
   n_hourly_rate: 0
 n_crews: 2  # maximum number of simultaneously operating crews to repair individual failures on a turbine
-annual_fee: 336000 #£450,000 per annum for a 1 GW wind farm. Includes costs associated with onshore logistics that involve support and resources to the wind farm operations, including quayside infrastructure, warehousing, logistics and operational planning -> equivalent to $560,000 per annum for 1 GW -> 0.56 $/kW -> 0.56 * 600000 kW =
+annual_fee: 300000 # Operations, maintenance and service port (fixed) from the WOMBAT_cost_history.xlsx database 0.5 $/kW-yr x 600,000 kW = $300,000 per year
