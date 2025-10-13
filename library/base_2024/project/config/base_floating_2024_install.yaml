@@ -7,14 +7,12 @@ site:
 plant:
   layout: custom
   num_turbines: 50
-  row_spacing: 7  # COE Review 2021
-  substation_distance: 1
-  turbine_spacing: 7  # COE Review 2021
+  row_spacing: 7 
+  turbine_spacing: 7 
 turbine: 12MW_generic
 oss_design:
   num_substations: 1
 port:
-  monthly_rate: 2261495.841    # 2000000.0 # COE Review 2021 multiplied by % increase from 2020 to 2022 from U.S Bureau Labor Statistics
   sub_assembly_lines: 3
   turbine_assembly_cranes: 3
   num_cranes : 3
@@ -39,6 +37,7 @@ OffshoreSubstationInstallation:
   feeder: demand_adjusted_floating_barge
 array_system_design:
   free_cable_length: 0.5
+  floating_cable_depth: 200
   cables:
   - XLPE_630mm_66kV
   location_data: base_floating_2024_layout
@@ -62,5 +61,5 @@ install_phases:
   OffshoreSubstationInstallation: 0
 
 project_parameters:
-  turbine_capex: 1700  # new assumed turbine price COE Review 2022
+  turbine_capex: 1770  # COWER: 2024 Edition; Turbine CapEx
   #supply_chain_capex: 756 # 439 $/kW for investments and 317 $/kW for vessels # commented out given DOE's comments about leaving this out for comparability with other technologies

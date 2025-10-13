@@ -7,12 +7,10 @@ site:
 plant:
   layout: custom
   num_turbines: 50
-  row_spacing: 7  # COE Review 2021
-  substation_distance: 1
-  turbine_spacing: 7  # COE Review 2021
+  row_spacing: 7 
+  turbine_spacing: 7 
 turbine: 12MW_generic
 port:
-  monthly_rate: 2261495.841    # 2000000.0 # COE Review 2021 multiplied by % increase from 2020 to 2022 from U.S Bureau Labor Statistics
   sub_assembly_lines: 1  # COE Review 2021
   turbine_assembly_cranes: 1  # COE Review 2021
 
@@ -26,9 +24,6 @@ oss_install_vessel: demand_adjusted_heavy_lift_vessel
 wtiv: demand_adjusted_wtiv
 
 # Module Specific
-monopile_design:
-  monopile_steel_cost: 3487.5 # 2250 # COE Review 2021 + applied % increase from 2020 to 2022 in steel costs according to 55 % Steel and Iron Price index increase
-  tp_steel_cost: 5006.5 # 3230 # COE Review 2021 + applied % increase from 2020 to 2022 in steel costs according to 55 % Steel and Iron Price index increase
 scour_protection_design:
   cost_per_tonne: 40  # COE Review 2021
   scour_protection_depth: 1  # COE Review 2021
@@ -66,5 +61,5 @@ install_phases:
   - 0.1
 
 project_parameters:
-  turbine_capex: 1700 # new assumed turbine price COE Review 2022
+  turbine_capex: 1770  # COWER: 2024 Edition; Turbine CapEx
   #supply_chain_capex: 756 # 439 $/kW for investments and 317 $/kW for vessels # commented out given DOE's comments about leaving this out for comparability with other technologies
