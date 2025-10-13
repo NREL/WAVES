@@ -41,7 +41,7 @@ array_system_design:
   free_cable_length: 0.5
   cables:
   - XLPE_630mm_66kV
-  location_data: base_floating_2022_layout
+  location_data: base_floating_2024_layout
 export_system_design:
   cables: XLPE_1000mm_220kV
   percent_added_length: 0.0

@@ -7,7 +7,7 @@ service_equipment:
   - clv.yaml
   - jackup.yaml
   - dsv.yaml
-layout: base_fixed_bottom_2022_layout.csv
+layout: base_fixed_bottom_2024_layout.csv
 inflation_rate: 0
 fixed_costs: fixed_costs_2022.yaml
 workday_start: 7

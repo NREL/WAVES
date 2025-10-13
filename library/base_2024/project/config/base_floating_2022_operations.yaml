@@ -6,7 +6,7 @@ service_equipment:
   - ctv3.yaml
   - clv.yaml
   - dsv.yaml
-layout: base_floating_2022_layout.csv
+layout: base_floating_2024_layout.csv
 inflation_rate: 0
 fixed_costs: fixed_costs_2022.yaml
 workday_start: 7
