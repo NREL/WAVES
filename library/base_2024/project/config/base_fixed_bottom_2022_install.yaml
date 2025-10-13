@@ -67,4 +67,4 @@ install_phases:
 
 project_parameters:
   turbine_capex: 1700 # new assumed turbine price COE Review 2022
-  supply_chain_capex: 756 # 439 $/kW for investments and 317 $/kW for vessels
+  #supply_chain_capex: 756 # 439 $/kW for investments and 317 $/kW for vessels # commented out given DOE's comments about leaving this out for comparability with other technologies
