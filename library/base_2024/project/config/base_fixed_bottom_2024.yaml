@@ -25,7 +25,7 @@ conenct_orbit_array_design: true
 
 # High-level project financials
 discount_rate: 0.025
-fixed_charge_rate: 0.0648 # real FCR from national LCOE study, 25 year lifetime instead of 30
+fixed_charge_rate: 0.0634 # real FCR from COWER: 2025 Edition draft as of 10/13/2025
 loss_ratio: 0.1
 offtake_price: 83.30
 
