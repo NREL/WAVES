@@ -30,19 +30,29 @@ towing_vessel_groups:
   ahts_vessels: 1
   towing_vessels: 2
 
+ArrayCableInstallation:
+  site:
+    distance: 7593 # cable lay vessel transporting cables from Arco Felice, Italy, assume same logistics as fixed
+ExportCableInstallation:
+  site:
+    distance: 116 # Assume Domestic, Charleston, SC,assume same logistics as fixed
+  export_system:
+    onshore_construction_cost: 120000000 # $120m in onshore cable construction work according to industry benchmark
+OffshoreSubstationInstallation:
+  feeder: floating_barge
+  num_feeders: 1
+
 # Module Specific
 substructure:
   takt_time: 168
-OffshoreSubstationInstallation:
-  feeder: floating_barge
 array_system_design:
   free_cable_length: 0.5
   floating_cable_depth: 200
   cables:
-  - XLPE_630mm_66kV
+  - XLPE_630mm_66kV_dynamic
   location_data: base_floating_2024_layout
 export_system_design:
-  cables: XLPE_1000mm_220kV
+  cables: XLPE_1200mm_220kV_dynamic # change to the 1200mm cable once pulling from right repo
   percent_added_length: 0.0
   landfall:
     interconnection_distance: 8 # COE Review 2021
@@ -63,3 +73,11 @@ install_phases:
 project_parameters:
   turbine_capex: 1770  # COWER: 2024 Edition; Turbine CapEx
   #supply_chain_capex: 756 # 439 $/kW for investments and 317 $/kW for vessels # commented out given DOE's comments about leaving this out for comparability with other technologies
+  interest_during_construction: 0.065  
+  construction_insurance_factor: 0.0207   # according to industry benchmark
+  decommissioning_factor: 0.2 #20% of installation costs according to industry benchmark
+  site_auction_price: 103519698 #Lease Auction Price $100m + Lease Rent Pre-COD 3,519,698 (Assume floating lease sale)
+  #250m according to industry benchmark
+  site_assessment_cost: 50000000  # modified so that total Project Development is 250m
+  construction_plan_cost: 10000000 # modified so that total Project Development is 250m       
+  installation_plan_cost: 100000000 # modified so that total Project Development is 250m

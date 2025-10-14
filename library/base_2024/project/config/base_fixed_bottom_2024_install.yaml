@@ -28,19 +28,31 @@ scour_protection_design:
   scour_protection_depth: 1  # COE Review 2021
 oss_design:
   num_substations: 1
+
+ArrayCableInstallation:
+  site:
+    distance: 7593 # cable lay vessel transporting cables from Arco Felice, Italy
+ExportCableInstallation:
+  site:
+    distance: 116 # Assume Domestic, Charleston, SC
+  export_system:
+    onshore_construction_cost: 120000000 # $120m in onshore cable construction work according to industry benchmark
+OffshoreSubstationInstallation:
+  feeder: example_heavy_feeder
+  num_feeders: 1
+  
+    
 array_system_design:
   cables:
   - XLPE_630mm_66kV
   location_data: base_fixed_bottom_2024_layout
 export_system_design:
-  cables: XLPE_1000mm_220kV
+  cables: XLPE_1200mm_220kV
   percent_added_length: 0.0
   landfall:
     interconnection_distance: 9  # COE Review 2021
     trench_length: 7   # COE Review 2021
-OffshoreSubstationInstallation:
-  feeder: example_heavy_feeder
-  num_feeders: 1
+
 # Configured Phases
 design_phases:
 - CustomArraySystemDesign
@@ -62,3 +74,11 @@ install_phases:
 project_parameters:
   turbine_capex: 1770  # COWER: 2024 Edition; Turbine CapEx
   #supply_chain_capex: 756 # 439 $/kW for investments and 317 $/kW for vessels # commented out given DOE's comments about leaving this out for comparability with other technologies
+  interest_during_construction: 0.065  
+  construction_insurance_factor: 0.0207   # according to industry benchmark
+  decommissioning_factor: 0.2 #20% of installation costs according to industry benchmark
+  site_auction_price: 5559666 #Lease Auction Price 2,039,968 + Lease Rent Pre-COD 3,519,698 (Assume OCS-A 0486)
+  #250m according to industry benchmark
+  site_assessment_cost: 50000000  # modified so that total Project Development is 250m
+  construction_plan_cost: 10000000 # modified so that total Project Development is 250m       
+  installation_plan_cost: 100000000 # modified so that total Project Development is 250m
