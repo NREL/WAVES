@@ -15,13 +15,12 @@ port:
   turbine_assembly_cranes: 1  # COE Review 2021
 
 # Vessels
-# TODO: CHECK IF THESE NEED TO MATCH ORBIT DEFAULTS
-array_cable_install_vessel: demand_adjusted_cable_lay_vessel
-export_cable_bury_vessel: demand_adjusted_cable_lay_vessel
-export_cable_install_vessel: demand_adjusted_cable_lay_vessel
-spi_vessel: demand_adjusted_scour_protection_vessel
-oss_install_vessel: demand_adjusted_heavy_lift_vessel
-wtiv: demand_adjusted_wtiv
+array_cable_install_vessel: example_cable_lay_vessel
+export_cable_bury_vessel: example_cable_lay_vessel
+export_cable_install_vessel: example_cable_lay_vessel
+spi_vessel: example_scour_protection_vessel
+oss_install_vessel: example_heavy_lift_vessel
+wtiv: example_wtiv
 
 # Module Specific
 scour_protection_design:
@@ -40,7 +39,7 @@ export_system_design:
     interconnection_distance: 9  # COE Review 2021
     trench_length: 7   # COE Review 2021
 OffshoreSubstationInstallation:
-  feeder: demand_adjusted_heavy_feeder_vessel
+  feeder: example_heavy_feeder
   num_feeders: 1
 # Configured Phases
 design_phases:

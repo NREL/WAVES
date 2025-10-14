@@ -18,13 +18,13 @@ port:
   num_cranes : 3
 
 # Vessels
-array_cable_install_vessel: demand_adjusted_cable_lay_vessel
-export_cable_install_vessel: demand_adjusted_cable_lay_vessel
-mooring_install_vessel: demand_adjusted_support_vessel
-oss_install_vessel: demand_adjusted_floating_heavy_lift_vessel
-ahts_vessel: demand_adjusted_support_vessel
+array_cable_install_vessel: example_cable_lay_vessel
+export_cable_bury_vessel: example_cable_lay_vessel
+export_cable_install_vessel: example_cable_lay_vessel
+mooring_install_vessel: example_support_vessel
+oss_install_vessel: floating_heavy_lift_vessel
 ahts_vessel: example_ahts_vessel
-towing_vessel: demand_adjusted_towing_vessel
+towing_vessel: example_towing_vessel
 towing_vessel_groups:
   num_groups : 1 # note these numbers are different than the default for ORBIT- I believe ORCA assumes only one installation group of 3 vessels total for floating
   ahts_vessels: 1
@@ -34,7 +34,7 @@ towing_vessel_groups:
 substructure:
   takt_time: 168
 OffshoreSubstationInstallation:
-  feeder: demand_adjusted_floating_barge
+  feeder: floating_barge
 array_system_design:
   free_cable_length: 0.5
   floating_cable_depth: 200
