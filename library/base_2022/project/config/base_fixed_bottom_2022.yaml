@@ -1,4 +1,4 @@
-#project type, can be "fixed", "floating" or "land" 
+#project type, can be "fixed", "floating" or "land"
 turbine_type: fixed
 
 # Primary model configurations

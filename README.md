@@ -24,7 +24,7 @@ reference guide, and examples.
 
 ## Requirements
 
-Python 3.9 or 3.10
+Python 3.10+, preferably 3.12
 
 ## Environment Setup
 
@@ -35,7 +35,7 @@ for the appropriate OS version.
 Using conda, create a new virtual environment:
 
 ```console
-conda create -n <environment_name> python=3.10
+conda create -n <environment_name> python=3.12
 conda activate <environment_name>
 conda install -c anaconda pip
 conda config --set pip_interop_enabled true
@@ -46,7 +46,7 @@ conda deactivate
 
 ## Installation
 
-Requires Python 3.10.
+Requires Python 3.10+.
 
 For basic usage, users can install WAVES directly from PyPI, or from source for more advanced usage.
 

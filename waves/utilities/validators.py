@@ -9,6 +9,34 @@ from functools import wraps
 from collections.abc import Callable
 
 
+def check_dict_consistency(dict_values: dict, output_name: str):
+    """Check a dictionary to ensure all values are equal to each other (or None).
+
+    Parameters
+    ----------
+    dict_values : dict
+        Dictionary containing values to checks.
+    output_name : str
+        Name of the output (for error messages only).
+
+    Raises
+    ------
+    ValueError
+        Raised if none of the items in the dict contain a non-None value.
+
+    ValueError
+        Raised if there is more than one distinct non-None value in the dict.
+    """
+    unique_values = set(dict_values.values())
+    num_unique_values = len(unique_values)
+    if num_unique_values == 0:
+        raise ValueError(f"No models produce an output for ``{output_name:s}``")
+    elif num_unique_values > 1:
+        raise ValueError(
+            f"Conflicting value of ``{output_name:s}`` between models: {str(dict_values):s}"
+        )
+
+
 def validate_frequency(frequency: str):
     """Checks that the :py:attr:`frequency` input is valid.
 
