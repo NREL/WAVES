@@ -5,6 +5,8 @@
 - Replaces the use of WOMBAT's weather profile for the internal `Project.weather` for
   all calculations ensuring analyses can be run without O&M, but still use basic
   sit statistics calculations.
+- Convert old-style WOMBAT failure data to the latest version in the `base_2022` example
+  library.
 
 ## v0.6 - 30 September 2025
 
