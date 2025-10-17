@@ -2963,8 +2963,8 @@ class Project(FromDictMixin):
                 self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),
                 np.mean(
                     compute_shear(
-                        weather.to_pandas(),
-                        self.identify_windspeed_columns_and_heights(weather.to_pandas()),
+                        weather,
+                        self.identify_windspeed_columns_and_heights(weather),
                         False,
                     )
                 ),

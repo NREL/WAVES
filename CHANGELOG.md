@@ -6,7 +6,8 @@
   all calculations ensuring analyses can be run without O&M, but still use basic
   sit statistics calculations.
 - Convert old-style WOMBAT failure data to the latest version in the `base_2022` example
-  library.
+  library, including updating the array cable layout to account for ORBIT fixes to the
+  cable carrying capacity.
 
 ## v0.6 - 30 September 2025
 
