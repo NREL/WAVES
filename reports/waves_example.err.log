@@ -1,0 +1,58 @@
+Traceback (most recent call last):
+  File "/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/nbclient/client.py", line 1319, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+start1 = perf_counter()
+project_fixed.run(
+    which_floris="wind_rose",  # month-based wind rose wake analysis
+    full_wind_rose=False,  # use the WOMBAT date range
+    floris_reinitialize_kwargs={"cut_in_wind_speed": 3.0, "cut_out_wind_speed": 25.0}  # standard ws range
+)
+project_fixed.wombat.env.cleanup_log_files()  # Delete logging data from the WOMBAT simulations
+end1 = perf_counter()
+
+start2 = perf_counter()
+project_floating.run(
+    which_floris="wind_rose",
+    full_wind_rose=False,
+    floris_reinitialize_kwargs=dict(cut_in_wind_speed=3.0, cut_out_wind_speed=25.0)
+)
+project_floating.wombat.env.cleanup_log_files()  # Delete logging data from the WOMBAT simulations
+end2 = perf_counter()
+
+print("-" * 29)  # separate our timing from the ORBIT and FLORIS run-time warnings
+print(f"Fixed run time: {end1 - start1:,.2f} seconds")
+print(f"Floating run time: {end2 - start2:,.2f} seconds")
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mTypeError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[5][39m[32m, line 2[39m
+[32m      1[39m start1 = perf_counter()
+[32m----> [39m[32m2[39m [43mproject_fixed[49m[43m.[49m[43mrun[49m[43m([49m
+[32m      3[39m [43m    [49m[43mwhich_floris[49m[43m=[49m[33;43m"[39;49m[33;43mwind_rose[39;49m[33;43m"[39;49m[43m,[49m[43m  [49m[38;5;66;43;03m# month-based wind rose wake analysis[39;49;00m
+[32m      4[39m [43m    [49m[43mfull_wind_rose[49m[43m=[49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m[43m  [49m[38;5;66;43;03m# use the WOMBAT date range[39;49;00m
+[32m      5[39m [43m    [49m[43mfloris_reinitialize_kwargs[49m[43m=[49m[43m{[49m[33;43m"[39;49m[33;43mcut_in_wind_speed[39;49m[33;43m"[39;49m[43m:[49m[43m [49m[32;43m3.0[39;49m[43m,[49m[43m [49m[33;43m"[39;49m[33;43mcut_out_wind_speed[39;49m[33;43m"[39;49m[43m:[49m[43m [49m[32;43m25.0[39;49m[43m}[49m[43m  [49m[38;5;66;43;03m# standard ws range[39;49;00m
+[32m      6[39m [43m)[49m
+[32m      7[39m project_fixed.wombat.env.cleanup_log_files()  [38;5;66;03m# Delete logging data from the WOMBAT simulations[39;00m
+[32m      8[39m end1 = perf_counter()
+
+[31mTypeError[39m: Project.run() got an unexpected keyword argument 'which_floris'
+

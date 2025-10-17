@@ -1,0 +1,995 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cost of Wind Energy Review 2022 &#8212; WAVES</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=30a733bc"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'waves_example';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Documentation" href="api.html" />
+    <link rel="prev" title="Contributor&#39;s Guide" href="contributing.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">WAVES</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NREL/WAVES" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/WAVES/" title="PyPI version" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://img.shields.io/pypi/v/WAVES?link=https%3A%2F%2Fpypi.org%2Fproject%2FWAVES%2F" class="icon-link-image" alt="PyPI version"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://mybinder.org/v2/gh/NREL/WAVES/main?filepath=examples" title="Binder" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="https://mybinder.org/badge_logo.svg" class="icon-link-image" alt="Binder"/></a>
+        </li>
+</ul></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">How to Use WAVES</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributor's Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Cost of Wind Energy Review 2022</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Documentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/waves.project.html">waves.project</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/waves.utilities.html">waves.utilities</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/waves.utilities.floris_runners.html">waves.utilities.floris_runners</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/waves.utilities.library.html">waves.utilities.library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/waves.utilities.met_data.html">waves.utilities.met_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/waves.utilities.validators.html">waves.utilities.validators</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES/edit/main/waves_example.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NREL/WAVES/issues/new?title=Issue%20on%20page%20%2Fwaves_example.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/waves_example.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Cost of Wind Energy Review 2022</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-and-styling">Imports and Styling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-the-wind-farm">Visualize the wind farm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-projects">Run the Projects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gather-the-results">Gather the results</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="cost-of-wind-energy-review-2022">
+<span id="example-cower-2022"></span><h1>Cost of Wind Energy Review 2022<a class="headerlink" href="#cost-of-wind-energy-review-2022" title="Link to this heading">#</a></h1>
+<p>Be sure to install <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;waves[examples]&quot;</span></code> (or <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;.[examples]&quot;</span></code>) to work with
+this example.</p>
+<p>This example will walk through the process of running a subset of the 2022 Cost of Wind Energy
+Review (COWER) analysis to demonstrate an analysis workflow. Please note, that this is not the exact
+workflow because it has been broken down to highlight some of the key features of WAVES. Similarly,
+this will stay up to date with WAVES's dependencies, namely ORBIT, WOMBAT, and FLORIS, so results
+may change slightly between this <em>example</em> relying on the configurations and the published results.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To run these examples from the command line, the below command can be used, which will dipslay and
+save the results by default, with an option to turn those features off. Use <code class="docutils literal notranslate"><span class="pre">waves</span> <span class="pre">--help</span></code> for more
+information in the command line wherever WAVES is installed.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: This is run from the top level of WAVES/</span>
+
+<span class="c1"># Run one example</span>
+waves<span class="w"> </span>library/base_2022<span class="w"> </span>base_fixed_bottom_2022.yaml
+
+<span class="c1"># Run both examples, but don&#39;t save the results</span>
+waves<span class="w"> </span>library/base_2022<span class="w"> </span>base_fixed_bottom_2022.yaml<span class="w"> </span>base_floating_2022.yaml<span class="w"> </span>--no-save-report
+</pre></div>
+</div>
+</div>
+<section id="imports-and-styling">
+<h2>Imports and Styling<a class="headerlink" href="#imports-and-styling" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">perf_counter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">waves</span><span class="w"> </span><span class="kn">import</span> <span class="n">Project</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">waves.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_yaml</span>
+
+<span class="c1"># Update core Pandas display settings</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">float_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:,.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_columns</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="mi">100</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">#</a></h2>
+<p>First, we need to set the library path, and then we'll load the configuration file, to show some of
+the configurations. For a complete guide and definition, please see either the
+<a class="reference external" href="https://nrel.github.io/WAVES/api.html">API documentation</a> or the
+<a class="reference external" href="https://nrel.github.io/WAVES/getting_started.html#configuring">How to use WAVES guide</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If your FLORIS installation is &lt;3.6, then the FLORIS configuration files in
+<code class="docutils literal notranslate"><span class="pre">library/base_2022/project/config/</span></code> will have to be updated so that line 107 (same line number for
+fixed bottom and floating) is using an absolute path like the example below.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># original, set to work with FLORIS &gt;= 3.6</span>
+<span class="nt">turbine_library_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../turbines</span>
+
+<span class="c1"># updated absolute path, replace &lt;path_to_waves&gt; in your own files</span>
+<span class="nt">turbine_library_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;path_to_waves&gt;/WAVES/library/base_2022/turbines/</span>
+</pre></div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">library_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;../library/base_2022/&quot;</span><span class="p">)</span>
+<span class="n">config_fixed</span> <span class="o">=</span> <span class="n">load_yaml</span><span class="p">(</span><span class="n">library_path</span> <span class="o">/</span> <span class="s2">&quot;project/config&quot;</span><span class="p">,</span> <span class="s2">&quot;base_fixed_bottom_2022.yaml&quot;</span><span class="p">)</span>
+<span class="n">config_floating</span> <span class="o">=</span> <span class="n">load_yaml</span><span class="p">(</span><span class="n">library_path</span> <span class="o">/</span> <span class="s2">&quot;project/config&quot;</span><span class="p">,</span> <span class="s2">&quot;base_floating_2022.yaml&quot;</span><span class="p">)</span>
+
+<span class="c1"># This example was designed prior to the FLORIS 3.6 release, so the path to the turbine library in</span>
+<span class="c1"># FLORIS must be manually updated, but this example must work for all users, so a dynamic method</span>
+<span class="c1"># is used below, ensuring this works for all users.</span>
+<span class="n">config_fixed</span><span class="p">[</span><span class="s2">&quot;floris_config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_yaml</span><span class="p">(</span><span class="n">library_path</span> <span class="o">/</span> <span class="s2">&quot;project/config&quot;</span><span class="p">,</span> <span class="n">config_fixed</span><span class="p">[</span><span class="s2">&quot;floris_config&quot;</span><span class="p">])</span>
+<span class="n">config_floating</span><span class="p">[</span><span class="s2">&quot;floris_config&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_yaml</span><span class="p">(</span><span class="n">library_path</span> <span class="o">/</span> <span class="s2">&quot;project/config&quot;</span><span class="p">,</span> <span class="n">config_floating</span><span class="p">[</span><span class="s2">&quot;floris_config&quot;</span><span class="p">])</span>
+
+<span class="n">config_fixed</span><span class="p">[</span><span class="s2">&quot;floris_config&quot;</span><span class="p">][</span><span class="s2">&quot;farm&quot;</span><span class="p">][</span><span class="s2">&quot;turbine_library_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">library_path</span> <span class="o">/</span> <span class="s2">&quot;turbines&quot;</span>
+<span class="n">config_floating</span><span class="p">[</span><span class="s2">&quot;floris_config&quot;</span><span class="p">][</span><span class="s2">&quot;farm&quot;</span><span class="p">][</span><span class="s2">&quot;turbine_library_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">library_path</span> <span class="o">/</span> <span class="s2">&quot;turbines&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we'll create a Project for each of the fixed bottom and floating offshore scenarios, showing
+the time it takes to initialize each project. Note that we're initializing using the
+<code class="docutils literal notranslate"><span class="pre">Project.from_dict()</span></code> <code class="docutils literal notranslate"><span class="pre">classmethod</span></code> because the configurations are designed to also work with the
+WAVES command line interface (CLI).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add in the library path for both configurations</span>
+<span class="n">config_fixed</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;library_path&quot;</span><span class="p">:</span> <span class="n">library_path</span><span class="p">,})</span>
+<span class="n">config_floating</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;library_path&quot;</span><span class="p">:</span> <span class="n">library_path</span><span class="p">,})</span>
+
+<span class="n">start1</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+
+<span class="n">project_fixed</span> <span class="o">=</span> <span class="n">Project</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">config_fixed</span><span class="p">)</span>
+
+<span class="n">end1</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+
+<span class="n">start2</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+
+<span class="n">project_floating</span> <span class="o">=</span> <span class="n">Project</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">config_floating</span><span class="p">)</span>
+
+<span class="n">end2</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fixed bottom loading time: </span><span class="si">{</span><span class="p">(</span><span class="n">end1</span><span class="o">-</span><span class="n">start1</span><span class="p">)</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Floating loading time: </span><span class="si">{</span><span class="p">(</span><span class="n">end2</span><span class="o">-</span><span class="n">start2</span><span class="p">)</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ORBIT library intialized at &#39;/home/runner/work/WAVES/WAVES/library/base_2022&#39;
+No LandBOSSE configuration provided, skipping model setup.
+No LandBOSSE configuration provided, skipping model setup.
+Fixed bottom loading time: 2.79 seconds
+Floating loading time: 2.63 seconds
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>UserWarning: /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/ORBIT/phases/design/array_system_design.py:1085
+Missing data in columns [&#39;bury_speed&#39;]; all values will be calculated.
+UserWarning: /opt/hostedtoolcache/Python/3.12.12/x64/lib/python3.12/site-packages/ORBIT/phases/design/array_system_design.py:1085
+Missing data in columns [&#39;bury_speed&#39;]; all values will be calculated.
+</pre></div>
+</div>
+</div>
+</div>
+<section id="visualize-the-wind-farm">
+<h3>Visualize the wind farm<a class="headerlink" href="#visualize-the-wind-farm" title="Link to this heading">#</a></h3>
+<p>Both projects use the same layout, so we'll plot just the fixed bottom plant, noting that the self-connected line at the &quot;OSS1&quot; indicates the unmodeled interconnection point via a modeled export cable.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">project_fixed</span><span class="o">.</span><span class="n">plot_farm</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/3e282213b7120c58e391856242f3ce83e79c84af75b4b0eb649ad7d2ec7897a5.png" src="_images/3e282213b7120c58e391856242f3ce83e79c84af75b4b0eb649ad7d2ec7897a5.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="run-the-projects">
+<h2>Run the Projects<a class="headerlink" href="#run-the-projects" title="Link to this heading">#</a></h2>
+<p>Now we'll, run all both the fixed-bottom and floating offshore wind scenarios. Notice that there are
+additional parameters to use for running the FLORIS model in WAVES: <code class="docutils literal notranslate"><span class="pre">&quot;wind_rose&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;time_series&quot;</span></code>. While time series is more accurate, it can take multiple hours to run for a
+20-year, hourly timeseries, and lead to similar results, so we choose the model that will take only
+a few minutes to run, instead.</p>
+<p>Additionally, the wind rose can be computed based on the full weather profile,
+<code class="docutils literal notranslate"><span class="pre">full_wind_rose=True</span></code>, for little added computation since WAVES computes a wind rose for each month
+of the year, for a more accurate energy output. However, we're using just the weather profile used
+in the O&amp;M phase: <code class="docutils literal notranslate"><span class="pre">full_wind_rose=False</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start1</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+<span class="n">project_fixed</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">which_floris</span><span class="o">=</span><span class="s2">&quot;wind_rose&quot;</span><span class="p">,</span>  <span class="c1"># month-based wind rose wake analysis</span>
+    <span class="n">full_wind_rose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># use the WOMBAT date range</span>
+    <span class="n">floris_reinitialize_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cut_in_wind_speed&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s2">&quot;cut_out_wind_speed&quot;</span><span class="p">:</span> <span class="mf">25.0</span><span class="p">}</span>  <span class="c1"># standard ws range</span>
+<span class="p">)</span>
+<span class="n">project_fixed</span><span class="o">.</span><span class="n">wombat</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">cleanup_log_files</span><span class="p">()</span>  <span class="c1"># Delete logging data from the WOMBAT simulations</span>
+<span class="n">end1</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+
+<span class="n">start2</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+<span class="n">project_floating</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="n">which_floris</span><span class="o">=</span><span class="s2">&quot;wind_rose&quot;</span><span class="p">,</span>
+    <span class="n">full_wind_rose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">floris_reinitialize_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">cut_in_wind_speed</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">cut_out_wind_speed</span><span class="o">=</span><span class="mf">25.0</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">project_floating</span><span class="o">.</span><span class="n">wombat</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">cleanup_log_files</span><span class="p">()</span>  <span class="c1"># Delete logging data from the WOMBAT simulations</span>
+<span class="n">end2</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">29</span><span class="p">)</span>  <span class="c1"># separate our timing from the ORBIT and FLORIS run-time warnings</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fixed run time: </span><span class="si">{</span><span class="n">end1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start1</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Floating run time: </span><span class="si">{</span><span class="n">end2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start2</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="n">start1</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">project_fixed</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">which_floris</span><span class="o">=</span><span class="s2">&quot;wind_rose&quot;</span><span class="p">,</span>  <span class="c1"># month-based wind rose wake analysis</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">full_wind_rose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># use the WOMBAT date range</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">floris_reinitialize_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cut_in_wind_speed&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span> <span class="s2">&quot;cut_out_wind_speed&quot;</span><span class="p">:</span> <span class="mf">25.0</span><span class="p">}</span>  <span class="c1"># standard ws range</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">project_fixed</span><span class="o">.</span><span class="n">wombat</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">cleanup_log_files</span><span class="p">()</span>  <span class="c1"># Delete logging data from the WOMBAT simulations</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="n">end1</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
+
+<span class="ne">TypeError</span>: Project.run() got an unexpected keyword argument &#39;which_floris&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Both of these examples can also be run via the CLI, though the FLORIS <code class="docutils literal notranslate"><span class="pre">turbine_library_path</span></code>
+configuration will have to be manually updated in each file to ensure the examples run.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">waves path/to/library/base_2022/ base_fixed_bottom_2022.yaml base_floating_bottom_2022.yaml --no-save-report</span>
+</pre></div>
+</div>
+</section>
+<section id="gather-the-results">
+<span id="example-cower-2022-results"></span><h2>Gather the results<a class="headerlink" href="#gather-the-results" title="Link to this heading">#</a></h2>
+<p>Another of the conveniences with using WAVES to run all three models is that some of the core
+metrics are wrapped in the <code class="docutils literal notranslate"><span class="pre">Project</span></code> API, with the ability to generate a report of a selection of
+the metrics.</p>
+<p>Below, we define the inputs for the report by the following paradigm, where the <code class="docutils literal notranslate"><span class="pre">&quot;metric&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;kwargs&quot;</span></code> keys must not be changed to ensure their values are read correctly. See the following
+setup for details.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">configuration_dictionary</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Descriptive Name of Metric&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;metric_method_name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;metric_kwarg_1&quot;</span><span class="p">:</span> <span class="s2">&quot;kwarg_1_value&quot;</span><span class="p">,</span> <span class="o">...</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Below, it can be seen that many metrics do not have the <code class="docutils literal notranslate"><span class="pre">&quot;kwargs&quot;</span></code> dictionary item. This is because
+an empty dictionary can be assumed to be used when no values need to be configured. In other words,
+the default method configurations will be relied on, if not otherwise specified.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">metrics_configuration</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;# Turbines&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;n_turbines&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;Turbine Rating (MW)&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;turbine_rating&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;Project Capacity (MW)&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;capacity&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;mw&quot;</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;# OSS&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;n_substations&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;Total Export Cable Length (km)&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;export_system_total_cable_length&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;Total Array Cable Length (km)&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;array_system_total_cable_length&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;CapEx ($)&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;capex&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;CapEx per kW ($/kW)&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;capex&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;per_capacity&quot;</span><span class="p">:</span> <span class="s2">&quot;kw&quot;</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;OpEx ($)&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;opex&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;OpEx per kW ($/kW)&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;opex&quot;</span><span class="p">,</span> <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;per_capacity&quot;</span><span class="p">:</span> <span class="s2">&quot;kw&quot;</span><span class="p">}},</span>
+    <span class="s2">&quot;AEP (MWh)&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;energy_production&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;mw&quot;</span><span class="p">,</span> <span class="s2">&quot;aep&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;with_losses&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;AEP per kW (MWh/kW)&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;energy_production&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;mw&quot;</span><span class="p">,</span> <span class="s2">&quot;per_capacity&quot;</span><span class="p">:</span> <span class="s2">&quot;kw&quot;</span><span class="p">,</span> <span class="s2">&quot;aep&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;with_losses&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;Net Capacity Factor With Wake Losses (%)&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;capacity_factor&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;which&quot;</span><span class="p">:</span> <span class="s2">&quot;net&quot;</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;Net Capacity Factor With All Losses (%)&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;capacity_factor&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;which&quot;</span><span class="p">:</span> <span class="s2">&quot;net&quot;</span><span class="p">,</span> <span class="s2">&quot;with_losses&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;Gross Capacity Factor (%)&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;capacity_factor&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;which&quot;</span><span class="p">:</span> <span class="s2">&quot;gross&quot;</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;Energy Availability (%)&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;availability&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kwargs&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;which&quot;</span><span class="p">:</span> <span class="s2">&quot;energy&quot;</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;LCOE ($/MWh)&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;lcoe&quot;</span><span class="p">},</span>
+<span class="p">}</span>
+
+
+<span class="c1"># Define the final order of the metrics in the resulting dataframes</span>
+<span class="n">metrics_order</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;# Turbines&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Turbine Rating (MW)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Project Capacity (MW)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;# OSS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Total Export Cable Length (km)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Total Array Cable Length (km)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FCR (%)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Offtake Price ($/MWh)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CapEx ($)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CapEx per kW ($/kW)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OpEx ($)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OpEx per kW ($/kW)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Annual OpEx per kW ($/kW)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Energy Availability (%)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Gross Capacity Factor (%)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Net Capacity Factor With Wake Losses (%)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Net Capacity Factor With All Losses (%)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AEP (MWh)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AEP per kW (MWh/kW)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LCOE ($/MWh)&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">capex_order</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Array System&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Export System&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Offshore Substation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Substructure&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Scour Protection&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Mooring System&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Turbine&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Array System Installation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Export System Installation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Offshore Substation Installation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Substructure Installation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Scour Protection Installation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Mooring System Installation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Turbine Installation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Soft&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Project&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Before we generate the report, let's see a CapEx breakdown of each scenario. To do this, we'll
+access ORBIT's <code class="docutils literal notranslate"><span class="pre">ProjectManager</span></code> object directly to access model-specific functionality. This is
+available for each model via:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">project.orbit</span></code>: provides access to ORBIT's <code class="docutils literal notranslate"><span class="pre">ProjectManager</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">project.wombat</span></code> provides access to WOMBAT's <code class="docutils literal notranslate"><span class="pre">Simulation</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">project.floris</span></code> provides access to FLORIS's <code class="docutils literal notranslate"><span class="pre">FlorisInterface</span></code></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Capture the CapEx breakdown from each scenario</span>
+<span class="n">df_capex_fixed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">project_fixed</span><span class="o">.</span><span class="n">orbit</span><span class="o">.</span><span class="n">capex_breakdown</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Component&quot;</span><span class="p">,</span> <span class="s2">&quot;CapEx ($) - Fixed&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">df_capex_floating</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">project_floating</span><span class="o">.</span><span class="n">orbit</span><span class="o">.</span><span class="n">capex_breakdown</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Component&quot;</span><span class="p">,</span> <span class="s2">&quot;CapEx ($) - Floating&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># Compute the normalized CapEx for each scenario</span>
+<span class="n">df_capex_fixed</span><span class="p">[</span><span class="s2">&quot;CapEx ($/kW) - Fixed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_capex_fixed</span><span class="p">[</span><span class="s2">&quot;CapEx ($) - Fixed&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">project_fixed</span><span class="o">.</span><span class="n">capacity</span><span class="p">(</span><span class="s2">&quot;kw&quot;</span><span class="p">)</span>
+<span class="n">df_capex_floating</span><span class="p">[</span><span class="s2">&quot;CapEx ($/kW) - Floating&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_capex_floating</span><span class="p">[</span><span class="s2">&quot;CapEx ($) - Floating&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">project_floating</span><span class="o">.</span><span class="n">capacity</span><span class="p">(</span><span class="s2">&quot;kw&quot;</span><span class="p">)</span>
+
+<span class="c1"># Combine the results into one, easy to view dataframe</span>
+<span class="n">df_capex</span> <span class="o">=</span> <span class="n">df_capex_fixed</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">df_capex_floating</span><span class="p">,</span>
+    <span class="n">on</span><span class="o">=</span><span class="s2">&quot;Component&quot;</span><span class="p">,</span>
+    <span class="n">how</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Component&quot;</span><span class="p">)</span>
+<span class="n">df_capex</span> <span class="o">=</span> <span class="n">df_capex</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">df_capex</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">capex_order</span><span class="p">)</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
+<span class="n">df_capex</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, let's generate the report, and then add in some additional reporting variables.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">project_name_fixed</span> <span class="o">=</span> <span class="s2">&quot;COE 2022 - Fixed&quot;</span>
+<span class="n">project_name_floating</span> <span class="o">=</span> <span class="s2">&quot;COE 2022 - Floating&quot;</span>
+
+<span class="c1"># Generate the reports using WAVES and the above configurations</span>
+<span class="c1"># NOTE: the results are transposed to view them more easily for the example, otherwise</span>
+<span class="c1"># each row would be a project, which is helpful for combining the results of many scenarios</span>
+<span class="n">report_df_fixed</span> <span class="o">=</span> <span class="n">project_fixed</span><span class="o">.</span><span class="n">generate_report</span><span class="p">(</span><span class="n">metrics_configuration</span><span class="p">,</span> <span class="n">project_name_fixed</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="n">report_df_floating</span> <span class="o">=</span> <span class="n">project_floating</span><span class="o">.</span><span class="n">generate_report</span><span class="p">(</span><span class="n">metrics_configuration</span><span class="p">,</span> <span class="n">project_name_floating</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+<span class="c1"># Gather some additional metadata and results from the projects</span>
+<span class="n">n_years_fixed</span> <span class="o">=</span> <span class="n">project_fixed</span><span class="o">.</span><span class="n">operations_years</span>
+<span class="n">n_years_floating</span> <span class="o">=</span> <span class="n">project_floating</span><span class="o">.</span><span class="n">operations_years</span>
+<span class="n">additional_reporting_fixed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;FCR (%)&quot;</span><span class="p">,</span> <span class="n">project_fixed</span><span class="o">.</span><span class="n">fixed_charge_rate</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;Offtake Price ($/MWh)&quot;</span><span class="p">,</span> <span class="n">project_fixed</span><span class="o">.</span><span class="n">offtake_price</span><span class="p">],</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;Annual OpEx per kW ($/kW)&quot;</span><span class="p">,</span>
+            <span class="n">report_df_fixed</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;OpEx per kW ($/kW)&quot;</span><span class="p">,</span> <span class="n">project_name_fixed</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_years_fixed</span>
+        <span class="p">],</span>
+    <span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Project&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">report_df_fixed</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Project&quot;</span><span class="p">)</span>
+
+<span class="n">additional_reporting_floating</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;FCR (%)&quot;</span><span class="p">,</span> <span class="n">project_floating</span><span class="o">.</span><span class="n">fixed_charge_rate</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">&quot;Offtake Price ($/MWh)&quot;</span><span class="p">,</span> <span class="n">project_floating</span><span class="o">.</span><span class="n">offtake_price</span><span class="p">],</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;Annual OpEx per kW ($/kW)&quot;</span><span class="p">,</span>
+            <span class="n">report_df_floating</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;OpEx per kW ($/kW)&quot;</span><span class="p">,</span> <span class="n">project_name_floating</span><span class="p">]</span> <span class="o">/</span> <span class="n">n_years_floating</span>
+        <span class="p">],</span>
+    <span class="p">],</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Project&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">report_df_floating</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+<span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Project&quot;</span><span class="p">)</span>
+
+<span class="c1"># Combine the additional metrics to the generated report</span>
+<span class="n">report_df_fixed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">report_df_fixed</span><span class="p">,</span> <span class="n">additional_reporting_fixed</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">metrics_order</span><span class="p">]</span>
+<span class="n">report_df_floating</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="n">report_df_floating</span><span class="p">,</span> <span class="n">additional_reporting_floating</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">metrics_order</span><span class="p">]</span>
+
+<span class="c1"># Combine both reports into one, easy to view dataframe</span>
+<span class="n">report_df</span> <span class="o">=</span> <span class="n">report_df_fixed</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">report_df_floating</span><span class="p">,</span>
+    <span class="n">how</span><span class="o">=</span><span class="s2">&quot;outer&quot;</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="n">report_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Metrics&quot;</span>
+
+<span class="c1"># Format percent-based rows to show as such, not as decimals</span>
+<span class="n">report_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">report_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)]</span> <span class="o">*=</span> <span class="mi">100</span>
+
+<span class="n">report_df</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="contributing.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Contributor's Guide</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="api.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API Documentation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-and-styling">Imports and Styling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-the-wind-farm">Visualize the wind farm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-projects">Run the Projects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gather-the-results">Gather the results</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Renewable Energy Laboratory
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
