@@ -1,5 +1,5 @@
 capacity_kw: 510
-capex_kw: 140
+capex_kw: 140  # 120,000 EUR/MW rounded to 140 USD/kW; https://guidetoanoffshorewindfarm.com/wind-farm-costs
 transformer:
   name: transformer
   maintenance:
