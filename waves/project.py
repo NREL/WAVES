@@ -2050,11 +2050,14 @@ class Project(FromDictMixin):
                     " keyword arguments."
                 )
 
-        revenue = self.energy_production(frequency=frequency) * 1000 * offtake_price  # MWh
+        if loss:
+            revenue = self.energy_losses(frequency=frequency) * 1000 * offtake_price  # MWh
+        else:
+            revenue = self.energy_production(frequency=frequency) * 1000 * offtake_price  # MWh
         if frequency != "project":
             if TYPE_CHECKING:
                 assert isinstance(revenue, pd.DataFrame)
-            revenue.columns = ["Revenue"]
+            revenue.columns = ["Loss" if loss else "Revenue"]
 
         if per_capacity is None:
             return revenue

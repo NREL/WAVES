@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+
+- Adds a `loss` boolean flag to `Project.revenue()` to get the lost revenue from
+  downtime, wakes, etc.
+- Adds the UWise comparison code and the updated configuration library `IEA_49/`.
+
 ## v0.6.1 - 17 October 2025
 
 - Replaces the use of WOMBAT's weather profile for the internal `Project.weather` for
