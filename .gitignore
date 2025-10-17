@@ -137,3 +137,4 @@ dmypy.json
 # Project specific
 *results/
 */weather/*.csv
+docs/_autosummary

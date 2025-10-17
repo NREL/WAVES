@@ -2897,6 +2897,7 @@ class Project(FromDictMixin):
                     configurations and available data.
         """
         # Define the project details template
+        weather = self.weather.loc[self.operations_start : self.operations_end]
         project_details = {
             "Assumption": [
                 "Wind plant capacity",
@@ -2967,10 +2968,8 @@ class Project(FromDictMixin):
                 self.average_wind_speed(self.orbit.config["turbine"]["hub_height"]),
                 np.mean(
                     compute_shear(
-                        self.wombat.env.weather.to_pandas(),
-                        self.identify_windspeed_columns_and_heights(
-                            self.wombat.env.weather.to_pandas()
-                        ),
+                        weather,
+                        self.identify_windspeed_columns_and_heights(weather),
                         False,
                     )
                 ),
@@ -3133,7 +3132,7 @@ class Project(FromDictMixin):
         pd.Series
             The wind speed data at :py:arg:`height`.
         """
-        weather = self.wombat.env.weather.to_pandas()
+        weather = self.weather.loc[self.operations_start : self.operations_end]
         ws_heights = self.identify_windspeed_columns_and_heights(weather)
         shear = compute_shear(weather, ws_heights)
         h1, *_ = ws_heights
@@ -3170,7 +3169,7 @@ class Project(FromDictMixin):
         """
         column_name = f"windspeed_{height}m"
 
-        weather = self.wombat.env.weather.to_pandas()
+        weather = self.weather.loc[self.operations_start : self.operations_end]
         ws_heights = self.identify_windspeed_columns_and_heights(weather)
 
         # Check if the column exists or if there is enough data to compute it
@@ -3253,7 +3252,7 @@ class Project(FromDictMixin):
         np.random.seed(random_seed)
 
         column_name = "windspeed_" + str(height) + "m"
-        weather = self.wombat.env.weather.to_pandas()
+        weather = self.weather.loc[self.operations_start : self.operations_end]
         ws_heights = self.identify_windspeed_columns_and_heights(weather)
 
         # Check if the column exists or if there is enough data to compute it
