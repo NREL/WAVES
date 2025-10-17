@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.6.1 - 17 October 2025
+
+- Replaces the use of WOMBAT's weather profile for the internal `Project.weather` for
+  all calculations ensuring analyses can be run without O&M, but still use basic
+  sit statistics calculations.
+- Convert old-style WOMBAT failure data to the latest version in the `base_2022` example
+  library, including updating the array cable layout to account for ORBIT fixes to the
+  cable carrying capacity.
+
 ## v0.6 - 30 September 2025
 
 - Land-based wind analyses are now supported through the inclusion of LandBOSSE.
