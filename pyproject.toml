@@ -90,7 +90,7 @@ all = ["waves[dev,docs,examples]"]
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = ["waves", "library/base/", "*.yaml", "*.csv"]
+include = ["waves", "library/base/", "library/IEA_49", "*.yaml", "*.csv"]
 exclude = [
     "*.tests",
     "*.tests.*",

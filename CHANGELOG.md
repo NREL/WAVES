@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## v0.7.1 - 17 August 2026
 
 - Adds a `loss` boolean flag to `Project.revenue()` to get the lost revenue from
   downtime, wakes, etc.
